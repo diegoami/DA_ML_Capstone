@@ -11,6 +11,7 @@ total_count = sum([len(files) for r, d, files in os.walk(root)])
 BATCH_SIZE=64
 NUM_WORKER=1
 MAX_EPOCHS=10
+num_epochs=10
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")
 torch.backends.cudnn.benchmark = True
@@ -62,12 +63,14 @@ dataloaders = {
 }
 #for batch_ndx, sample in enumerate(train_dataset_loader):
 #    print(batch_ndx)
-#       print(sample)
+#    print(sample)
 
-net = net.CNN()
+model = net.CNN().to(device)
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
+train_losses = []
+valid_losses = []
 
 #for epoch in range(MAX_EPOCHS):
     # Training
@@ -76,27 +79,53 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 #        local_batch, local_labels = local_batch.to(device), local_labels.to(device)
 
 
-for epoch in range(2):  # loop over the dataset multiple times
+for epoch in range(1, num_epochs + 1):
+    # keep-track-of-training-and-validation-loss
+    train_loss = 0.0
+    valid_loss = 0.0
 
-    running_loss = 0.0
-    for i, data in enumerate(train_dataset_loader, 0):
-        # get the inputs; data is a list of [inputs, labels]
-        inputs, labels = data
+    # training-the-model
+    model.train()
+    for data, target in train_dataset_loader:
+        # move-tensors-to-GPU
+        data = data.to(device)
+        target = target.to(device)
 
-        # zero the parameter gradients
+        # clear-the-gradients-of-all-optimized-variables
         optimizer.zero_grad()
-
-        # forward + backward + optimize
-        outputs = net(inputs)
-        loss = criterion(outputs, labels)
+        # forward-pass: compute-predicted-outputs-by-passing-inputs-to-the-model
+        output = model(data)
+        # calculate-the-batch-loss
+        loss = criterion(output, target)
+        # backward-pass: compute-gradient-of-the-loss-wrt-model-parameters
         loss.backward()
+        # perform-a-ingle-optimization-step (parameter-update)
         optimizer.step()
+        # update-training-loss
+        train_loss += loss.item() * data.size(0)
 
-        # print statistics
-        running_loss += loss.item()
- #       if i % 2000 == 1999:    # print every 2000 mini-batches
-        print('[%d, %5d] loss: %.3f' %
-              (epoch + 1, i + 1, running_loss / 2000))
-        running_loss = 0.0
+    # validate-the-model
+    model.eval()
+    for data, target in valid_dataset_loader:
+        data = data.to(device)
+        target = target.to(device)
+
+        output = model(data)
+
+        loss = criterion(output, target)
+
+        # update-average-validation-loss
+        valid_loss += loss.item() * data.size(0)
+
+    # calculate-average-losses
+    train_loss = train_loss / len(train_dataset_loader.sampler)
+    valid_loss = valid_loss / len(valid_dataset_loader.sampler)
+    train_losses.append(train_loss)
+    valid_losses.append(valid_loss)
+
+    # print-training/validation-statistics
+    print('Epoch: {} \tTraining Loss: {:.6f} \tValidation Loss: {:.6f}'.format(
+        epoch, train_loss, valid_loss))
 
 print('Finished Training')
+torch.save(net, 'model.pth')
