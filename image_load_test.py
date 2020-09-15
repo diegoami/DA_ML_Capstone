@@ -104,7 +104,7 @@ for epoch in range(1, num_epochs + 1):
         optimizer.step()
         # update-training-loss
         train_loss += loss.item() * data.size(0)
-
+        print(f'Batch tr')
     # validate-the-model
     model.eval()
     for data, target in valid_dataset_loader:
