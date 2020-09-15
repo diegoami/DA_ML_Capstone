@@ -14,6 +14,7 @@ MAX_EPOCHS=10
 num_epochs=10
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")
+print(device)
 torch.backends.cudnn.benchmark = True
 
 # Parameters
