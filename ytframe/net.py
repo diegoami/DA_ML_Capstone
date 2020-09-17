@@ -8,7 +8,7 @@ class CNN(nn.Module):
         self.conv1 = nn.Conv2d(in_channels=3, out_channels=10, kernel_size=3)
         self.conv2 = nn.Conv2d(10, 20, kernel_size=3)
         self.conv2_drop = nn.Dropout2d()
-        self.fc1 = nn.Linear(720, 1024)
+        self.fc1 = nn.Linear(3920, 1024)
         self.fc2 = nn.Linear(1024, 8)
 
     def forward(self, x):

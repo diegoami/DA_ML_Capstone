@@ -8,22 +8,22 @@ import torch.nn as nn
 
 root = 'wendy_cnn_frames_data'
 total_count = sum([len(files) for r, d, files in os.walk(root)])
-BATCH_SIZE=64
+BATCH_SIZE=1024
 NUM_WORKER=1
 MAX_EPOCHS=10
-num_epochs=10
+num_epochs=100
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")
 print(device)
 torch.backends.cudnn.benchmark = True
 
 # Parameters
-params = {'batch_size': 64,
+params = {'batch_size': 1024,
           'shuffle': True,
           'num_workers': 6}
 from torchvision import transforms
-IMG_HEIGHT = 32
-IMG_WIDTH = 32
+IMG_HEIGHT = 64
+IMG_WIDTH = 64
 data_transform = torchvision.transforms.Compose(
     [
         transforms.Resize((IMG_HEIGHT, IMG_WIDTH)),
@@ -87,6 +87,7 @@ for epoch in range(1, num_epochs + 1):
 
     # training-the-model
     model.train()
+    index = 0
     for data, target in train_dataset_loader:
         # move-tensors-to-GPU
         data = data.to(device)
@@ -104,9 +105,11 @@ for epoch in range(1, num_epochs + 1):
         optimizer.step()
         # update-training-loss
         train_loss += loss.item() * data.size(0)
-        print(f'Batch tr')
+        print(f'Epoch: {epoch}, Training, Batch {index}')
+        index += 1
     # validate-the-model
     model.eval()
+    index = 0
     for data, target in valid_dataset_loader:
         data = data.to(device)
         target = target.to(device)
@@ -117,7 +120,8 @@ for epoch in range(1, num_epochs + 1):
 
         # update-average-validation-loss
         valid_loss += loss.item() * data.size(0)
-
+        print(f'Epoch: {epoch}, Validate, Batch {index}')
+        index += 1
     # calculate-average-losses
     train_loss = train_loss / len(train_dataset_loader.sampler)
     valid_loss = valid_loss / len(valid_dataset_loader.sampler)
@@ -129,4 +133,3 @@ for epoch in range(1, num_epochs + 1):
         epoch, train_loss, valid_loss))
 
 print('Finished Training')
-torch.save(net, 'model.pth')
