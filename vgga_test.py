@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import time
 import os
 import copy
+from letsplay_classifier.model import VGGLP
 BATCH_SIZE=8
 NUM_WORKER=2
 TRAIN = 'train'
@@ -179,16 +180,24 @@ def eval_model(vgg, criterion):
     print("Avg acc (test): {:.4f}".format(avg_acc))
     print('-' * 10)
 
-vgg16 = models.vgg16_bn()
-print(vgg16.classifier[6].out_features) # 1000
-num_features = vgg16.classifier[6].in_features
-features = list(vgg16.classifier.children())[:-1] # Remove last layer
-features.extend([nn.Linear(num_features, len(class_names))]) # Add our layer with 4 outputs
-vgg16.classifier = nn.Sequential(*features) # Replace the model classifier
-print(vgg16)
 
+def setup_model():
+
+    vgg16 = models.vgg16_bn()
+    print(vgg16.classifier[6].out_features) # 1000
+    num_features = vgg16.classifier[6].in_features
+    features = list(vgg16.classifier.children())[:-1] # Remove last layer
+    features.extend([nn.Linear(num_features, len(class_names))]) # Add our layer with 4 outputs
+    vgg16.classifier = nn.Sequential(*features) # Replace the model classifier
+    print(vgg16)
+
+    if use_gpu:
+        vgg16.cuda()  # .cuda() will move everything to the GPU side
+
+#vgg16 = setup_model()
+vgg16 = VGGLP(len(class_names))
 if use_gpu:
-    vgg16.cuda()  # .cuda() will move everything to the GPU side
+    vgg16.cuda()
 
 criterion = nn.CrossEntropyLoss()
 
