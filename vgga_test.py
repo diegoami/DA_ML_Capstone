@@ -5,21 +5,17 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.optim import lr_scheduler
 from torch.autograd import Variable
-import numpy as np
 import torchdata as td
 import torchvision
 from torchvision import datasets, models, transforms
-import matplotlib.pyplot as plt
 import time
 import os
 import copy
 from letsplay_classifier.model import VGGLP
-BATCH_SIZE=8
-NUM_WORKER=2
-TRAIN = 'train'
-VAL = 'val'
-TEST = 'test'
-plt.ion()
+
+BATCH_SIZE = 8
+NUM_WORKER = 2
+TRAIN, VAL, TEST = 'train', 'val', 'test'
 
 use_gpu = torch.cuda.is_available()
 if use_gpu:
@@ -33,7 +29,6 @@ data_transform = torchvision.transforms.Compose(
     [
         transforms.Resize((IMG_HEIGHT, IMG_WIDTH)),
         transforms.ToTensor()
-
     ]
 )
 model_dataset = td.datasets.WrapDataset(torchvision.datasets.ImageFolder(root, transform=data_transform))
@@ -46,16 +41,7 @@ train_dataset, valid_dataset, test_dataset = torch.utils.data.random_split(
     model_dataset, (train_count, valid_count, test_count)
 )
 
-
-print("Classes: ")
 class_names = model_dataset.classes
-print(class_names)
-
-# Apply transformations here only for train dataset
-
-#train_dataset = train_dataset.map(data_transform)
-
-# Rest of the code goes the same
 
 train_dataset_loader = torch.utils.data.DataLoader(
     train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKER
@@ -79,66 +65,9 @@ dataset_sizes = {
     TEST: test_count
 }
 
-def imshow(inp, title=None):
-    inp = inp.numpy().transpose((1, 2, 0))
-    # plt.figure(figsize=(10, 10))
-    plt.axis('off')
-    plt.imshow(inp)
-    if title is not None:
-        plt.title(title)
-    plt.pause(0.001)
-
-def show_databatch(inputs, classes):
-    out = torchvision.utils.make_grid(inputs)
-    imshow(out, title=[class_names[x] for x in classes])
-
-# Get a batch of training data
-inputs, classes = next(iter(dataloaders[TRAIN]))
-show_databatch(inputs, classes)
-
-
-def visualize_model(vgg, num_images=6):
-    was_training = vgg.training
-
-    # Set model for evaluation
-    vgg.train(False)
-    vgg.eval()
-
-    images_so_far = 0
-
-    for i, data in enumerate(dataloaders[TEST]):
-        inputs, labels = data
-        size = inputs.size()[0]
-
-        if use_gpu:
-            inputs, labels = Variable(inputs.cuda(), volatile=True), Variable(labels.cuda(), volatile=True)
-        else:
-            inputs, labels = Variable(inputs, volatile=True), Variable(labels, volatile=True)
-
-        outputs = vgg(inputs)
-
-        _, preds = torch.max(outputs.data, 1)
-        predicted_labels = [preds[j] for j in range(inputs.size()[0])]
-
-        print("Ground truth:")
-        show_databatch(inputs.data.cpu(), labels.data.cpu())
-        print("Prediction:")
-        show_databatch(inputs.data.cpu(), predicted_labels)
-
-        del inputs, labels, outputs, preds, predicted_labels
-        torch.cuda.empty_cache()
-
-        images_so_far += size
-        if images_so_far >= num_images:
-            break
-
-    vgg.train(mode=was_training)  # Revert model back to original
-
 
 def eval_model(vgg, criterion):
     since = time.time()
-    avg_loss = 0
-    avg_acc = 0
     loss_test = 0
     acc_test = 0
 
@@ -170,8 +99,8 @@ def eval_model(vgg, criterion):
         del inputs, labels, outputs, preds
         torch.cuda.empty_cache()
 
-    avg_loss = loss_test /test_count
-    avg_acc = acc_test / test_count
+    avg_loss = torch.true_divide(loss_test, test_count)
+    avg_acc = torch.true_divide(acc_test, test_count)
 
     elapsed_time = time.time() - since
     print()
@@ -194,7 +123,7 @@ def setup_model():
     if use_gpu:
         vgg16.cuda()  # .cuda() will move everything to the GPU side
 
-#vgg16 = setup_model()
+
 vgg16 = VGGLP(len(class_names))
 if use_gpu:
     vgg16.cuda()
@@ -209,12 +138,6 @@ def train_model(vgg, criterion, optimizer, scheduler, num_epochs=10):
     since = time.time()
     best_model_wts = copy.deepcopy(vgg.state_dict())
     best_acc = 0.0
-
-    avg_loss = 0
-    avg_acc = 0
-    avg_loss_val = 0
-    avg_acc_val = 0
-
     train_batches = len(dataloaders[TRAIN])
     val_batches = len(dataloaders[VAL])
 
@@ -316,5 +239,7 @@ def train_model(vgg, criterion, optimizer, scheduler, num_epochs=10):
     vgg.load_state_dict(best_model_wts)
     return vgg
 
-vgg16 = train_model(vgg16, criterion, optimizer_ft, exp_lr_scheduler, num_epochs=15)
-torch.save(vgg16.state_dict(), 'VGG16_mblade.pt')
+#vgg16 = train_model(vgg16, criterion, optimizer_ft, exp_lr_scheduler, num_epochs=15)
+#torch.save(vgg16.state_dict(), 'VGG16_mblade.pt')
+vgg16.load_state_dict(torch.load('VGG16_mblade.pt'))
+eval_model(vgg16, criterion)
