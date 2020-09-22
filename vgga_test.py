@@ -13,8 +13,8 @@ import matplotlib.pyplot as plt
 import time
 import os
 import copy
-BATCH_SIZE=16
-NUM_WORKER=4
+BATCH_SIZE=8
+NUM_WORKER=2
 TRAIN = 'train'
 VAL = 'val'
 TEST = 'test'
@@ -253,8 +253,8 @@ def train_model(vgg, criterion, optimizer, scheduler, num_epochs=10):
 
         print()
         # * 2 as we only used half of the dataset
-        avg_loss = loss_train * 2 / dataset_sizes[TRAIN]
-        avg_acc = acc_train * 2 / dataset_sizes[TRAIN]
+        avg_loss = torch.true_divide(loss_train * 2, dataset_sizes[TRAIN])
+        avg_acc = torch.true_divide(acc_train * 2, dataset_sizes[TRAIN])
 
         vgg.train(False)
         vgg.eval()
@@ -277,14 +277,14 @@ def train_model(vgg, criterion, optimizer, scheduler, num_epochs=10):
             _, preds = torch.max(outputs.data, 1)
             loss = criterion(outputs, labels)
 
-            loss_val += loss.data[0]
+            loss_val += loss.data
             acc_val += torch.sum(preds == labels.data)
 
             del inputs, labels, outputs, preds
             torch.cuda.empty_cache()
 
-        avg_loss_val = loss_val / dataset_sizes[VAL]
-        avg_acc_val = acc_val / dataset_sizes[VAL]
+        avg_loss_val = torch.true_divide(loss_val, dataset_sizes[VAL])
+        avg_acc_val = torch.true_divide(acc_val, dataset_sizes[VAL])
 
         print()
         print("Epoch {} result: ".format(epoch))
@@ -307,5 +307,5 @@ def train_model(vgg, criterion, optimizer, scheduler, num_epochs=10):
     vgg.load_state_dict(best_model_wts)
     return vgg
 
-vgg16 = train_model(vgg16, criterion, optimizer_ft, exp_lr_scheduler, num_epochs=2)
+vgg16 = train_model(vgg16, criterion, optimizer_ft, exp_lr_scheduler, num_epochs=15)
 torch.save(vgg16.state_dict(), 'VGG16_mblade.pt')
