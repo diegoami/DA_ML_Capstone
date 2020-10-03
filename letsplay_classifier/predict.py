@@ -1,19 +1,12 @@
-import argparse
 import os
-import sys
-import pandas as pd
 import numpy as np
-
 import torch
-import torch.nn as nn
-import torch.optim as optim
 import torch.utils.data
 
-from io import StringIO
 from six import BytesIO
 
 # import model
-from model import SimpleNet
+from .model import VGGLP
 
 # accepts and returns numpy data
 CONTENT_TYPE = 'application/x-npy'
@@ -33,7 +26,7 @@ def model_fn(model_dir):
 
     # Determine the device and construct the model.
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = SimpleNet(model_info['input_dim'], model_info['hidden_dim'], model_info['output_dim'])
+    model = VGGLP(model_info['num_classes'])
 
     # Load the stored model parameters.
     model_path = os.path.join(model_dir, 'model.pth')
