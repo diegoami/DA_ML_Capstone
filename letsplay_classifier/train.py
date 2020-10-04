@@ -110,11 +110,11 @@ def save_model(model, model_dir):
     # save state dictionary
     torch.save(model.cpu().state_dict(), path)
     
-def save_model_params():
+def save_model_params(num_classes):
     model_info_path = os.path.join(args.model_dir, 'model_info.pth')
     with open(model_info_path, 'wb') as f:
         model_info = {
-            'num_classes': args.num_classes,
+            'num_classes': num_classes,
             'img_width': args.img_width,
             'img_height': args.img_height
         }
@@ -329,7 +329,7 @@ if __name__ == '__main__':
     save_model(model, args.model_dir)
 
     # Given: save the parameters used to construct the model
-    save_model_params()
+    save_model_params(num_classes=len(class_names))
 
 
     

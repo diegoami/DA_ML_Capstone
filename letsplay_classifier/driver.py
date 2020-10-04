@@ -18,7 +18,7 @@ def eval_model(model, criterion):
     loss_test = 0
     acc_test = 0
 
-    test_batches = len(dataloaders['test'])
+    test_batches = len(dataloaders['val'])
     print("Evaluating model")
     print('-' * 10)
 
@@ -80,8 +80,6 @@ if __name__ == '__main__':
                         help='input batch size for training (default: 8)')
     args = parser.parse_args()
     model = model_fn(args.data_dir)
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     dataloaders, dataset_sizes, class_names = get_data_loaders(img_dir=args.data_dir, img_width=args.img_width, img_height=args.img_height, batch_size=args.batch_size )
 
