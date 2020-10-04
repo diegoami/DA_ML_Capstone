@@ -2,12 +2,17 @@ import os
 import numpy as np
 import torch
 import torch.utils.data
-
+import json
 from six import BytesIO
+import torchdata as td
+import torchvision
+from torchvision import datasets, models, transforms
+import requests
+from PIL import Image
 
 # import model
 from .model import VGGLP
-
+IMG_HEIGHT, IMG_WIDTH = 128, 128
 # accepts and returns numpy data
 CONTENT_TYPE = 'application/x-npy'
 
@@ -39,12 +44,23 @@ def model_fn(model_dir):
     print("Done loading model.")
     return model
 
-def input_fn(serialized_input_data, content_type):
-    print('Deserializing the input data.')
-    if content_type == CONTENT_TYPE:
-        stream = BytesIO(serialized_input_data)
-        return np.load(stream)
-    raise Exception('Requested unsupported ContentType in content_type: ' + content_type)
+
+def input_fn(request_body, content_type='application/json'):
+
+
+    if content_type == 'application/json':
+        input_data = json.loads(request_body)
+        url = input_data['url']
+
+        image_data = Image.open(requests.get(url, stream=True).raw)
+
+        image_transform = transforms.Compose([
+            transforms.Resize((IMG_HEIGHT, IMG_WIDTH)),
+            transforms.ToTensor()
+        ])
+        return image_transform(image_data)
+    raise Exception(f'Requested unsupported ContentType in content_type {content_type}')
+
 
 def output_fn(prediction_output, accept):
     print('Serializing the generated output.')

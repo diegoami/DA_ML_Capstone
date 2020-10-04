@@ -16,7 +16,7 @@ import torch.utils.data
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.optim import lr_scheduler
+
 from torch.autograd import Variable
 import torchdata as td
 import torchvision
@@ -114,7 +114,9 @@ def save_model_params():
     model_info_path = os.path.join(args.model_dir, 'model_info.pth')
     with open(model_info_path, 'wb') as f:
         model_info = {
-            'num_classes': args.num_classes
+            'num_classes': args.num_classes,
+            'img_width': args.img_width,
+            'img_height': args.img_height
         }
         torch.save(model_info, f)
 
@@ -181,7 +183,7 @@ def \
 
         for i, data in enumerate(dataloaders['train']):
             if i % 100 == 0:
-                print("\rTraining batch {}/{}".format(i, train_batches / 2), end='', flush=True)
+                print("\rTraining batch {}/{}".format(i, train_batches ), end='', flush=True)
 
 
 
@@ -273,14 +275,14 @@ if __name__ == '__main__':
 
     # SageMaker parameters, like the directories for training data and saving models; set automatically
     # Do not need to change
-    if not LOCAL:
-        parser.add_argument('--hosts', type=list, default=json.loads(os.environ['SM_HOSTS']))
-        parser.add_argument('--current-host', type=str, default=os.environ['SM_CURRENT_HOST'])
-        parser.add_argument('--model-dir', type=str, default=os.environ['SM_MODEL_DIR'])
-        parser.add_argument('--data-dir', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
+
+    parser.add_argument('--hosts', type=list, default=json.loads(os.environ['SM_HOSTS']))
+    parser.add_argument('--current-host', type=str, default=os.environ['SM_CURRENT_HOST'])
+    parser.add_argument('--model-dir', type=str, default=os.environ['SM_MODEL_DIR'])
+    parser.add_argument('--data-dir', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
 
     # Training Parameters, given
-    parser.add_argument('--img-dir', type=str, default='../wendy_cnn_frames_data')
+
     parser.add_argument('--img-width', type=int, default=256, metavar='N',
                         help='width of image (default: 256)')
     parser.add_argument('--img-height', type=int, default=256, metavar='N',
@@ -306,7 +308,7 @@ if __name__ == '__main__':
     # get train loader
     #train_loader = _get_train_loader(args.batch_size, args.data_dir) # data_dir from above..
 
-    dataloaders, dataset_sizes, class_names = get_data_loaders(img_dir=args.img_dir, img_width=args.img_width, img_height=args.img_height, batch_size=args.batch_size )
+    dataloaders, dataset_sizes, class_names = get_data_loaders(img_dir=args.data_dir, img_width=args.img_width, img_height=args.img_height, batch_size=args.batch_size )
 
     # To get params from the parser, call args.argument_name, ex. args.epochs or ards.hidden_dim
     # Don't forget to move your model .to(device) to move to GPU , if appropriate
