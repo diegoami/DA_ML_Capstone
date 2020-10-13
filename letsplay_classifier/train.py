@@ -136,7 +136,7 @@ def get_data_loaders(img_dir, img_height=256, img_width=256, batch_size=8):
     train_count = int(0.75 * total_count)
     valid_count = total_count - train_count
 
-    train_dataset, valid_dataset= torch.utils.data.random_split(
+    train_dataset, valid_dataset = torch.utils.data.random_split(
         model_dataset, (train_count, valid_count)
     )
 

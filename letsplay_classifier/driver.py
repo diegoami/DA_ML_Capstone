@@ -46,8 +46,8 @@ def eval_model(model, criterion):
         del inputs, labels, outputs, preds
         torch.cuda.empty_cache()
 
-    avg_loss = torch.true_divide(loss_test, dataset_sizes[TEST])
-    avg_acc = torch.true_divide(acc_test, dataset_sizes[TEST])
+    avg_loss = torch.true_divide(loss_test, dataset_sizes['val'])
+    avg_acc = torch.true_divide(acc_test, dataset_sizes['val'])
 
     elapsed_time = time.time() - since
     print()
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch-size', type=int, default=8, metavar='N',
                         help='input batch size for training (default: 8)')
     args = parser.parse_args()
-    model = model_fn(args.data_dir)
+    model = model_fn(args.model_dir)
 
     dataloaders, dataset_sizes, class_names = get_data_loaders(img_dir=args.data_dir, img_width=args.img_width, img_height=args.img_height, batch_size=args.batch_size )
 

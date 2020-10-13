@@ -1,0 +1,9 @@
+.idea/
+.ipynb_checkpoints/
+*.pt
+letsplay_classifier/.ipynb_checkpoints/
+letsplay_classifier/__pycache__/
+wendy_cnn_frames_data.zip
+wendy_cnn_frames_data/
+ytframe/__pycache__/
+

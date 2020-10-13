@@ -11,7 +11,7 @@ import requests
 from PIL import Image
 
 # import model
-from .model import VGGLP
+from model import VGGLP
 IMG_HEIGHT, IMG_WIDTH = 128, 128
 # accepts and returns numpy data
 CONTENT_TYPE = 'application/x-npy'
