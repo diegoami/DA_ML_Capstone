@@ -4,6 +4,7 @@ import time
 import copy
 import os
 import json
+from sklearn.model_selection import train_test_split
 
 import pandas as pd
 LOCAL = 1
@@ -118,19 +119,21 @@ def get_data_loaders(img_dir, img_height=256, img_width=256, batch_size=8):
     # Also you shouldn't use transforms here but below
     train_count = int(0.75 * total_count)
     valid_count = total_count - train_count
+    import numpy as np
 
-    train_dataset, valid_dataset = torch.utils.data.random_split(
-        model_dataset, (train_count, valid_count)
-    )
+    train_idx, valid_idx = train_test_split(
+        np.arange(len(model_dataset)),
+        test_size=0.25,
+        shuffle=True,
+        stratify=model_dataset.targets)
+
+    train_sampler = torch.utils.data.SubsetRandomSampler(train_idx)
+    valid_sampler = torch.utils.data.SubsetRandomSampler(valid_idx)
+
+    train_dataset_loader = torch.utils.data.DataLoader(model_dataset, batch_size=batch_size, sampler=train_sampler)
+    valid_dataset_loader = torch.utils.data.DataLoader(model_dataset, batch_size=batch_size, sampler=valid_sampler)
 
 
-
-    train_dataset_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True, num_workers=NUM_WORKER
-    )
-    valid_dataset_loader = torch.utils.data.DataLoader(
-        valid_dataset, batch_size=batch_size, shuffle=True, num_workers=NUM_WORKER
-    )
 
 
     dataloaders = {
