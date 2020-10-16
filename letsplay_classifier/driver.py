@@ -38,7 +38,10 @@ def eval_model(model, criterion):
             inputs, labels = Variable(inputs, volatile=True), Variable(labels, volatile=True)
 
         outputs = model(inputs)
-
+        print(outputs)
+        print(outputs.shape)
+        print(labels)
+        print(labels.shape)
         _, preds = torch.max(outputs.data, 1)
         loss = criterion(outputs, labels)
 

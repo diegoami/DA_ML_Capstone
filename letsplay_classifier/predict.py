@@ -88,6 +88,6 @@ def predict_fn(input_data, model):
     # Compute the result of applying the model to the input data.
     out = model(inputs)
     # The variable `result` should be a numpy array; a single value 0-1
-    result = out.cpu().detach().numpy()
+    result = out.cpu().detach()
 
     return result

@@ -2,13 +2,14 @@ from predict import model_fn, predict_fn
 import argparse
 import os
 import json
+import numpy as np
 import time
 from numpy import asarray
 from torch.autograd import Variable
 import torch
 from PIL import Image
 from torchvision import transforms
-
+import torch.nn as nn
 
 
 if __name__ == '__main__':
@@ -35,10 +36,17 @@ if __name__ == '__main__':
                         help='input batch size for training (default: 8)')
     args = parser.parse_args()
     model = model_fn(args.model_dir)
-
+    criterion = nn.CrossEntropyLoss()
     dirs = sorted(os.listdir(args.data_dir))
-
+    index = 0
+    loss_test = 0
+    acc_test = 0
+    count = 0
     for dir in dirs:
+
+        labels = torch.empty(1, dtype=int)
+        labels[0] = index
+        print(labels)
         curr_img_dir = os.path.join(args.data_dir, dir)
         images = os.listdir(curr_img_dir)
         for image in images:
@@ -46,12 +54,27 @@ if __name__ == '__main__':
             print(curr_img)
             with open(curr_img, 'rb') as f:
                 image_data = Image.open(f).resize((args.img_height, args.img_width))
-                #data = asarray(image_data).reshape(3, args.img_height, args.img_width)
-                #print(type(data))
-                # summarize shape
-                #print(data.shape)
+
                 image_resized = transforms.Resize((args.img_height, args.img_width))(image_data)
                 image_tensor = transforms.ToTensor()(image_resized)
                 image_unsqueezed = image_tensor.unsqueeze(0)
-                print(image_unsqueezed.shape)
-                print(predict_fn(image_unsqueezed, model))
+                #print(image_unsqueezed.shape)
+                prediction = predict_fn(image_unsqueezed, model)
+                #print(prediction)
+
+                _, preds = torch.max(prediction.data, 1)
+                #print(preds)
+                #print(labels)
+                #print(labels.shape)
+
+                loss = criterion(prediction, labels)
+                #print(loss)
+                loss_test += loss.data
+                acc_test += torch.sum(preds == labels.data)
+                count += 1
+                avg_loss = torch.true_divide(loss_test, count)
+                avg_acc = torch.true_divide(acc_test, count)
+                print("{} processed".format(count))
+                print("Avg loss (test): {:.4f}".format(avg_loss))
+                print("Avg acc (test): {:.4f}".format(avg_acc))
+        index += 1
