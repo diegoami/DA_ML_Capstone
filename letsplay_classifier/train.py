@@ -49,23 +49,6 @@ def model_fn(model_dir):
     return model.to(device)
 
 
-# Load the training data from a csv file
-def _get_train_loader(batch_size, data_dir):
-    print("Get data loader.")
-
-    # read in csv file
-    train_data = pd.read_csv(os.path.join(data_dir, "train.csv"), header=None)
-
-    # labels are first column
-    train_y = torch.from_numpy(train_data[[0]].values).float().squeeze()
-    # features are the rest
-    train_x = torch.from_numpy(train_data.drop([0], axis=1).values).float()
-
-    # create dataset
-    train_ds = torch.utils.data.TensorDataset(train_x, train_y)
-
-    return torch.utils.data.DataLoader(train_ds, batch_size=batch_size)
-
 
 # Provided train function
 def train(model, train_loader, epochs, optimizer, criterion, device):
@@ -188,7 +171,7 @@ def \
 
 
             inputs, labels = data
-
+            print(inputs.numpy().shape)
             if use_gpu:
                 inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
             else:

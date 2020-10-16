@@ -9,7 +9,7 @@ import torchvision
 from torchvision import datasets, models, transforms
 import requests
 from PIL import Image
-
+from torch.autograd import Variable
 # import model
 from model import VGGLP
 IMG_HEIGHT, IMG_WIDTH = 128, 128
@@ -72,18 +72,21 @@ def output_fn(prediction_output, accept):
 
 def predict_fn(input_data, model):
     print('Predicting class labels for the input data...')
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    
+    print(input_data.shape)
+    if torch.cuda.is_available() :
+        inputs = Variable(input_data.cuda(), volatile=True)
+    else:
+        inputs = Variable(input_data, volatile=True)
+    print(inputs.shape)
     # Process input_data so that it is ready to be sent to our model
     # convert data to numpy array then to Tensor
-    data = torch.from_numpy(input_data.astype('float32'))
-    data = data.to(device)
+    #data = torch.from_numpy(input_data.astype('float32'))
+    #data = data.to(device)
 
-    # Put model into evaluation mode
-    model.eval()
+
 
     # Compute the result of applying the model to the input data.
-    out = model(data)
+    out = model(inputs)
     # The variable `result` should be a numpy array; a single value 0-1
     result = out.cpu().detach().numpy()
 

@@ -29,6 +29,8 @@ def eval_model(model, criterion):
         model.train(False)
         model.eval()
         inputs, labels = data
+        print(inputs.shape)
+        print(inputs.numpy().shape)
 
         if use_gpu:
             inputs, labels = Variable(inputs.cuda(), volatile=True), Variable(labels.cuda(), volatile=True)
