@@ -2,10 +2,7 @@ from predict import model_fn, predict_fn
 import argparse
 import os
 import json
-import numpy as np
-import time
-from numpy import asarray
-from torch.autograd import Variable
+
 import torch
 from PIL import Image
 from torchvision import transforms
@@ -58,17 +55,12 @@ if __name__ == '__main__':
                 image_resized = transforms.Resize((args.img_height, args.img_width))(image_data)
                 image_tensor = transforms.ToTensor()(image_resized)
                 image_unsqueezed = image_tensor.unsqueeze(0)
-                #print(image_unsqueezed.shape)
                 prediction = predict_fn(image_unsqueezed, model)
-                #print(prediction)
 
                 _, preds = torch.max(prediction.data, 1)
-                #print(preds)
-                #print(labels)
-                #print(labels.shape)
 
                 loss = criterion(prediction, labels)
-                #print(loss)
+
                 loss_test += loss.data
                 acc_test += torch.sum(preds == labels.data)
                 count += 1

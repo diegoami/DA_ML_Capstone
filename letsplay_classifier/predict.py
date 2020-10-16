@@ -4,17 +4,16 @@ import torch
 import torch.utils.data
 import json
 from six import BytesIO
-import torchdata as td
-import torchvision
+
 from torchvision import datasets, models, transforms
 import requests
 from PIL import Image
 from torch.autograd import Variable
 # import model
 from model import VGGLP
-IMG_HEIGHT, IMG_WIDTH = 128, 128
+IMG_HEIGHT, IMG_WIDTH = 64, 64
 # accepts and returns numpy data
-CONTENT_TYPE = 'application/x-npy'
+CONTENT_TYPE = 'application/json'
 
 
 def model_fn(model_dir):
@@ -53,21 +52,22 @@ def input_fn(request_body, content_type='application/json'):
         url = input_data['url']
 
         image_data = Image.open(requests.get(url, stream=True).raw)
-
-        image_transform = transforms.Compose([
-            transforms.Resize((IMG_HEIGHT, IMG_WIDTH)),
-            transforms.ToTensor()
-        ])
-        return image_transform(image_data)
+        image_resized = transforms.Resize((IMG_HEIGHT, IMG_WIDTH))(image_data)
+        image_tensor = transforms.ToTensor()(image_resized)
+        image_unsqueezed = image_tensor.unsqueeze(0)
+        return image_unsqueezed
     raise Exception(f'Requested unsupported ContentType in content_type {content_type}')
 
 
-def output_fn(prediction_output, accept):
+def output_fn(prediction_output, accept='application/json'):
     print('Serializing the generated output.')
-    if accept == CONTENT_TYPE:
-        buffer = BytesIO()
-        np.save(buffer, prediction_output)
-        return buffer.getvalue(), accept
+    if accept == 'application/json':
+        arr = prediction_output.numpy()
+        dictresult = dict(enumerate(arr.flatten().tolist(), 1))
+        print(dictresult)
+        json_res = json.dumps(dictresult)
+        print(json_res)
+        return json_res
     raise Exception('Requested unsupported ContentType in Accept: ' + accept)
 
 def predict_fn(input_data, model):
