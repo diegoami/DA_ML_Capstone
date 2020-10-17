@@ -1,14 +1,11 @@
-from predict import model_fn, predict_fn
+from predict_fromfile import model_fn, predict_fn, input_fn, output_fn
 import argparse
 import os
 import json
-
 import torch
 from PIL import Image
-from torchvision import transforms
+
 import torch.nn as nn
-
-
 
 if __name__ == '__main__':
     # All of the model parameters and training parameters are sent as arguments
@@ -49,23 +46,20 @@ if __name__ == '__main__':
         images = os.listdir(curr_img_dir)
         for image in images:
             curr_img = os.path.join(curr_img_dir, image)
-            print(curr_img)
-            with open(curr_img, 'rb') as f:
-                image_data = Image.open(f).resize((args.img_height, args.img_width))
 
-                image_resized = transforms.Resize((args.img_height, args.img_width))(image_data)
-                image_tensor = transforms.ToTensor()(image_resized)
-                image_unsqueezed = image_tensor.unsqueeze(0)
-                prediction = predict_fn(image_unsqueezed, model)
+            with open(curr_img, 'rb') as f:
+                image_data = Image.open(f)
+
+                input_object = input_fn(image_data )
+
+                prediction = predict_fn(input_object, model)
+
+                output = output_fn(prediction)
+
+                output_list = json.loads(output)
+                prediction = torch.FloatTensor(output_list).unsqueeze(0)
 
                 _, preds = torch.max(prediction.data, 1)
-                print(prediction)
-                print(prediction.data)
-                print(prediction.data.shape)
-
-                print(preds)
-                print(preds.shape)
-
                 loss = criterion(prediction, labels)
 
                 loss_test += loss.data
