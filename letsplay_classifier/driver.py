@@ -5,12 +5,10 @@ import os
 import json
 import time
 from train import get_data_loaders
-import torch.optim as optim
-from torch.optim import lr_scheduler
 from torch.autograd import Variable
 import torch
 import torch.nn as nn
-import torch.optim as optim
+from constants import IMG_HEIGHT, IMG_WIDTH
 
 def eval_model(model, criterion):
     use_gpu = torch.cuda.is_available()
@@ -29,8 +27,6 @@ def eval_model(model, criterion):
         model.train(False)
         model.eval()
         inputs, labels = data
-        print(inputs.shape)
-        print(inputs.numpy().shape)
 
         if use_gpu:
             inputs, labels = Variable(inputs.cuda(), volatile=True), Variable(labels.cuda(), volatile=True)
@@ -38,10 +34,7 @@ def eval_model(model, criterion):
             inputs, labels = Variable(inputs, volatile=True), Variable(labels, volatile=True)
 
         outputs = model(inputs)
-        print(outputs)
-        print(outputs.shape)
-        print(labels)
-        print(labels.shape)
+
         _, preds = torch.max(outputs.data, 1)
         loss = criterion(outputs, labels)
 
@@ -77,9 +70,9 @@ if __name__ == '__main__':
     parser.add_argument('--data-dir', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
 
 
-    parser.add_argument('--img-width', type=int, default=128, metavar='N',
+    parser.add_argument('--img-width', type=int, default=IMG_WIDTH, metavar='N',
                         help='width of image (default: 128)')
-    parser.add_argument('--img-height', type=int, default=128, metavar='N',
+    parser.add_argument('--img-height', type=int, default=IMG_HEIGHT, metavar='N',
                         help='height of image (default: 128)')
     parser.add_argument('--batch-size', type=int, default=8, metavar='N',
                         help='input batch size for training (default: 8)')

@@ -5,13 +5,10 @@ import copy
 import os
 import json
 from sklearn.model_selection import train_test_split
+from constants import IMG_WIDTH, IMG_HEIGHT
 
-import pandas as pd
 LOCAL = 1
-# pytorch
-import torch
-import torch.nn as nn
-import torch.optim as optim
+
 import torch.utils.data
 
 import torch
@@ -21,7 +18,7 @@ import torch.optim as optim
 from torch.autograd import Variable
 import torchdata as td
 import torchvision
-from torchvision import datasets, models, transforms
+from torchvision import transforms
 
 # import model
 from model import VGGLP
@@ -104,8 +101,8 @@ def save_model_params(num_classes):
         }
         torch.save(model_info, f)
 
-def get_data_loaders(img_dir, img_height=256, img_width=256, batch_size=8):
-    NUM_WORKER = 2
+def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_size=8):
+
     root = img_dir
     total_count = sum([len(files) for r, d, files in os.walk(root)])
 
@@ -174,7 +171,6 @@ def \
 
 
             inputs, labels = data
-            print(inputs.numpy().shape)
             if use_gpu:
                 inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
             else:
@@ -269,10 +265,10 @@ if __name__ == '__main__':
 
     # Training Parameters, given
 
-    parser.add_argument('--img-width', type=int, default=256, metavar='N',
-                        help='width of image (default: 256)')
-    parser.add_argument('--img-height', type=int, default=256, metavar='N',
-                        help='height of image (default: 256)')
+    parser.add_argument('--img-width', type=int, default=IMG_WIDTH, metavar='N',
+                        help='width of image (default: 128)')
+    parser.add_argument('--img-height', type=int, default=IMG_HEIGHT, metavar='N',
+                        help='height of image (default: 72)')
     parser.add_argument('--batch-size', type=int, default=8, metavar='N',
                         help='input batch size for training (default: 8)')
     parser.add_argument('--epochs', type=int, default=15, metavar='N',
@@ -303,13 +299,8 @@ if __name__ == '__main__':
     if torch.cuda.is_available():
         model.cuda()
 
-
-
     optimizer_ft = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
     criterion = nn.CrossEntropyLoss()
-    #optimizer_ft = optim.Adam(model.parameters(), lr=args.lr)
-    #criterion = nn.BCELoss()
-
 
     model = train_model(model, dataloaders, dataset_sizes, criterion, optimizer_ft, num_epochs=args.epochs)
     save_model(model, args.model_dir)
@@ -318,9 +309,3 @@ if __name__ == '__main__':
     save_model_params(num_classes=len(class_names))
 
 
-    
-    # Trains the model (given line of code, which calls the above training function)
-    # This function *also* saves the model state dictionary
-    #train(model, train_loader, args.epochs, optimizer, criterion, device)
-    
-    

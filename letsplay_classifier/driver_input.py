@@ -2,12 +2,8 @@ from predict import model_fn, predict_fn, input_fn, output_fn
 import argparse
 import os
 import json
-
 import torch
-from PIL import Image
-from torchvision import transforms
-import torch.nn as nn
-
+from constants import IMG_HEIGHT, IMG_WIDTH
 
 if __name__ == '__main__':
     # All of the model parameters and training parameters are sent as arguments
@@ -25,9 +21,9 @@ if __name__ == '__main__':
     parser.add_argument('--data-dir', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
 
 
-    parser.add_argument('--img-width', type=int, default=128, metavar='N',
+    parser.add_argument('--img-width', type=int, default=IMG_WIDTH, metavar='N',
                         help='width of image (default: 128)')
-    parser.add_argument('--img-height', type=int, default=128, metavar='N',
+    parser.add_argument('--img-height', type=int, default=IMG_HEIGHT, metavar='N',
                         help='height of image (default: 128)')
     parser.add_argument('--batch-size', type=int, default=8, metavar='N',
                         help='input batch size for training (default: 8)')
@@ -45,3 +41,6 @@ if __name__ == '__main__':
         print(prediction)
         output = output_fn(prediction)
         print(output)
+        output_list = json.loads(output)
+        torch_tensor  = torch.FloatTensor(output_list)
+        print(torch_tensor)

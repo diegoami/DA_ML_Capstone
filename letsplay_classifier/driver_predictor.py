@@ -9,6 +9,7 @@ from torchvision import transforms
 import torch.nn as nn
 
 
+
 if __name__ == '__main__':
     # All of the model parameters and training parameters are sent as arguments
     # when this script is executed, during a training job
@@ -27,20 +28,20 @@ if __name__ == '__main__':
 
     parser.add_argument('--img-width', type=int, default=128, metavar='N',
                         help='width of image (default: 128)')
-    parser.add_argument('--img-height', type=int, default=128, metavar='N',
-                        help='height of image (default: 128)')
+    parser.add_argument('--img-height', type=int, default=72, metavar='N',
+                        help='height of image (default: 72)')
     parser.add_argument('--batch-size', type=int, default=8, metavar='N',
                         help='input batch size for training (default: 8)')
     args = parser.parse_args()
     model = model_fn(args.model_dir)
     criterion = nn.CrossEntropyLoss()
-    dirs = sorted(os.listdir(args.data_dir))
     index = 0
     loss_test = 0
     acc_test = 0
     count = 0
-    for dir in dirs:
 
+    dirs = sorted(os.listdir(args.data_dir))
+    for dir in dirs:
         labels = torch.empty(1, dtype=int)
         labels[0] = index
         print(labels)
