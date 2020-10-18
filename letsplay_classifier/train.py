@@ -4,7 +4,7 @@ import time
 import copy
 import os
 import json
-from sklearn.model_selection import train_test_split
+
 from constants import IMG_WIDTH, IMG_HEIGHT
 
 LOCAL = 1
@@ -23,6 +23,11 @@ from torchvision import transforms
 # import model
 from model import VGGLP
 
+import subprocess as sb 
+import sys 
+
+sb.call([sys.executable, "-m", "pip", "install", "scikit-learn"]) 
+from sklearn.model_selection import train_test_split
 
 def model_fn(model_dir):
     print("Loading model.")
