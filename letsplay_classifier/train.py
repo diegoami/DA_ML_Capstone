@@ -16,18 +16,23 @@ import torch.nn as nn
 import torch.optim as optim
 
 from torch.autograd import Variable
-import torchdata as td
-import torchvision
-from torchvision import transforms
+
 
 # import model
 from model import VGGLP
 
-import subprocess as sb 
-import sys 
+#import subprocess as sb 
+#import sys 
+#sb.call([sys.executable, "-m", "pip", "install", "scikit-learn"]) 
+#sb.call([sys.executable, "-m", "pip", "install", "torchdata==0.2.0"]) 
+#sb.call([sys.executable, "-m", "pip", "install", "torchvision==0.7.0"]) 
 
-sb.call([sys.executable, "-m", "pip", "install", "scikit-learn"]) 
 from sklearn.model_selection import train_test_split
+
+
+import torchdata as td
+import torchvision
+from torchvision import transforms
 
 def model_fn(model_dir):
     print("Loading model.")
@@ -171,7 +176,7 @@ def \
 
         for i, data in enumerate(dataloaders['train']):
             if i % 100 == 0:
-                print("\rTraining batch {}/{}".format(i, train_batches ), end='', flush=True)
+                print("Training batch {}/{}".format(i, train_batches ))
 
 
 

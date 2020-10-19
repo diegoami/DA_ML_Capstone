@@ -3,14 +3,22 @@ import torch
 import torch.utils.data
 import json
 
-from torchvision import datasets, models, transforms
 import requests
 from PIL import Image
 from torch.autograd import Variable
 from model import VGGLP
 from constants import IMG_HEIGHT, IMG_WIDTH
-CONTENT_TYPE = 'application/json'
+CONTENT_TYPE = 'application/jpeg'
 
+
+#import subprocess as sb 
+#import sys 
+
+#sb.call([sys.executable, "-m", "pip", "install", "scikit-learn"]) 
+#sb.call([sys.executable, "-m", "pip", "install", "torchdata==0.2.0"]) 
+#sb.call([sys.executable, "-m", "pip", "install", "torchvision==0.7.0"]) 
+
+from torchvision import datasets, models, transforms
 
 def model_fn(model_dir):
     """Load the PyTorch model from the `model_dir` directory."""
@@ -38,14 +46,11 @@ def model_fn(model_dir):
     return model
 
 
-def input_fn(request_body, content_type='application/json'):
+def input_fn(request_body, content_type='application/jpeg'):
 
 
-    if content_type == 'application/json':
-        input_data = json.loads(request_body)
-        url = input_data['url']
-
-        image_data = Image.open(requests.get(url, stream=True).raw)
+    if content_type == 'application/jpeg':
+        image_data = request_body
         image_resized = transforms.Resize((IMG_HEIGHT, IMG_WIDTH))(image_data)
         image_tensor = transforms.ToTensor()(image_resized)
         image_unsqueezed = image_tensor.unsqueeze(0)
