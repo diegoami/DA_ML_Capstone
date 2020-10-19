@@ -27,16 +27,28 @@ def save_model(model, model_dir):
     # save state dictionary
     torch.save(model.cpu().state_dict(), path)
     
-def save_model_params(num_classes):
-    model_info_path = os.path.join(args.model_dir, 'model_info.pth')
+def save_model_params(model_dir, num_classes, img_width, img_height, epochs):
+    
+    model_info_path = os.path.join(model_dir, 'model_info.pth')
     with open(model_info_path, 'wb') as f:
         model_info = {
             'num_classes': num_classes,
-            'img_width': args.img_width,
-            'img_height': args.img_height
+            'img_width': img_width,
+            'img_height': img_height,
+            'epochs': epochs
         }
         torch.save(model_info, f)
 
+def save_model_metrics(model_dir, best_acc, best_loss):
+    model_metrics_path = os.path.join(model_dir, 'model_metrics.pth')
+    with open(model_metrics_path, 'wb') as f:
+        model_metrics = {
+            'best_acc': best_acc,
+            'best_loss': best_loss
+        }
+        torch.save(model_metrics, f)
+        
+        
 def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_size=8):
     """
     Builds the data loader objects for retrieving images from a specific directory
@@ -60,6 +72,7 @@ def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_
     train_count = int(0.75 * total_count)
     valid_count = total_count - train_count
     
+    # stratify the dataset
     train_idx, valid_idx = train_test_split(
         np.arange(len(model_dataset)),
         test_size=0.25,
@@ -92,12 +105,13 @@ def train_model(model, dataloaders, dataset_sizes, criterion, optimizer,  num_ep
     criterion - the criterion used to evaluate the model
     optimizer - the optimizer used to train the model
     num_epoch - the number of epochs to train
-    returns the trained model
+    returns the trained model, accuracy and loss
     """
     use_gpu = torch.cuda.is_available()
     since = time.time()
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
+    best_loss = 1.0
     train_batches = len(dataloaders['train'])
     val_batches = len(dataloaders['val'])
 
@@ -183,6 +197,7 @@ def train_model(model, dataloaders, dataset_sizes, criterion, optimizer,  num_ep
 
         if avg_acc_val > best_acc:
             best_acc = avg_acc_val
+            best_loss = avg_loss_val
             best_model_wts = copy.deepcopy(model.state_dict())
 
     elapsed_time = time.time() - since
@@ -191,7 +206,7 @@ def train_model(model, dataloaders, dataset_sizes, criterion, optimizer,  num_ep
     print("Best acc: {:.4f}".format(best_acc))
 
     model.load_state_dict(best_model_wts)
-    return model
+    return model, best_acc, best_loss
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -209,6 +224,8 @@ if __name__ == '__main__':
                         help='height of image (default: 72)')
     parser.add_argument('--batch-size', type=int, default=8, metavar='N',
                         help='input batch size for training (default: 8)')
+    parser.add_argument('--layer-cfg', type=str, default='D', metavar='N',
+                        help='layer type for VGG')
     parser.add_argument('--epochs', type=int, default=15, metavar='N',
                         help='number of epochs to train (default: 15)')
     parser.add_argument('--lr', type=float, default=0.001, metavar='LR',
@@ -225,19 +242,24 @@ if __name__ == '__main__':
     if torch.cuda.is_available():
         torch.cuda.manual_seed(args.seed)
 
+    # retrieves train and validation data loaders and datasets, and the label names         
     dataloaders, dataset_sizes, class_names = get_data_loaders(img_dir=args.data_dir, img_width=args.img_width, img_height=args.img_height, batch_size=args.batch_size )
 
-    model = VGGLP(len(class_names))
+    # initializes a VGG model returning the desired labels
+    model = VGGLP(len(class_names), args.layer_cfg)
     if torch.cuda.is_available():
         model.cuda()
 
     optimizer_ft = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
     criterion = nn.CrossEntropyLoss()
 
-    model = train_model(model, dataloaders, dataset_sizes, criterion, optimizer_ft, num_epochs=args.epochs)
+    # retrieves the trained model, along with best accuracy and loss
+    model, best_acc, best_loss = train_model(model, dataloaders, dataset_sizes, criterion, optimizer_ft, num_epochs=args.epochs)
     save_model(model, args.model_dir)
 
-    # Given: save the parameters used to construct the model
-    save_model_params(num_classes=len(class_names))
+    #  save the parameters used to construct the model
+    save_model_params(args.model_dir, len(class_names), args.img_width, args.img_height, args.epochs)
 
+    # saves the best accuracy and loss in this model
+    save_model_metrics(args.model_dir, best_acc, best_loss)
 
