@@ -11,13 +11,6 @@ from constants import IMG_HEIGHT, IMG_WIDTH
 CONTENT_TYPE = 'application/jpeg'
 
 
-#import subprocess as sb 
-#import sys 
-
-#sb.call([sys.executable, "-m", "pip", "install", "scikit-learn"]) 
-#sb.call([sys.executable, "-m", "pip", "install", "torchdata==0.2.0"]) 
-#sb.call([sys.executable, "-m", "pip", "install", "torchvision==0.7.0"]) 
-
 from torchvision import datasets, models, transforms
 
 def model_fn(model_dir):
@@ -47,7 +40,9 @@ def model_fn(model_dir):
 
 
 def input_fn(request_body, content_type='application/jpeg'):
-
+    """
+    predictor using an image in its request
+    """
 
     if content_type == 'application/jpeg':
         image_data = request_body
@@ -59,6 +54,10 @@ def input_fn(request_body, content_type='application/jpeg'):
 
 
 def output_fn(prediction_output, accept='application/json'):
+    """
+    result of a request as an array of probabilities in json format
+    """
+    
     print('Serializing the generated output.')
     if accept == 'application/json':
         arr = prediction_output.numpy()
@@ -70,6 +69,11 @@ def output_fn(prediction_output, accept='application/json'):
     raise Exception('Requested unsupported ContentType in Accept: ' + accept)
 
 def predict_fn(input_data, model):
+    """
+    executes a prediction based on a model
+    input_data - the data point to predict (an image) as a pytorch 
+    
+    """
     print('Predicting class labels for the input data...')
     print(input_data.shape)
     if torch.cuda.is_available() :

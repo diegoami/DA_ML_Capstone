@@ -90,7 +90,7 @@ The closest problem I know of is categorizing sports videos, as from this link, 
 ## Evaluation Metrics
 
 
-To verify how well the model categorizes images in videos, as this is a problem of categorization with multiple and unbalanced labels, I will use the log loss as a metric for optimizing the model. This is because I am interested in a model which returns the probability of categories for each image.
+To verify how well the model categorizes images in videos, as this is a problem of categorization with multiple and unbalanced labels, I will use the log loss as a metric for optimizing the model, or rather cross entropy which is used in case of multiple possible categories. This is because I am interested in a model which returns the probability of categories for each image.
 
 
 We are also interested in a good average F1 and especially on a good recall when identifying images categorized in a different way as “OTHER”.
@@ -107,8 +107,7 @@ Image dataset creation:  Extraction of single images from videos at specific tim
 Training Job: a neural network will be trained to identify the probability for each category of an image. Our goal is to reach a good measurement on the identified metrics (log loss, f1, recall)
 
 
-Deployment of Service: a model will be deployed, in form of a service, that will be able to categorize a set of images, returning a probability for each category. 
-This model will be also able to accept a video or the URL of a video and the seconds interval at which images will be retrieved -  say, like, every two seconds.
+Deployment of Service: a model and a predictor will be deployed, that will be able to categorize a set of images, returning a probability for each category. 
 
-
-Client: a client will call the service passing a video and a second interval as an argument, and then execute a visualization of the result - identifying video segments and the probability of what category segments belong to.
+A possible future extension will be the possibility to accept a video or the URL of a video and the seconds interval at which images will be retrieved -  say, like, every two seconds.
+In this case, a client will call the service passing a video and a second interval as an argument, and then execute a visualization of the result - identifying video segments and the probability of what category segments belong to. This is however out of scope of thi project.

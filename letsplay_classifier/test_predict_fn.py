@@ -8,17 +8,12 @@ from PIL import Image
 from torchvision import transforms
 import torch.nn as nn
 
-
+"""
+used to test prediction from models outside of Sagemaker
+"""
 
 if __name__ == '__main__':
-    # All of the model parameters and training parameters are sent as arguments
-    # when this script is executed, during a training job
-
-    # Here we set up an argument parser to easily access the parameters
     parser = argparse.ArgumentParser()
-
-    # SageMaker parameters, like the directories for training data and saving models; set automatically
-    # Do not need to change
 
     parser.add_argument('--hosts', type=list, default=json.loads(os.environ['SM_HOSTS']))
     parser.add_argument('--current-host', type=str, default=os.environ['SM_CURRENT_HOST'])

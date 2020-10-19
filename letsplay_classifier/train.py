@@ -21,11 +21,7 @@ from torch.autograd import Variable
 # import model
 from model import VGGLP
 
-#import subprocess as sb 
-#import sys 
-#sb.call([sys.executable, "-m", "pip", "install", "scikit-learn"]) 
-#sb.call([sys.executable, "-m", "pip", "install", "torchdata==0.2.0"]) 
-#sb.call([sys.executable, "-m", "pip", "install", "torchvision==0.7.0"]) 
+
 
 from sklearn.model_selection import train_test_split
 
@@ -33,66 +29,6 @@ from sklearn.model_selection import train_test_split
 import torchdata as td
 import torchvision
 from torchvision import transforms
-
-def model_fn(model_dir):
-    print("Loading model.")
-
-    # First, load the parameters used to create the model.
-    model_info = {}
-    model_info_path = os.path.join(model_dir, 'model_info.pth')
-    with open(model_info_path, 'rb') as f:
-        model_info = torch.load(f)
-
-    print("model_info: {}".format(model_info))
-
-    # Determine the device and construct the model.
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = VGGLP(model_info.num_classes)
-
-    # Load the stored model parameters.
-    model_path = os.path.join(model_dir, 'model.pth')
-    with open(model_path, 'rb') as f:
-        model.load_state_dict(torch.load(f))
-    
-    return model.to(device)
-
-
-
-# Provided train function
-def train(model, train_loader, epochs, optimizer, criterion, device):
-    """
-    This is the training method that is called by the PyTorch training script. The parameters
-    passed are as follows:
-    model        - The PyTorch model that we wish to train.
-    train_loader - The PyTorch DataLoader that should be used during training.
-    epochs       - The total number of epochs to train for.
-    optimizer    - The optimizer to use during training.
-    criterion    - The loss function used for training. 
-    device       - Where the model and data should be loaded (gpu or cpu).
-    """
-    
-    for epoch in range(1, epochs + 1):
-        model.train()
-        total_loss = 0
-        for batch_idx, (data, target) in enumerate(train_loader, 1):
-            # prep data
-            data, target = data.to(device), target.to(device)
-            optimizer.zero_grad() # zero accumulated gradients
-            # get output of SimpleNet
-            output = model(data)
-            # calculate loss and perform backprop
-            loss = criterion(output, target)
-            loss.backward()
-            optimizer.step()
-    
-            total_loss += loss.item()
-        
-        # print loss stats
-        print("Epoch: {}, Loss: {}".format(epoch, total_loss / len(train_loader)))
-
-    # save trained model, after all epochs
-    save_model(model, args.model_dir)
-
 
 # Provided model saving functions
 def save_model(model, model_dir):
@@ -112,9 +48,14 @@ def save_model_params(num_classes):
         torch.save(model_info, f)
 
 def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_size=8):
-
-    root = img_dir
-    total_count = sum([len(files) for r, d, files in os.walk(root)])
+    """
+    Builds the data loader objects for retrieving images from a specific directory
+    img_dir - the directory where images are located
+    img_height - the height to which to compress images
+    img_width - the width to which compress images
+    returns - the data loaders, the daset sizes, and the names of the labels
+    """
+    total_count = sum([len(files) for r, d, files in os.walk(img_dir)])
 
     data_transform = torchvision.transforms.Compose(
         [
@@ -122,12 +63,12 @@ def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_
             transforms.ToTensor()
         ]
     )
+    
     model_dataset = td.datasets.WrapDataset(torchvision.datasets.ImageFolder(root, transform=data_transform))
-    # Also you shouldn't use transforms here but below
+
     train_count = int(0.75 * total_count)
     valid_count = total_count - train_count
-    import numpy as np
-
+    
     train_idx, valid_idx = train_test_split(
         np.arange(len(model_dataset)),
         test_size=0.25,
@@ -140,9 +81,6 @@ def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_
     train_dataset_loader = torch.utils.data.DataLoader(model_dataset, batch_size=batch_size, sampler=train_sampler)
     valid_dataset_loader = torch.utils.data.DataLoader(model_dataset, batch_size=batch_size, sampler=valid_sampler)
 
-
-
-
     dataloaders = {
         'train': train_dataset_loader,
         'val': valid_dataset_loader
@@ -154,11 +92,20 @@ def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_
     class_names = model_dataset.classes
     return dataloaders, dataset_sizes, class_names
 
-def \
-        train_model(vgg, dataloaders, dataset_sizes, criterion, optimizer,  num_epochs=15):
+def train_model(model, dataloaders, dataset_sizes, criterion, optimizer,  num_epochs=10):
+    """
+    trains the model using a set of images
+    model - the model to be trained
+    dataloaders - a map of dataloaders for retrieving load images for train and val-idation
+    dataset_sizes - a map of int containing the size of datasets for train and validation
+    criterion - the criterion used to evaluate the model
+    optimizer - the optimizer used to train the model
+    num_epoch - the number of epochs to train
+    returns the trained model
+    """
     use_gpu = torch.cuda.is_available()
     since = time.time()
-    best_model_wts = copy.deepcopy(vgg.state_dict())
+    best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
     train_batches = len(dataloaders['train'])
     val_batches = len(dataloaders['val'])
@@ -172,13 +119,10 @@ def \
         acc_train = 0
         acc_val = 0
 
-        vgg.train(True)
-
+        model.train(True)
         for i, data in enumerate(dataloaders['train']):
             if i % 100 == 0:
                 print("Training batch {}/{}".format(i, train_batches ))
-
-
 
             inputs, labels = data
             if use_gpu:
@@ -188,7 +132,7 @@ def \
 
             optimizer.zero_grad()
 
-            outputs = vgg(inputs)
+            outputs = model(inputs)
 
             _, preds = torch.max(outputs.data, 1)
             loss = criterion(outputs, labels)
@@ -207,12 +151,12 @@ def \
         avg_loss = torch.true_divide(loss_train, dataset_sizes['train'])
         avg_acc = torch.true_divide(acc_train, dataset_sizes['train'])
 
-        vgg.train(False)
-        vgg.eval()
+        model.train(False)
+        model.eval()
 
         for i, data in enumerate(dataloaders['val']):
             if i % 100 == 0:
-                print("\rValidation batch {}/{}".format(i, val_batches), end='', flush=True)
+                print("Validation batch {}/{}".format(i, val_batches))
 
             inputs, labels = data
 
@@ -223,7 +167,7 @@ def \
 
             optimizer.zero_grad()
 
-            outputs = vgg(inputs)
+            outputs = model(inputs)
 
             _, preds = torch.max(outputs.data, 1)
             loss = criterion(outputs, labels)
@@ -248,32 +192,26 @@ def \
 
         if avg_acc_val > best_acc:
             best_acc = avg_acc_val
-            best_model_wts = copy.deepcopy(vgg.state_dict())
+            best_model_wts = copy.deepcopy(model.state_dict())
 
     elapsed_time = time.time() - since
     print()
     print("Training completed in {:.0f}m {:.0f}s".format(elapsed_time // 60, elapsed_time % 60))
     print("Best acc: {:.4f}".format(best_acc))
 
-    vgg.load_state_dict(best_model_wts)
-    return vgg
+    model.load_state_dict(best_model_wts)
+    return model
 
 if __name__ == '__main__':
-    # All of the model parameters and training parameters are sent as arguments
-    # when this script is executed, during a training job
-    
-    # Here we set up an argument parser to easily access the parameters
     parser = argparse.ArgumentParser()
 
-    # SageMaker parameters, like the directories for training data and saving models; set automatically
-    # Do not need to change
+    # SageMaker parameters
 
     parser.add_argument('--hosts', type=list, default=json.loads(os.environ['SM_HOSTS']))
     parser.add_argument('--current-host', type=str, default=os.environ['SM_CURRENT_HOST'])
     parser.add_argument('--model-dir', type=str, default=os.environ['SM_MODEL_DIR'])
     parser.add_argument('--data-dir', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
 
-    # Training Parameters, given
 
     parser.add_argument('--img-width', type=int, default=IMG_WIDTH, metavar='N',
                         help='width of image (default: 128)')
@@ -296,14 +234,8 @@ if __name__ == '__main__':
     torch.manual_seed(args.seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed(args.seed)
-        
-    # get train loader
-    #train_loader = _get_train_loader(args.batch_size, args.data_dir) # data_dir from above..
 
     dataloaders, dataset_sizes, class_names = get_data_loaders(img_dir=args.data_dir, img_width=args.img_width, img_height=args.img_height, batch_size=args.batch_size )
-
-    # To get params from the parser, call args.argument_name, ex. args.epochs or ards.hidden_dim
-    # Don't forget to move your model .to(device) to move to GPU , if appropriate
 
     model = VGGLP(len(class_names))
     if torch.cuda.is_available():
