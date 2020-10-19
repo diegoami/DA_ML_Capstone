@@ -7,11 +7,12 @@ from PIL import Image
 
 import torch.nn as nn
 
-if __name__ == '__main__':
-    # All of the model parameters and training parameters are sent as arguments
-    # when this script is executed, during a training job
+"""
+Script used to test the validity of the methods in predict.py
+"""
 
-    # Here we set up an argument parser to easily access the parameters
+if __name__ == '__main__':
+
     parser = argparse.ArgumentParser()
 
     # SageMaker parameters, like the directories for training data and saving models; set automatically

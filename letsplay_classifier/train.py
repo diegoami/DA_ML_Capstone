@@ -4,28 +4,17 @@ import time
 import copy
 import os
 import json
-
 from constants import IMG_WIDTH, IMG_HEIGHT
-
-LOCAL = 1
-
 import torch.utils.data
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
 
 from torch.autograd import Variable
-
-
 # import model
 from model import VGGLP
 
-
-
 from sklearn.model_selection import train_test_split
-
-
 import torchdata as td
 import torchvision
 from torchvision import transforms
@@ -64,7 +53,8 @@ def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_
         ]
     )
     
-    model_dataset = td.datasets.WrapDataset(torchvision.datasets.ImageFolder(root, transform=data_transform))
+    # build a dataset of images from the img_dir directory
+    model_dataset = td.datasets.WrapDataset(torchvision.datasets.ImageFolder(img_dir, transform=data_transform))
 
     train_count = int(0.75 * total_count)
     valid_count = total_count - train_count
@@ -211,7 +201,6 @@ if __name__ == '__main__':
     parser.add_argument('--current-host', type=str, default=os.environ['SM_CURRENT_HOST'])
     parser.add_argument('--model-dir', type=str, default=os.environ['SM_MODEL_DIR'])
     parser.add_argument('--data-dir', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
-
 
     parser.add_argument('--img-width', type=int, default=IMG_WIDTH, metavar='N',
                         help='width of image (default: 128)')
