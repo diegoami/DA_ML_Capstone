@@ -4,8 +4,9 @@ import os
 import json
 import torch
 from PIL import Image
-
+import requests
 import torch.nn as nn
+import numpy as np
 
 """
 Script used to test the validity of the methods in predict.py
@@ -18,25 +19,30 @@ if __name__ == '__main__':
     # SageMaker parameters, like the directories for training data and saving models; set automatically
     # Do not need to change
 
-    parser.add_argument('--hosts', type=list, default=json.loads(os.environ['SM_HOSTS']))
-    parser.add_argument('--current-host', type=str, default=os.environ['SM_CURRENT_HOST'])
-    parser.add_argument('--model-dir', type=str, default=os.environ['SM_MODEL_DIR'])
+    #parser.add_argument('--hosts', type=list, default=json.loads(os.environ['SM_HOSTS']))
+    #parser.add_argument('--current-host', type=str, default=os.environ['SM_CURRENT_HOST'])
+    #parser.add_argument('--model-dir', type=str, default=os.environ['SM_MODEL_DIR'])
     parser.add_argument('--data-dir', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
 
 
-    parser.add_argument('--img-width', type=int, default=128, metavar='N',
-                        help='width of image (default: 128)')
-    parser.add_argument('--img-height', type=int, default=72, metavar='N',
-                        help='height of image (default: 72)')
-    parser.add_argument('--batch-size', type=int, default=8, metavar='N',
-                        help='input batch size for training (default: 8)')
+    #parser.add_argument('--img-width', type=int, default=128, metavar='N',
+    #                    help='width of image (default: 128)')
+    #parser.add_argument('--img-height', type=int, default=72, metavar='N',
+    #                    help='height of image (default: 72)')
+    #parser.add_argument('--batch-size', type=int, default=8, metavar='N',
+    #                    help='input batch size for training (default: 8)')
     args = parser.parse_args()
-    model = model_fn(args.model_dir)
+    #model = model_fn(args.model_dir)
     criterion = nn.CrossEntropyLoss()
     index = 0
     loss_test = 0
     acc_test = 0
     count = 0
+    from sagemaker.predictor import RealTimePredictor
+    endpoint_name = 'pytorch-inference-2020-10-19-16-29-34-165'
+    predictor = RealTimePredictor(endpoint_name,
+         content_type='application/json',
+         accept='application/json')
 
     dirs = sorted(os.listdir(args.data_dir))
     for dir in dirs:
@@ -51,11 +57,14 @@ if __name__ == '__main__':
             with open(curr_img, 'rb') as f:
                 imagef = Image.open(f)
                 image_data = json.dumps(np.array(imagef).tolist())
-                input_object = input_fn(image_data )
+                
+                output = predictor.predict(image_data)
+                #input_object = input_fn(image_data )
 
-                prediction = predict_fn(input_object, model)
+                #prediction = predict_fn(input_object, model)
 
-                output = output_fn(prediction)
+                #output = output_fn(prediction)
+                #requests.post('https://runtime.sagemaker.eu-central-1.amazonaws.com/endpoints/pytorch-inference-2020-10-19-15-58-59-387/invocations', image_data)
 
                 output_list = json.loads(output)
                 prediction = torch.FloatTensor(output_list).unsqueeze(0)
@@ -68,7 +77,8 @@ if __name__ == '__main__':
                 count += 1
                 avg_loss = torch.true_divide(loss_test, count)
                 avg_acc = torch.true_divide(acc_test, count)
-                print("{} processed".format(count))
-                print("Avg loss (test): {:.4f}".format(avg_loss))
-                print("Avg acc (test): {:.4f}".format(avg_acc))
+                if True:
+                    print("{} processed".format(count))
+                    print("Avg loss (test): {:.4f}".format(avg_loss))
+                    print("Avg acc (test): {:.4f}".format(avg_acc))
         index += 1
