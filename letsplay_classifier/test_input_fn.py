@@ -1,4 +1,4 @@
-from predict_fromfile import model_fn, predict_fn, input_fn, output_fn
+from predict import model_fn, predict_fn, input_fn, output_fn
 import argparse
 import os
 import json
@@ -49,8 +49,8 @@ if __name__ == '__main__':
             curr_img = os.path.join(curr_img_dir, image)
 
             with open(curr_img, 'rb') as f:
-                image_data = Image.open(f)
-
+                imagef = Image.open(f)
+                image_data = json.dumps(np.array(imagef).tolist())
                 input_object = input_fn(image_data )
 
                 prediction = predict_fn(input_object, model)

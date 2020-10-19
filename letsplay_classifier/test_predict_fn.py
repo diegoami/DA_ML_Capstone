@@ -46,7 +46,7 @@ if __name__ == '__main__':
             curr_img = os.path.join(curr_img_dir, image)
             print(curr_img)
             with open(curr_img, 'rb') as f:
-                image_data = Image.open(f).resize((args.img_height, args.img_width))
+                image_data = Image.open(f)
 
                 image_resized = transforms.Resize((args.img_height, args.img_width))(image_data)
                 image_tensor = transforms.ToTensor()(image_resized)

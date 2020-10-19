@@ -4,6 +4,7 @@ import time
 import copy
 import os
 import json
+import numpy as np
 from constants import IMG_WIDTH, IMG_HEIGHT
 import torch.utils.data
 import torch

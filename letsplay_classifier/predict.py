@@ -8,15 +8,15 @@ from PIL import Image
 from torch.autograd import Variable
 from model import VGGLP
 from constants import IMG_HEIGHT, IMG_WIDTH
-CONTENT_TYPE = 'application/jpeg'
+import numpy as np
 
 
 from torchvision import datasets, models, transforms
 
-def model_fn(model_dir):
+def model_fn(model_dir_arg):
     """Load the PyTorch model from the `model_dir` directory."""
     print("Loading model.")
-
+    model_dir = '/opt/ml/model'
     model_info_path = os.path.join(model_dir, 'model_info.pth')
     with open(model_info_path, 'rb') as f:
         model_info = torch.load(f)
@@ -39,13 +39,13 @@ def model_fn(model_dir):
     return model
 
 
-def input_fn(request_body, content_type='application/jpeg'):
+def input_fn(request_body, content_type='application/json'):
     """
     predictor using an image in its request
     """
 
-    if content_type == 'application/jpeg':
-        image_data = request_body
+    if content_type == 'application/json':
+        image_data = Image.fromarray(np.array(json.loads(request_body), dtype='uint8'))
         image_resized = transforms.Resize((IMG_HEIGHT, IMG_WIDTH))(image_data)
         image_tensor = transforms.ToTensor()(image_resized)
         image_unsqueezed = image_tensor.unsqueeze(0)
