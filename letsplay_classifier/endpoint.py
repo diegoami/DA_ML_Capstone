@@ -29,7 +29,7 @@ def evaluate(endpoint_name, data_dir, percentage=1):
          content_type='application/json',
          accept='application/json')
 
-    dirs = sorted(os.listdir(args.data_dir))
+    dirs = sorted(os.listdir(data_dir))
     for dir in dirs:
         labels = torch.empty(1, dtype=int)
         labels[0] = index
@@ -49,7 +49,7 @@ def evaluate(endpoint_name, data_dir, percentage=1):
                 
                 output_list = json.loads(output)
                 prediction = torch.FloatTensor(output_list).unsqueeze(0)
-
+                print(prediction)
                 _, preds = torch.max(prediction.data, 1)
                 loss = criterion(prediction, labels)
 

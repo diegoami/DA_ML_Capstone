@@ -27,7 +27,7 @@ def save_model(model, model_dir):
     # save state dictionary
     torch.save(model.cpu().state_dict(), path)
     
-def save_model_params(model_dir, num_classes, img_width, img_height, epochs):
+def save_model_params(model_dir, num_classes, img_width, img_height, epochs, layer_cfg):
     
     model_info_path = os.path.join(model_dir, 'model_info.pth')
     with open(model_info_path, 'wb') as f:
@@ -35,7 +35,8 @@ def save_model_params(model_dir, num_classes, img_width, img_height, epochs):
             'num_classes': num_classes,
             'img_width': img_width,
             'img_height': img_height,
-            'epochs': epochs
+            'epochs': epochs,
+            'layer_cfg': layer_cfg
         }
         torch.save(model_info, f)
 
@@ -258,7 +259,7 @@ if __name__ == '__main__':
     save_model(model, args.model_dir)
 
     #  save the parameters used to construct the model
-    save_model_params(args.model_dir, len(class_names), args.img_width, args.img_height, args.epochs)
+    save_model_params(args.model_dir, len(class_names), args.img_width, args.img_height, args.epochs, args.layer_cfg)
 
     # saves the best accuracy and loss in this model
     save_model_metrics(args.model_dir, best_acc, best_loss)

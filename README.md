@@ -3,6 +3,9 @@
 Diego Amicabile - August 2020
 # AUTOMATIC SPLITTING OF VIDEO GAMES RECORDINGS
 
+## Files 
+
+To get started, use the jupyter notebook Wendy_CNN.ipynb. It may require at least 10 GB of space.
 
 ## Domain background
 
