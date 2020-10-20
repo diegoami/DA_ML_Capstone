@@ -244,7 +244,7 @@ if __name__ == '__main__':
         torch.cuda.manual_seed(args.seed)
 
     # retrieves train and validation data loaders and datasets, and the label names         
-    dataloaders, dataset_sizes, class_names = get_data_loaders(img_dir=args.data_dir, img_width=args.img_width, img_height=args.img_height, batch_size=args.batch_size )
+    dataloaders, dataset_sizes, class_names = get_data_loaders(img_dir=args.data_dir,  img_height=args.img_height, img_width=args.img_width, batch_size=args.batch_size )
 
     # initializes a VGG model returning the desired labels
     model = VGGLP(len(class_names), args.layer_cfg)
