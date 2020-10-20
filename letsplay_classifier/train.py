@@ -139,7 +139,8 @@ def train_model(model, dataloaders, dataset_sizes, criterion, optimizer,  num_ep
             optimizer.zero_grad()
 
             outputs = model(inputs)
-
+            print(outputs)
+            print(labels)
             _, preds = torch.max(outputs.data, 1)
             loss = criterion(outputs, labels)
 
@@ -174,7 +175,7 @@ def train_model(model, dataloaders, dataset_sizes, criterion, optimizer,  num_ep
             optimizer.zero_grad()
 
             outputs = model(inputs)
-
+            print(outputs)
             _, preds = torch.max(outputs.data, 1)
             loss = criterion(outputs, labels)
 

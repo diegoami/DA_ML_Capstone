@@ -5,9 +5,10 @@ import json
 import torch
 from PIL import Image
 import requests
-import torch.nn as nn
+from math import exp, log
 import numpy as np
 import random
+
 
 from sagemaker.predictor import RealTimePredictor
 
@@ -19,10 +20,9 @@ def evaluate(endpoint_name, data_dir, percentage=1):
     data_dir : the local directory where files can be found
     percentage : the percentage of files 
     """
-    criterion = nn.CrossEntropyLoss()
     index = 0
-    loss_test = 0
-    acc_test = 0
+    loss_tot = 0
+    acc_tot = 0
     count = 0
     image_total = 0
     predictor = RealTimePredictor(endpoint_name,
@@ -31,9 +31,6 @@ def evaluate(endpoint_name, data_dir, percentage=1):
 
     dirs = sorted(os.listdir(data_dir))
     for dir in dirs:
-        labels = torch.empty(1, dtype=int)
-        labels[0] = index
-        print(labels)
         curr_img_dir = os.path.join(data_dir, dir)
         images = os.listdir(curr_img_dir)
         for image in images:
@@ -41,26 +38,43 @@ def evaluate(endpoint_name, data_dir, percentage=1):
             image_total += 1
             if (random.uniform(0, 1) > percentage):
                 continue
+            count += 1
             with open(curr_img, 'rb') as f:
                 imagef = Image.open(f)
                 image_data = json.dumps(np.array(imagef).tolist())
                 
                 output = predictor.predict(image_data)
                 
-                output_list = json.loads(output)
-                prediction = torch.FloatTensor(output_list).unsqueeze(0)
-                print(prediction)
-                _, preds = torch.max(prediction.data, 1)
-                loss = criterion(prediction, labels)
-
-                loss_test += loss.data
-                acc_test += torch.sum(preds == labels.data)
-                count += 1
-                avg_loss = torch.true_divide(loss_test, count)
-                avg_acc = torch.true_divide(acc_test, count)
-                if (count % 50 == 0):
+                ol = output_list = json.loads(output)
+                
+                print(ol)
+                print(sum(ol))
+                print([exp(ol[j]) for j in range(len(ol))])
+                print(sum([exp(ol[j]) for j in range(len(ol))]))
+                mol = max(ol)
+                loss = (-ol[index]+log(sum([exp(ol[j]) for j in range(len(ol))])))
+                acc = ol[index] == mol
+                loss_tot += loss
+                acc_tot += acc
+                #prediction, labels = Variable(prediction, volatile=True), Variable(labels, volatile=True)
+                #print(prediction)
+                #print(labels)
+                avg_loss, avg_acc = loss_tot / count, acc_tot / count
+                
+                if True:
+         #       if (count % 50 == 0):
                     print("{} processed of {}".format(count, image_total))
                     print("Avg loss (test): {:.4f}".format(avg_loss))
                     print("Avg acc (test): {:.4f}".format(avg_acc))
         index += 1
     return avg_acc, avg_loss, count
+
+
+
+if __name__ == '__main__':
+    
+    endpoint_name='DA-ML-endpoint'
+    avg_acc, avg_loss, count = evaluate(endpoint_name, '../wendy_cnn_frames_data', 0.05)
+    print("{} processed of {}".format(count, image_total))
+    print("Avg loss : {:.4f}".format(avg_loss))
+    print("Avg acc : {:.4f}".format(avg_acc))
