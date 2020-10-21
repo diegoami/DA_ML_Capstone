@@ -46,19 +46,7 @@ def evaluate(endpoint_name, data_dir, percentage=1):
                 output = predictor.predict(image_data)
                 
                 ol = output_list = json.loads(output)
-                
-                print(ol)
-                print(sum(ol))
-                print([exp(ol[j]) for j in range(len(ol))])
-                print(sum([exp(ol[j]) for j in range(len(ol))]))
-                mol = max(ol)
-                loss = (-ol[index]+log(sum([exp(ol[j]) for j in range(len(ol))])))
-                acc = ol[index] == mol
-                loss_tot += loss
-                acc_tot += acc
-                #prediction, labels = Variable(prediction, volatile=True), Variable(labels, volatile=True)
-                #print(prediction)
-                #print(labels)
+
                 avg_loss, avg_acc = loss_tot / count, acc_tot / count
                 
                 if True:

@@ -2,10 +2,9 @@ from predict import model_fn, predict_fn, input_fn, output_fn
 import argparse
 import os
 import json
-import torch
+import numpy as np
 from PIL import Image
-
-import torch.nn as nn
+import random
 
 if __name__ == '__main__':
     # All of the model parameters and training parameters are sent as arguments
@@ -22,34 +21,34 @@ if __name__ == '__main__':
     parser.add_argument('--model-dir', type=str, default=os.environ['SM_MODEL_DIR'])
     parser.add_argument('--data-dir', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
 
-
-    parser.add_argument('--img-width', type=int, default=128, metavar='N',
-                        help='width of image (default: 128)')
-    parser.add_argument('--img-height', type=int, default=72, metavar='N',
-                        help='height of image (default: 72)')
-    parser.add_argument('--batch-size', type=int, default=8, metavar='N',
-                        help='input batch size for training (default: 8)')
     args = parser.parse_args()
     model = model_fn(args.model_dir)
-    criterion = nn.CrossEntropyLoss()
-    index = 0
+
+    inc_index = 0
     loss_test = 0
     acc_test = 0
     count = 0
+    total = 0
+
 
     dirs = sorted(os.listdir(args.data_dir))
+    np_conf = np.zeros((len(dirs), len(dirs)))
+
+    percentage = 0.05
     for dir in dirs:
-        labels = torch.empty(1, dtype=int)
-        labels[0] = index
-        print(labels)
+        label_index =  inc_index
+
         curr_img_dir = os.path.join(args.data_dir, dir)
         images = os.listdir(curr_img_dir)
         for image in images:
             curr_img = os.path.join(curr_img_dir, image)
-
+            total += 1
+            if (random.uniform(0, 1) > percentage):
+                continue
             with open(curr_img, 'rb') as f:
-                image_data = Image.open(f)
 
+                imagef = Image.open(f)
+                image_data = json.dumps(np.array(imagef).tolist())
                 input_object = input_fn(image_data )
 
                 prediction = predict_fn(input_object, model)
@@ -57,13 +56,22 @@ if __name__ == '__main__':
                 output = output_fn(prediction)
 
                 output_list = json.loads(output)
-                prediction = torch.FloatTensor(output_list).unsqueeze(0)
 
+                index, maxx = 0, -100
+                for i, ol in enumerate(output_list):
+                    if ol > maxx:
+                        maxx = ol
+                        index = i
 
-                acc_test += torch.sum(preds == labels.data)
+                acc_test += (index == label_index)
                 count += 1
-                avg_acc = torch.true_divide(acc_test, count)
-                print("{} processed".format(count))
-                print("Avg loss (test): {:.4f}".format(avg_loss))
-                print("Avg acc (test): {:.4f}".format(avg_acc))
-        index += 1
+                avg_acc = acc_test / count
+                np_conf[ label_index, index] += 1
+                if (count % 50 == 0):
+                    print("{} processed up to {}".format(count, total))
+                    print("Avg acc (test): {:.4f}".format(avg_acc))
+                    print(np_conf)
+        inc_index += 1
+    print("{} processed up to {}".format(count, total))
+    print("Avg acc (test): {:.4f}".format(avg_acc))
+    print(np_conf)

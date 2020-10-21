@@ -17,7 +17,10 @@ def model_fn(model_dir_arg):
     global IMG_HEIGHT, IMG_WIDTH 
     """Load the PyTorch model from the `model_dir` directory."""
     print("Loading model.")
-    model_dir = '/opt/ml/model'
+    if (os.path.exists('/opt/ml/model')):
+        model_dir = '/opt/ml/model'
+    else:
+        model_dir = model_dir_arg
     model_info_path = os.path.join(model_dir, 'model_info.pth')
     with open(model_info_path, 'rb') as f:
         model_info = torch.load(f)
@@ -58,14 +61,13 @@ def output_fn(prediction_output, accept='application/json'):
     """
     result of a request as an array of probabilities in json format
     """
-    
-    print('Serializing the generated output.')
+
     if accept == 'application/json':
         arr = prediction_output.numpy()
         listresult = arr.flatten().tolist()
-        print(listresult)
+
         json_res = json.dumps(listresult)
-        print(json_res)
+
         return json_res
     raise Exception('Requested unsupported ContentType in Accept: ' + accept)
 
@@ -75,13 +77,10 @@ def predict_fn(input_data, model):
     input_data - the data point to predict (an image) as a pytorch 
     
     """
-    print('Predicting class labels for the input data...')
-    print(input_data.shape)
     if torch.cuda.is_available() :
         inputs = Variable(input_data.cuda(), volatile=True)
     else:
         inputs = Variable(input_data, volatile=True)
-    print(inputs.shape)
 
     # Compute the result of applying the model to the input data.
     out = model(inputs)
