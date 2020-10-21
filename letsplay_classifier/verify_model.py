@@ -26,7 +26,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     model = model_fn(args.model_dir)
 
-    inc_index = 0
+    label_index = 0
     loss_test = 0
     acc_test = 0
     count = 0
@@ -36,11 +36,10 @@ if __name__ == '__main__':
 
 
     dirs = sorted(os.listdir(args.data_dir))
-    np_conf = np.zeros((len(dirs), len(dirs)))
+    np_conf = np.zeros((len(dirs), len(dirs)), dtype='uint')
 
     percentage = 0.05
     for dir in dirs:
-        label_index =  inc_index
 
         curr_img_dir = os.path.join(args.data_dir, dir)
         images = os.listdir(curr_img_dir)
@@ -77,7 +76,7 @@ if __name__ == '__main__':
                     print("{} processed up to {}".format(count, total))
                     print("Avg acc (test): {:.4f}".format(avg_acc))
                     print(np_conf)
-        inc_index += 1
+        label_index += 1
     print("{} processed up to {}".format(count, total))
     print("Avg acc (test): {:.4f}".format(avg_acc))
     print(np_conf)
