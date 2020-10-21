@@ -1,4 +1,3 @@
-
 import os
 import json
 
@@ -11,7 +10,7 @@ from sagemaker.predictor import RealTimePredictor
 
 def evaluate(endpoint_name, data_dir, percentage=1):
     """
-    Does an evaluation on a subset of the images on the endpoint. Not great performance.
+    Does an evaluation on a subset of the images on the endpoint.
     
     endpoint_name : the name of the endpoint where 
     data_dir : the local directory where files can be found
@@ -21,30 +20,44 @@ def evaluate(endpoint_name, data_dir, percentage=1):
 
     count = 0
     image_total = 0
+    
+    # label of images
+    label_index = 0
+    y_true, y_pred = [], []
+    
+    # set up a predictor from the endpoint
     predictor = RealTimePredictor(endpoint_name,
          content_type='application/json',
          accept='application/json')
-    label_index = 0
-    y_true, y_pred = [], []
+    
+    # we scan dirs in alphabetical orders, as the data loaders do
     dirs = sorted(os.listdir(data_dir))
-    np_conf = np.zeros((len(dirs), len(dirs)), dtype='uint')
+    
     for dir in dirs:
         curr_img_dir = os.path.join(data_dir, dir)
         images = os.listdir(curr_img_dir)
+        
+        # scanning all images belonging to a label
         for image in images:
             curr_img = os.path.join(curr_img_dir, image)
             image_total += 1
+            
+            # we use only a random subset (performance)
             if (random.uniform(0, 1) > percentage):
                 continue
             count += 1
+            
             with open(curr_img, 'rb') as f:
+                
+                # pass image as a json
                 imagef = Image.open(f)
                 image_data = json.dumps(np.array(imagef).tolist())
                 output = predictor.predict(image_data)
-                
                 output_list = json.loads(output)
 
                 pred_index, maxx = 0, -100
+                
+                # "argmax" on a list to find the most likely label
                 for i, ol in enumerate(output_list):
                     if ol > maxx:
                         maxx = ol

@@ -6,6 +6,7 @@ Diego Amicabile - August 2020
 ## Files 
 
 To get started, use the jupyter notebook Wendy_CNN.ipynb. It may require at least 10 GB of space.
+We assume Sagemaker 1 and Pytorch 1.6.
 
 ## Domain background
 
@@ -68,7 +69,7 @@ These are the categories I would like to identify in scenes. The set is not bala
 
 ## Solution Statement
 
-The full solution should be able to recognize scenes in videos and write down the time intervals of scenes that have been recognized, along with the probability for each category.
+The ideal solution should be able to recognize scenes in videos and write down the time intervals of scenes that have been recognized, along with the probability for each category. 
 
 
 To allow for that, I will create a model based on CNNs identifying the category probabilities of static images extracted from videos. There is enough information on most images to identify the scene type. 
@@ -84,11 +85,13 @@ When training the model, I will use images from each of the categories of intere
 ## Benchmark Model
 
 I could not find a benchmark for someone trying to solve a similar problem.
-The closest problem I know of is categorizing sports videos, as from this link, which gets very high accuracy and uses a combination of CNN, RNN and transfer learning. However, there are two main differences, compared with the probleTm I am trying to solve:
+The closest problem I know of is categorizing sports videos, as from this link, which gets very high accuracy and uses a combination of CNN, RNN and transfer learning. However, there are two main differences, compared with the problem I am trying to solve:
 
 
 * I am trying to split videos in parts and categorize those parts, and not trying to categorize full videos
 * The images that need to be categorized do not come from the “wild”, but are limited by the way they are generated from games graphical engines
+
+In the end, I decided to use a VGG16 net, fully retrained.
 
 ## Evaluation Metrics
 
@@ -104,7 +107,7 @@ We are also interested in a good average F1 and especially on a good recall when
 Assumption: all videos have been uploaded to S3. For some videos, which I will use for training, a companion text file including the time interval of identified scenes and their category is provided.
 
 
-Image dataset creation:  Extraction of single images from videos at specific time offsets and labeling of the extracted images with a scene type. Processing of images to make sure that they are all the same size and format. The dataset will be split into training and validation subsets, ensuring that subsets contains similar samples - with balanced categories and retrieved from similar scenes.
+Image dataset creation:  Extraction of single images from videos at specific time offsets and labeling of the extracted images with a scene type. Processing of images to make sure that they are all the same size and format. The dataset will be split into training and validation subsets, ensuring that subsets contains similar samples - with balanced categories and retrieved from similar scenes. Images will be put in a subdirectory named after the category I am trying to recognize.
 
 
 Training Job: a neural network will be trained to identify the probability for each category of an image. Our goal is to reach a good measurement on the identified metrics (log loss, f1, recall)
@@ -114,3 +117,5 @@ Deployment of Service: a model and a predictor will be deployed, that will be ab
 
 A possible future extension will be the possibility to accept a video or the URL of a video and the seconds interval at which images will be retrieved -  say, like, every two seconds.
 In this case, a client will call the service passing a video and a second interval as an argument, and then execute a visualization of the result - identifying video segments and the probability of what category segments belong to. This is however out of scope of thi project.
+
+The endpoint I have ended up deploying works with json files, as images are passed using this format and converted to and from the PIL Image format.

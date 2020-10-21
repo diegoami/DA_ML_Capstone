@@ -12,7 +12,6 @@ import torch.nn as nn
 import torch.optim as optim
 
 from torch.autograd import Variable
-# import model
 from model import VGGLP
 
 from sklearn.model_selection import train_test_split
@@ -20,15 +19,28 @@ import torchdata as td
 import torchvision
 from torchvision import transforms
 
-# Provided model saving functions
+
 def save_model(model, model_dir):
+    """
+    saves the model.
+    model - the model to be saved
+    model_dir - the directory where to save it
+    """
     print("Saving the model.")
     path = os.path.join(model_dir, 'model.pth')
     # save state dictionary
     torch.save(model.cpu().state_dict(), path)
     
 def save_model_params(model_dir, num_classes, img_width, img_height, epochs, layer_cfg):
-    
+    """
+    Save the paramaters using for creating the model
+    model_dir : where to save the model
+    num_classes : the amount of categories
+    img_width: the width to which resize images
+    img_height: the height to which resize images
+    epochs: number of epochs in iteration
+    layer_cfg: what configuration of layers to use in the VGG model ()
+    """    
     model_info_path = os.path.join(model_dir, 'model_info.pth')
     with open(model_info_path, 'wb') as f:
         model_info = {
@@ -41,6 +53,15 @@ def save_model_params(model_dir, num_classes, img_width, img_height, epochs, lay
         torch.save(model_info, f)
 
 def save_model_metrics(model_dir, best_acc, best_loss):
+    """
+    Save the metrics found while training
+    model_dir : where to save the model
+    num_classes : the amount of categories
+    img_width: the width to which resize images
+    img_height: the height to which resize images
+    epochs: number of epochs in iteration
+    layer_cfg: what configuration of layers to use in the VGG model ()
+    """
     model_metrics_path = os.path.join(model_dir, 'model_metrics.pth')
     with open(model_metrics_path, 'wb') as f:
         model_metrics = {
@@ -70,6 +91,7 @@ def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_
     # build a dataset of images from the img_dir directory
     model_dataset = td.datasets.WrapDataset(torchvision.datasets.ImageFolder(img_dir, transform=data_transform))
 
+    
     train_count = int(0.75 * total_count)
     valid_count = total_count - train_count
     
@@ -80,6 +102,7 @@ def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_
         shuffle=True,
         stratify=model_dataset.targets)
 
+    # create two data loaders for training and validation dataset
     train_sampler = torch.utils.data.SubsetRandomSampler(train_idx)
     valid_sampler = torch.utils.data.SubsetRandomSampler(valid_idx)
 
@@ -116,6 +139,7 @@ def train_model(model, dataloaders, dataset_sizes, criterion, optimizer,  num_ep
     train_batches = len(dataloaders['train'])
     val_batches = len(dataloaders['val'])
 
+    # in each epoch
     for epoch in range(num_epochs):
         print("Epoch {}/{}".format(epoch, num_epochs))
         print('-' * 10)
@@ -125,6 +149,7 @@ def train_model(model, dataloaders, dataset_sizes, criterion, optimizer,  num_ep
         acc_train = 0
         acc_val = 0
 
+        # first step - train the model on the training set
         model.train(True)
         for i, data in enumerate(dataloaders['train']):
             if i % 100 == 0:
@@ -139,8 +164,6 @@ def train_model(model, dataloaders, dataset_sizes, criterion, optimizer,  num_ep
             optimizer.zero_grad()
 
             outputs = model(inputs)
-            print(outputs)
-            print(labels)
             _, preds = torch.max(outputs.data, 1)
             loss = criterion(outputs, labels)
 
@@ -158,6 +181,7 @@ def train_model(model, dataloaders, dataset_sizes, criterion, optimizer,  num_ep
         avg_loss = torch.true_divide(loss_train, dataset_sizes['train'])
         avg_acc = torch.true_divide(acc_train, dataset_sizes['train'])
 
+        # evaluate on the validation set
         model.train(False)
         model.eval()
 
@@ -175,7 +199,6 @@ def train_model(model, dataloaders, dataset_sizes, criterion, optimizer,  num_ep
             optimizer.zero_grad()
 
             outputs = model(inputs)
-            print(outputs)
             _, preds = torch.max(outputs.data, 1)
             loss = criterion(outputs, labels)
 

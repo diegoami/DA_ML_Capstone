@@ -49,7 +49,10 @@ def input_fn(request_body, content_type='application/json'):
     """
 
     if content_type == 'application/json':
+        # converts images from json format
         image_data = Image.fromarray(np.array(json.loads(request_body), dtype='uint8'))
+        
+        # applies trasformation
         image_resized = transforms.Resize((IMG_HEIGHT, IMG_WIDTH))(image_data)
         image_tensor = transforms.ToTensor()(image_resized)
         image_unsqueezed = image_tensor.unsqueeze(0)
@@ -60,6 +63,7 @@ def input_fn(request_body, content_type='application/json'):
 def output_fn(prediction_output, accept='application/json'):
     """
     result of a request as an array of probabilities in json format
+    prediction_output : the prediction returned from the model
     """
 
     if accept == 'application/json':
