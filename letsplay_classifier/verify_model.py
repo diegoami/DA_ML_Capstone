@@ -5,6 +5,8 @@ import json
 import numpy as np
 from PIL import Image
 import random
+from sklearn.metrics import classification_report
+
 
 if __name__ == '__main__':
     # All of the model parameters and training parameters are sent as arguments
@@ -29,6 +31,8 @@ if __name__ == '__main__':
     acc_test = 0
     count = 0
     total = 0
+
+    y_true, y_pred = [], []
 
 
     dirs = sorted(os.listdir(args.data_dir))
@@ -57,16 +61,18 @@ if __name__ == '__main__':
 
                 output_list = json.loads(output)
 
-                index, maxx = 0, -100
+                pred_index, maxx = 0, -100
                 for i, ol in enumerate(output_list):
                     if ol > maxx:
                         maxx = ol
-                        index = i
+                        pred_index = i
 
-                acc_test += (index == label_index)
+                acc_test += (pred_index == label_index)
                 count += 1
                 avg_acc = acc_test / count
-                np_conf[ label_index, index] += 1
+                np_conf[ label_index, pred_index] += 1
+                y_true.append(label_index)
+                y_pred.append(pred_index)
                 if (count % 50 == 0):
                     print("{} processed up to {}".format(count, total))
                     print("Avg acc (test): {:.4f}".format(avg_acc))
@@ -75,3 +81,5 @@ if __name__ == '__main__':
     print("{} processed up to {}".format(count, total))
     print("Avg acc (test): {:.4f}".format(avg_acc))
     print(np_conf)
+    report = classification_report(y_true=y_true, y_pred=y_pred)
+    print(report)
