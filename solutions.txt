@@ -1,0 +1,37 @@
+PROBLEM DEFINITION
+
+As written in the proposal, the goal of this project is to verify whether it is possible to split videos produced while playing a videogame in separate scenes. In particular, I was interested in finding out whether it is possible to build a model which could identify settings of frames from the game Mount & Blade: Warband. In this game you alternate between uneventful sequence and more interesting parts, such as Battle, Sieges, Tournaments, attacks to Hideouts and so on.
+To create a dataset I took some videos from a game walkthrough (Playlists: https://www.youtube.com/watch?v=ei-ZqMq0PDY&list=PLNP_nRm4k4jd-AJ0GwTPS1ld2YP8FdT4h and https://www.youtube.com/watch?v=pnP3b5wXMZM&list=PLNP_nRm4k4jfNLo7FkjXewFH9Xe5Uc2Pa ) where I had written down in the description how videos can be split in different types of sequence.
+For instance in this video, https://www.youtube.com/watch?v=MEhPGFEOvpw&list=PLNP_nRm4k4jfNLo7FkjXewFH9Xe5Uc2Pa&index=54, by means of this description I can categorize frames included in the time intervals as "Hideout", "Battle", "Tournament", "Town" and "Other" (for every other else=
+
+
+09:51-12:21 Hideout Tundra Bandits (Failed)
+18:47-19:44 Battle with Sea Raiders
+20:50-21:46 Battle with Sea Raiders
+22:54-23:42 Battle with Sea Raiders
+34:06-37:44 Tournament won in Tihr
+38:46-40:48 Town escape for Boyar Vlan 
+
+To downloading the videos, extract frames from them and assign them to categories I have created a companion project:
+https://github.com/diegoami/DA_split_youtube_frames_s3/tree/support_playlists. I downloaded the videos from youtube using 
+youtube-dl and extracted from them frames every 2 seconds using opencv. Using the metadata in comments it is then possible to assign labels to single frames.
+The dataset I created is in a zip file: https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data.zip
+
+In this project I will create a model which categorizes these images and check metrics like cross entropy, while training, and confidence matrix including F1, recall and precision on each call, after publishing an endpoint based on this model.
+
+PROBLEM ANALYSIS
+
+Convolutional Neural Network are a very standard approach for categorizing images. There are several templates to create neural network. One that is included in Pytorch is VGG16, with several types of layers. 
+As the images extracted from game walkthrough are not related to real world images, using a pretrained net possibly expanding it with a layer does not make sense. Instead, we would opt for a full train.
+Before feeding them to the neural networks, images are resized to 128 x 72, which should be enough for the algorithm to recognize features ( original images are all 640 x 360). As we already have around 48000 images, we do not do data augmentation (like, use mirrored images). 
+The flaw in the dataset, regrettably, is that some categories, such as SIEGE, TRAP and TOWN, have relatively few samples. However, in this first pass, we would not modify the dataset. 
+
+IMPLEMENTATION
+
+For the implementation, we work with Sagemaker notebooks and Pytorch version 1.6, we which take care to include with torchvision, torchdata and scikit-learn (for preprocessing) taking advantage of the possibility of including a requirement.txt file.
+We load the full datasets of images, but we split in a random and stratified way in a train and validation dataset. We the provide a script, train.py, that allows to train a VGG16 neural network, specifying the desired image width and height to which to resize, the amount of epochs, and the kind of layer layout in the VGG16 model that we desire.
+In the provided Jupyter Notebook, we can trigger this training, and a standard run on this training script gives us an average loss of 0.003, and an average accuracy of 0.97, proving that the images contain enough information to allow a categorization.
+
+I saved then the model and created an endpoint and a predictor. For simplicity, this predictor accepts and returns JSON format messages. In the file endpoint.py, we call this predictor to calculate metrics on our full dataset without using pytorch, but only looping through some of images, converting it to JSON, passing to the predictor and comparing the true values with the labels, so that at the end we can get a confidence matrix
+
+
