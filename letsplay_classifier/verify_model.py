@@ -6,7 +6,78 @@ import numpy as np
 from PIL import Image
 import random
 from sklearn.metrics import classification_report
+from collections import defaultdict
 
+
+def verify(model, data_dir, percentage=1):
+    """
+    Give a classification report and a confidence matrix of a model
+    :param model: the model to analyze
+    :param data_dir: the directory containing data
+    :param percentage: the percentage of data to analyze (0-1)
+    :return:
+    """
+    label_index = 0
+
+    acc_test = 0
+    count = 0
+    total = 0
+
+    y_true, y_pred = [], []
+
+    dirs = sorted(os.listdir(data_dir))
+    np_conf = np.zeros((len(dirs), len(dirs)), dtype='uint')
+
+    misclassified = defaultdict(list)
+    for dir in dirs:
+
+        curr_img_dir = os.path.join(data_dir, dir)
+        images = os.listdir(curr_img_dir)
+        for image in images:
+            curr_img = os.path.join(curr_img_dir, image)
+            total += 1
+            rnd_value = random.uniform(0, 1)
+            if (rnd_value > percentage):
+                continue
+            with open(curr_img, 'rb') as f:
+
+                imagef = Image.open(f)
+
+
+                prediction = predict_fn(imagef, model)
+
+                output = output_fn(prediction)
+
+                output_list = json.loads(output)
+
+                pred_index, maxx = 0, -100
+                for i, ol in enumerate(output_list):
+                    if ol > maxx:
+                        maxx = ol
+                        pred_index = i
+
+                acc_test += (pred_index == label_index)
+                count += 1
+                avg_acc = acc_test / count
+                np_conf[label_index, pred_index] += 1
+                y_true.append(label_index)
+                y_pred.append(pred_index)
+                if (pred_index != label_index):
+                    misckey = (label_index, pred_index)
+                    misclassified[misckey].append((dir, image))
+
+                if (count % 500 == 0):
+                    print("{} processed up to {}".format(count, total))
+
+        label_index += 1
+    print("{} processed up to {}".format(count, total))
+    print("Avg acc (test): {:.4f}".format(avg_acc))
+    print("Confidence Matrix")
+    print(np_conf)
+    report = classification_report(y_true=y_true, y_pred=y_pred)
+    print(report)
+
+    return report, np_conf, misclassified
 
 if __name__ == '__main__':
     # All of the model parameters and training parameters are sent as arguments
@@ -23,62 +94,7 @@ if __name__ == '__main__':
     parser.add_argument('--model-dir', type=str, default=os.environ['SM_MODEL_DIR'])
     parser.add_argument('--data-dir', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
 
+
     args = parser.parse_args()
     model = model_fn(args.model_dir)
-
-    label_index = 0
-    loss_test = 0
-    acc_test = 0
-    count = 0
-    total = 0
-
-    y_true, y_pred = [], []
-
-
-    dirs = sorted(os.listdir(args.data_dir))
-    np_conf = np.zeros((len(dirs), len(dirs)), dtype='uint')
-
-    percentage = 0.05
-    for dir in dirs:
-
-        curr_img_dir = os.path.join(args.data_dir, dir)
-        images = os.listdir(curr_img_dir)
-        for image in images:
-            curr_img = os.path.join(curr_img_dir, image)
-            total += 1
-            if (random.uniform(0, 1) > percentage):
-                continue
-            with open(curr_img, 'rb') as f:
-
-                imagef = Image.open(f)
-                image_data = json.dumps(np.array(imagef).tolist())
-                input_object = input_fn(image_data )
-
-                prediction = predict_fn(input_object, model)
-
-                output = output_fn(prediction)
-
-                output_list = json.loads(output)
-
-                pred_index, maxx = 0, -100
-                for i, ol in enumerate(output_list):
-                    if ol > maxx:
-                        maxx = ol
-                        pred_index = i
-
-                acc_test += (pred_index == label_index)
-                count += 1
-                avg_acc = acc_test / count
-                np_conf[ label_index, pred_index] += 1
-                y_true.append(label_index)
-                y_pred.append(pred_index)
-                if (count % 50 == 0):
-                    print("{} processed up to {}".format(count, total))
-                    print("Avg acc (test): {:.4f}".format(avg_acc))
-                    print(np_conf)
-        label_index += 1
-    print("{} processed up to {}".format(count, total))
-    print("Avg acc (test): {:.4f}".format(avg_acc))
-    print(np_conf)
-    report = classification_report(y_true=y_true, y_pred=y_pred)
-    print(report)
+    verify(model, args.data_dir, 1)

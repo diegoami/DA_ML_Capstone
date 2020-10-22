@@ -19,6 +19,7 @@ import torchdata as td
 import torchvision
 from torchvision import transforms
 
+from verify_model import verify
 
 def save_model(model, model_dir):
     """
@@ -258,6 +259,7 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=1, metavar='S',
                         help='random seed (default: 1)')
 
+
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -287,4 +289,10 @@ if __name__ == '__main__':
 
     # saves the best accuracy and loss in this model
     save_model_metrics(args.model_dir, best_acc, best_loss)
+
+    # verify the model and prints its confidence matrix
+    report, np_conf, misclassified = verify(model, args.data_dir, 1)
+    print(report)
+    print(np_conf)
+    print(misclassified)
 

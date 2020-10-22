@@ -11,7 +11,7 @@ from constants import IMG_HEIGHT, IMG_WIDTH
 import numpy as np
 
 
-from torchvision import datasets, models, transforms
+from torchvision import transforms
 
 def model_fn(model_dir_arg):
     global IMG_HEIGHT, IMG_WIDTH 
@@ -53,10 +53,8 @@ def input_fn(request_body, content_type='application/json'):
         image_data = Image.fromarray(np.array(json.loads(request_body), dtype='uint8'))
         
         # applies trasformation
-        image_resized = transforms.Resize((IMG_HEIGHT, IMG_WIDTH))(image_data)
-        image_tensor = transforms.ToTensor()(image_resized)
-        image_unsqueezed = image_tensor.unsqueeze(0)
-        return image_unsqueezed
+
+        return image_data
     raise Exception(f'Requested unsupported ContentType in content_type {content_type}')
 
 
@@ -81,11 +79,14 @@ def predict_fn(input_data, model):
     input_data - the data point to predict (an image) as a pytorch 
     
     """
-    if torch.cuda.is_available() :
-        inputs = Variable(input_data.cuda(), volatile=True)
-    else:
-        inputs = Variable(input_data, volatile=True)
 
+    image_resized = transforms.Resize((IMG_HEIGHT, IMG_WIDTH))(input_data)
+    image_tensor = transforms.ToTensor()(image_resized)
+    image_unsqueezed = image_tensor.unsqueeze(0)
+    if torch.cuda.is_available():
+        inputs = Variable(image_unsqueezed.cuda(), volatile=True)
+    else:
+        inputs = Variable(image_unsqueezed, volatile=True)
     # Compute the result of applying the model to the input data.
     out = model(inputs)
     # The variable `result` should be a numpy array; a single value 0-1
