@@ -18,10 +18,12 @@ The game that I have chosen to use is Mount of Blade, of which I have several wa
 * TOWN (escape): escape from the town or castle prison 
 * OTHER : everything else 
 
-As written in the proposal, the goal of this project is to verify whether it is possible to split videos produced while playing a videogame in separate scenes. In particular, I was interested in finding out whether it is possible to build a model which could identify settings of frames from the game Mount & Blade: Warband. In this game you alternate between uneventful sequence and more interesting parts, such as Battle, Sieges, Tournaments, attacks to Hideouts and so on.
-To create a dataset I took some videos from a game walkthrough (Playlists: https://www.youtube.com/watch?v=ei-ZqMq0PDY&list=PLNP_nRm4k4jd-AJ0GwTPS1ld2YP8FdT4h and https://www.youtube.com/watch?v=pnP3b5wXMZM&list=PLNP_nRm4k4jfNLo7FkjXewFH9Xe5Uc2Pa ) where I had written down in the description how videos can be split in different types of sequence.
-For instance in this video, https://www.youtube.com/watch?v=MEhPGFEOvpw&list=PLNP_nRm4k4jfNLo7FkjXewFH9Xe5Uc2Pa&index=54, by means of this description I can categorize frames included in the time intervals as "Hideout", "Battle", "Tournament", "Town" and "Other" (for every other else=
+To create a dataset I took some videos from a game walkthrough of mine, the adventures of Wendy. I used the episodes from 41 to 66 from following public playlists on youtube: 
 
+* [Wendy - Part I -  Let's play Mount and Blade](https://www.youtube.com/watch?v=ei-ZqMq0PDY&list=PLNP_nRm4k4jd-AJ0GwTPS1ld2YP8FdT4h)
+* [Wendy - Part II - Let's play Mount and Blade - Retired](https://www.youtube.com/watch?v=pnP3b5wXMZM&list=PLNP_nRm4k4jfNLo7FkjXewFH9Xe5Uc2Pa) 
+
+These are some episodes I went through and manually split into scenes. I wrote down how they were split in the description. For instance, in episode 54, I have identified following scenes, of the category "Hideout", "Battle", "Tournament", "Town". All the other parts of the video are categorized as "Other".  
 
 09:51-12:21 Hideout Tundra Bandits (Failed)
 18:47-19:44 Battle with Sea Raiders
@@ -30,12 +32,16 @@ For instance in this video, https://www.youtube.com/watch?v=MEhPGFEOvpw&list=PLN
 34:06-37:44 Tournament won in Tihr
 38:46-40:48 Town escape for Boyar Vlan 
 
-To downloading the videos, extract frames from them and assign them to categories I have created a companion project:
-https://github.com/diegoami/DA_split_youtube_frames_s3/tree/support_playlists. I downloaded the videos from youtube using 
-youtube-dl and extracted from them frames every 2 seconds using opencv. Using the metadata in comments it is then possible to assign labels to single frames.
-The dataset I created is in a zip file: https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data.zip
+To prepare the data set, I had set up [a companion project](https://github.com/diegoami/DA_split_youtube_frames_s3/tree/support_playlists):
+ 
+This project:
+- Downloads the relevant videos from youtube, using the youtube-dl python library, in a 640x360 format
+- Extract at every two seconds a frame and save it an jpeg file, using the opencv python library
+- Scrape the description from the youtube description
+- Distribute the files over directories named by the categories.
 
-In this project I will create a model which categorizes these images and check metrics like cross entropy, while training, and confidence matrix including F1, recall and precision on each call, after publishing an endpoint based on this model.
+This way, I created a dataset that [I uploaded to a S3 bucket](https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data.zip) and made public.
+
 
 ## PROBLEM ANALYSIS
 

@@ -40,16 +40,10 @@ def verify(model, data_dir, percentage=1):
             if (rnd_value > percentage):
                 continue
             with open(curr_img, 'rb') as f:
-
                 imagef = Image.open(f)
-
-
                 prediction = predict_fn(imagef, model)
-
                 output = output_fn(prediction)
-
                 output_list = json.loads(output)
-
                 pred_index, maxx = 0, -100
                 for i, ol in enumerate(output_list):
                     if ol > maxx:
@@ -62,9 +56,10 @@ def verify(model, data_dir, percentage=1):
                 np_conf[label_index, pred_index] += 1
                 y_true.append(label_index)
                 y_pred.append(pred_index)
-                if (pred_index != label_index):
-                    misckey = (label_index, pred_index)
-                    misclassified[misckey].append((dir, image))
+                if (pred_index != label_index and maxx > 1):
+                    misckey = f'{label_index}:{pred_index}'
+                    misclassified[misckey].append((image, maxx))
+                    misclassified[misckey].sort(key=lambda x: x[1], reverse=True)
 
                 if (count % 500 == 0):
                     print("{} processed up to {}".format(count, total))
@@ -97,4 +92,18 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     model = model_fn(args.model_dir)
-    verify(model, args.data_dir, 1)
+    report, np_conf, misclassified = verify(model, args.data_dir, 1)
+
+    print(report)
+    print(np_conf)
+    print(misclassified)
+
+    with open('misclassified.json', 'w', encoding='utf-8') as f:
+        json.dump(misclassified, f, ensure_ascii=False, indent=4)
+
+    for key in misclassified.keys():
+        print(key)
+        print("=============================")
+        values = misclassified[key]
+        for value in values:
+            print(value)

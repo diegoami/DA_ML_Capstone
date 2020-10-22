@@ -90,7 +90,8 @@ def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_
     )
     
     # build a dataset of images from the img_dir directory
-    model_dataset = td.datasets.WrapDataset(torchvision.datasets.ImageFolder(img_dir, transform=data_transform))
+    im_folder = torchvision.datasets.ImageFolder(img_dir, transform=data_transform)
+    model_dataset = td.datasets.WrapDataset(im_folder)
 
     
     train_count = int(0.75 * total_count)
@@ -120,6 +121,7 @@ def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_
     }
     class_names = model_dataset.classes
     return dataloaders, dataset_sizes, class_names
+
 
 def train_model(model, dataloaders, dataset_sizes, criterion, optimizer,  num_epochs=10):
     """
@@ -289,10 +291,4 @@ if __name__ == '__main__':
 
     # saves the best accuracy and loss in this model
     save_model_metrics(args.model_dir, best_acc, best_loss)
-
-    # verify the model and prints its confidence matrix
-    report, np_conf, misclassified = verify(model, args.data_dir, 1)
-    print(report)
-    print(np_conf)
-    print(misclassified)
 
