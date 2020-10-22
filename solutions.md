@@ -4,6 +4,20 @@ October 2020
 
 ## PROBLEM DEFINITION
 
+
+During the last few years it has become more and more common to stream on platforms such as Youtube and Twitch while playing video games, or to upload recorded sessions. The volume of videos produced is overwhelming. In many of the videos games being streamed there are different types of scenes. Both for content producers and consumers it would be useful to be able to automatically split videos, to find out in what time intervals different types of scenes run. For instance, having as an input the video recording of a Minecraft speedrun, we could be able to produce the time intervals when the game is taking place in the Overworld surface, in caves, in the Nether and the End respectively - the four main settings of this game.
+
+The game that I have chosen to use is Mount of Blade, of which I have several walkthroughs. In this game, I have identified seven types of scenes to which an image belongs:
+
+* BATTLE: any battle taking place in an open field or in a village 
+* TOURNAMENT: Tournaments in arena 
+* HIDEOUT: the warband assaults a bandit hideout 
+* TRAINING: the hero trains in a field or in a village 
+* SIEGE: a town is sieged 
+* TRAP: hero falls into a trap and must fight their way out 
+* TOWN (escape): escape from the town or castle prison 
+* OTHER : everything else 
+
 As written in the proposal, the goal of this project is to verify whether it is possible to split videos produced while playing a videogame in separate scenes. In particular, I was interested in finding out whether it is possible to build a model which could identify settings of frames from the game Mount & Blade: Warband. In this game you alternate between uneventful sequence and more interesting parts, such as Battle, Sieges, Tournaments, attacks to Hideouts and so on.
 To create a dataset I took some videos from a game walkthrough (Playlists: https://www.youtube.com/watch?v=ei-ZqMq0PDY&list=PLNP_nRm4k4jd-AJ0GwTPS1ld2YP8FdT4h and https://www.youtube.com/watch?v=pnP3b5wXMZM&list=PLNP_nRm4k4jfNLo7FkjXewFH9Xe5Uc2Pa ) where I had written down in the description how videos can be split in different types of sequence.
 For instance in this video, https://www.youtube.com/watch?v=MEhPGFEOvpw&list=PLNP_nRm4k4jfNLo7FkjXewFH9Xe5Uc2Pa&index=54, by means of this description I can categorize frames included in the time intervals as "Hideout", "Battle", "Tournament", "Town" and "Other" (for every other else=
