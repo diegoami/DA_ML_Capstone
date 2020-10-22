@@ -10,6 +10,7 @@ import torch.utils.data
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import shutil
 
 from torch.autograd import Variable
 from model import VGGLP
@@ -122,6 +123,38 @@ def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_
     class_names = model_dataset.classes
     return dataloaders, dataset_sizes, class_names
 
+def move_files_to_right_place(data_dir, class_names):
+    help_dict = [{} for c in range(len(class_names))]
+
+    if os.path.isfile('misclassified.json'):
+        with open('misclassified.json', 'r') as f:
+            misclassified = json.load(f)
+    else:
+        misclassified = {}
+
+    for miskey in misclassified:
+        label, predicted = map(int,miskey.split(':'))
+        files_to_check = [x[0] for x in misclassified[miskey]]
+        for file_to_check in files_to_check:
+            help_dict[label][file_to_check] = predicted
+
+
+
+    if os.path.isfile('rejected.json'):
+        with open('rejected.json', 'r') as f:
+            rejected = json.load(f)
+    else:
+        rejected = {}
+
+    for label_idx, cur_dict in enumerate(help_dict):
+        for key_help in cur_dict:
+            if key_help in rejected:
+                target_idx = rejected[key_help]
+                source_file = os.path.join(data_dir, class_names[label_idx], key_help)
+                target_file = os.path.join(data_dir, class_names[target_idx], key_help)
+                if not os.path.isfile(target_file) and os.path.isfile(source_file):
+                    print(f'Moving {source_file} to  {target_file}')
+                    shutil.move(source_file, target_file)
 
 def train_model(model, dataloaders, dataset_sizes, criterion, optimizer,  num_epochs=10):
     """
@@ -261,7 +294,6 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=1, metavar='S',
                         help='random seed (default: 1)')
 
-
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -270,7 +302,9 @@ if __name__ == '__main__':
     torch.manual_seed(args.seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed(args.seed)
+    class_names = sorted(os.listdir(args.data_dir))
 
+    move_files_to_right_place(class_names=class_names, data_dir=args.data_dir)
     # retrieves train and validation data loaders and datasets, and the label names         
     dataloaders, dataset_sizes, class_names = get_data_loaders(img_dir=args.data_dir,  img_height=args.img_height, img_width=args.img_width, batch_size=args.batch_size )
 

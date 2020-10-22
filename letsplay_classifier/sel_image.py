@@ -118,10 +118,6 @@ def get_next_image():
             #print(key, value)
                 yield key, value
 if __name__ == '__main__':
-    import time
-
-
-
     app = App()
     app.mainloop()
 
