@@ -114,7 +114,7 @@ def get_next_image():
     for key in misclassified.keys():
         values = misclassified[key]
         for value in values:
-            if (value[1] > 4):
+            if (value[1] > 3):
             #print(key, value)
                 yield key, value
 if __name__ == '__main__':
