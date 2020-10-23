@@ -25,7 +25,7 @@ def verify(model, data_dir, percentage=1):
 
     y_true, y_pred = [], []
 
-    dirs = sorted(os.listdir(data_dir))
+    dirs = [ s for s in sorted(os.listdir(data_dir)) if os.path.isdir(os.path.join(data_dir,s))]
     np_conf = np.zeros((len(dirs), len(dirs)), dtype='uint')
 
     misclassified = defaultdict(list)

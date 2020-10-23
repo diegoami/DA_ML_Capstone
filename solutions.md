@@ -71,19 +71,105 @@ For instance battle images should look like that:
 
 
 ### FIRST ITERATION
+Notebook: [Wendy_CNN.ipynb](Wendy_CNN.ipynb)
 
 The simplest way I chose to verify whether a model is viable was to start and set up a Convolutional Neural Network in Pytorch, as I was pretty sure that 
+
 * this was pretty much the most sensible way to approach the problem
 * I could use standard CNN topologies available in Pytorch
 * analyzing the result of the model would give me more information on what I would have to be looking for
 
-Convolutional Neural Network are, as a matter of fact, a very standard approach for categorizing images. 
-A simple to use and flexible topology I could use was VGG. 
+Convolutional Neural Network are, as a matter of fact, a very standard approach for categorizing images. A simple to use and flexible topology I decided to use was VGG, which is included in the Pytorch library. 
 
-As the images extracted from game walkthrough are not related to real world images, using a pretrained net, possibly expanding it with a layer does not make sense. Instead, we would opt for a full train.
-Before feeding them to the neural networks, images are resized to 128 x 72, which should be enough for the algorithm to recognize features ( original images are all 640 x 360). As we already have around 48000 images, we do not do data augmentation (like, use mirrored images), also because it is not given that the game may actually show mirrored images.
 
-The flaw in the dataset, regrettably, is that some categories, such as SIEGE, TRAP and TOWN, have relatively few samples. However, in this first pass, we would not modify the dataset. 
+As the images extracted from game walkthrough are not related to real world images, using a pretrained net and expand it with a transfer learning does not seem to make sense. Instead, I opted for a full train.
+In the preprocessing phase, in this iteration, I resized images to 128 x 72, which should be enough for the algorithm to recognize features ( original images are all 640 x 360). As I already have around 48000 images, I thought I would do not need any kind of data augmentation (like, use mirrored images), also because it is not given that the game may actually show mirrored images.
+
+The flaw in the dataset, regrettably, is that some categories, such as SIEGE, TRAP and TOWN, have relatively few samples. Looking at the confidence matrix I got, there were however some surprises in the report I got when I decided to test the produced model with 10% of the dataset. 
+
+
+Confidence Matrix
+ 
+| X| 0    | 1   | 2   | 3   | 4   | 5   | 6   | 7   | 
+|--|------|-----|-----|-----|-----|-----|-----|-----|
+| 0|  5671|    9|   93|    1|   19|    0|    1|    0|
+| 1|    59| 1041|   49|    1|    3|    0|    0|    0|
+| 2|   315|   19|30312|    1|  156|    0|   77|    0|
+| 3|    26|    2|    2|  164|    0|    0|    0|    0|
+| 4|    67|    7|  290|    1| 6401|    0|    4|    0|
+| 5|    17|    0|   40|    0|    0|    3|    0|    0|
+| 6|     8|    1|  175|    0|   49|    0|  537|    0|
+| 7|    13|    1|   62|    0|    1|    4|    0|    8|
+  
+
+
+
+  |class| class_name |precision|recall |f1-score|   support |
+  |-----|------------|---------|-------|--------|---------- |
+  | 0   | Battle     |  0.92   |0.98   | 0.95   |       5974|
+  | 1   | Hideout    |  0.96   |0.90   | 0.93   |       1153|
+  | 2   | Other      |  0.98   |0.98   | 0.98   |      30880|
+  | 3   | Siege      |  0.98   |0.85   | 0.91   |        194|
+  | 4   | Tournament |  0.97   |0.95   | 0.98   |       6770|
+  | 5   | Trap       |  0.43   |0.05   | 0.09   |         60|
+  | 6   | Training   |  0.87   |0.70   | 0.77   |        770|
+  | 7   | Town       |  1.00   |0.09   | 0.16   |        89 |
+
+It turned out that the Siege class is not a problem (as a matter of fact, images belonging to this category are pretty distinctive). However, the classes Trap, Town and Training tended all to be misclassified. After checking the confidence matrix, I decided that it would make sense to remove these three categories, so that Training is classified as Other (Training is not interesting anyway) whil Trap and Town are classified as Battle.
+
+### SECOND ITERATION
+
+First, I make sure to create a second dataset, where I map Trap and Town to Battle, and Training to Other. So that I end up with 5 categories:
+
+* Battle      : 5943 
+* Hideout     : 1153
+* Other       : 31650  
+* Siege       : 194
+* Tournament  : 6770
+
+I chose a smaller format for the images I save, as they are already too big for any model I can realistically train. The dataset becomes therefore much smaller: 
+
+I also add a preprocessing step to correct the mistakes that I find in the dataset. For this, I use a [list of images that were misclassified](letsplay_classifier/misclassified.json) produced by the script [verify_model](letsplay_classifier/verify_model.py). Using [a little tool](letsplay_classifier/sel_image.py) I try and sort between images that have a very high probability of being classified wrongly, and write down in files those images for which [I confirm the expected label](letsplay_classifier/confirmed.json)), and those images where [I reject the expected label for the predicted one](letsplay_classifier/rejected.json).
+
+
+
+
+Avg acc (test): 0.9915
+Confidence Matrix
+[[ 6077     1    43     0     6]
+ [   19  1128     4     4     2]
+ [  135    10 31405     1    23]
+ [    3     1     0   189     0]
+ [    9     1   122     3  6524]]
+              precision    recall  f1-score   support
+
+           0       0.97      0.99      0.98      6127
+           1       0.99      0.97      0.98      1157
+           2       0.99      0.99      0.99     31574
+           3       0.96      0.98      0.97       193
+           4       1.00      0.98      0.99      6659
+
+    accuracy                           0.99     45710
+   macro avg       0.98      0.98      0.98     45710
+weighted avg       0.99      0.99      0.99     45710
+
+              precision    recall  f1-score   support
+
+           0       0.97      0.99      0.98      6127
+           1       0.99      0.97      0.98      1157
+           2       0.99      0.99      0.99     31574
+           3       0.96      0.98      0.97       193
+           4       1.00      0.98      0.99      6659
+
+    accuracy                           0.99     45710
+   macro avg       0.98      0.98      0.98     45710
+weighted avg       0.99      0.99      0.99     45710
+
+[[ 6077     1    43     0     6]
+ [   19  1128     4     4     2]
+ [  135    10 31405     1    23]
+ [    3     1     0   189     0]
+ [    9     1   122     3  6524]]
 
 ## IMPLEMENTATION
 

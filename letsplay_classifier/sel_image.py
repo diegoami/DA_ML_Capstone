@@ -3,10 +3,10 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import json
 import os
-import itertools
-import multiprocessing
+THRESHOLD = 2.5
+
 class_names = ['Battle', 'Hideout', 'Other', 'Siege', 'Tournament']
-data_dir = '../wendy_cnn_frames_data'
+data_dir = '../wendy_cnn_frames_data_2'
 if os.path.isfile('misclassified.json'):
     with open('misclassified.json', 'r') as f:
         misclassified = json.load(f)
@@ -25,6 +25,10 @@ else:
 
 
 class App:
+    """
+    Helper small application to check on images that may have been misclassified by a model. Will show an image and ask the user to select between predicted and expected label.
+    """
+
     def __init__(self, master=tk.Tk(), image_name=''):
 
         self.master = master
@@ -114,7 +118,7 @@ def get_next_image():
     for key in misclassified.keys():
         values = misclassified[key]
         for value in values:
-            if (value[1] > 3):
+            if (value[1] > THRESHOLD):
             #print(key, value)
                 yield key, value
 if __name__ == '__main__':
