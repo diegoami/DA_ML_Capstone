@@ -4,10 +4,13 @@ October 2020
 
 ## PROBLEM DEFINITION
 
+### BROAD CONTEXT 
 
 During the last few years it has become more and more common to stream on platforms such as Youtube and Twitch while playing video games, or to upload recorded sessions. The volume of videos produced is overwhelming. In many of the videos games being streamed there are different types of scenes. Both for content producers and consumers it would be useful to be able to automatically split videos, to find out in what time intervals different types of scenes run. For instance, having as an input the video recording of a Minecraft speedrun, we could be able to produce the time intervals when the game is taking place in the Overworld surface, in caves, in the Nether and the End respectively - the four main settings of this game.
 
-The game that I have chosen to use is Mount of Blade, of which I have several walkthroughs. In this game, I have identified seven types of scenes to which an image belongs:
+### PROJECT SCOPE 
+ 
+The game that I have chosen to analyze is _Mount of Blade: Warband_, of which I made several walkthroughs. In this game, I have identified seven types of scenes to which an image belongs:
 
 * BATTLE: any battle taking place in an open field or in a village 
 * TOURNAMENT: Tournaments in arena 
@@ -20,8 +23,8 @@ The game that I have chosen to use is Mount of Blade, of which I have several wa
 
 To create a dataset I took some videos from a game walkthrough of mine, the adventures of Wendy. I used the episodes from 41 to 66 from following public playlists on youtube: 
 
-* [Wendy - Part I -  Let's play Mount and Blade](https://www.youtube.com/watch?v=ei-ZqMq0PDY&list=PLNP_nRm4k4jd-AJ0GwTPS1ld2YP8FdT4h)
-* [Wendy - Part II - Let's play Mount and Blade - Retired](https://www.youtube.com/watch?v=pnP3b5wXMZM&list=PLNP_nRm4k4jfNLo7FkjXewFH9Xe5Uc2Pa) 
+* [CNN-Wendy-I](https://www.youtube.com/playlist?list=PLNP_nRm4k4jfVfQobYTRQAXV_uOzt8Bov)
+* [CNN-Wendy-II](https://www.youtube.com/playlist?list=PLNP_nRm4k4jdEQ-OM31xNqeE64svvx-aT) 
 
 These are some episodes I went through and manually split into scenes. I wrote down how they were split in the description. For instance, in episode 54, I have identified following scenes, of the category "Hideout", "Battle", "Tournament", "Town". All the other parts of the video are categorized as "Other".  
 
@@ -40,13 +43,44 @@ This project:
 - Scrape the description from the youtube description
 - Distribute the files over directories named by the categories.
 
-This way, I created a dataset that [I uploaded to a S3 bucket](https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data.zip) and made public.
+This way, I created first a dataset that [I uploaded to a S3 bucket](https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data.zip) and made public.
 
 
 ## PROBLEM ANALYSIS
 
-Convolutional Neural Network are a very standard approach for categorizing images. There are several templates to create neural network. One that is included in Pytorch is VGG16, with several types of layers. 
-As the images extracted from game walkthrough are not related to real world images, using a pretrained net possibly expanding it with a layer does not make sense. Instead, we would opt for a full train.
+### DATASET ANALYSIS
+
+The amount of images I have generated first in this way, using the current set of videos broken down in scenes, was 45718, divided over the three categorie . They are contained in [this zip file](https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data.zip) on S3 (3.4 GB).
+
+This was the breakdown of the images I collected over the 8 classes I mentioned above 
+
+* BATTLE: ~13%
+* TOURNAMENT: ~14.8%
+* HIDEOUT: ~2.5%
+* TRAINING: ~1.7%
+* SIEGE: ~0.4%
+* TRAP: ~0.2%
+* TOWN (escape): ~0.2%
+* OTHER : ~67.6%
+
+As it can be seen, some categories have few samples, so it was going to be expected that we could have trouble with those
+A sanity check whether the images are in the correct directory can be done using [this notebook](analysis.ipynb):
+
+For instance battle images should look like that:
+![Battle images](docimages/battle_images.png)
+
+
+### FIRST ITERATION
+
+The simplest way I chose to verify whether a model is viable was to start and set up a Convolutional Neural Network in Pytorch, as I was pretty sure that 
+* this was pretty much the most sensible way to approach the problem
+* I could use standard CNN topologies available in Pytorch
+* analyzing the result of the model would give me more information on what I would have to be looking for
+
+Convolutional Neural Network are, as a matter of fact, a very standard approach for categorizing images. 
+A simple to use and flexible topology I could use was VGG. 
+
+As the images extracted from game walkthrough are not related to real world images, using a pretrained net, possibly expanding it with a layer does not make sense. Instead, we would opt for a full train.
 Before feeding them to the neural networks, images are resized to 128 x 72, which should be enough for the algorithm to recognize features ( original images are all 640 x 360). As we already have around 48000 images, we do not do data augmentation (like, use mirrored images), also because it is not given that the game may actually show mirrored images.
 
 The flaw in the dataset, regrettably, is that some categories, such as SIEGE, TRAP and TOWN, have relatively few samples. However, in this first pass, we would not modify the dataset. 
