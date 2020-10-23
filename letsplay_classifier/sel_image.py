@@ -26,7 +26,7 @@ else:
 
 class App:
     """
-    Helper small application to check on images that may have been misclassified by a model. Will show an image and ask the user to select between predicted and expected label.
+    Helper small application to check on images that may have been misclassified by a model. Will show an       image and ask the user to select between predicted and expected label.
     """
 
     def __init__(self, master=tk.Tk(), image_name=''):

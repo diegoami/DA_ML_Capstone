@@ -23,19 +23,19 @@ The game that I have chosen to analyze is _Mount of Blade: Warband_, of which I 
 
 To create a dataset I took some videos from a game walkthrough of mine, the adventures of Wendy. I used the episodes from 41 to 66 from following public playlists on youtube: 
 
-* [CNN-Wendy-I](https://www.youtube.com/playlist?list=PLNP_nRm4k4jfVfQobYTRQAXV_uOzt8Bov)
-* [CNN-Wendy-II](https://www.youtube.com/playlist?list=PLNP_nRm4k4jdEQ-OM31xNqeE64svvx-aT) 
+* CNN-Wendy-I: _https://www.youtube.com/playlist?list=PLNP_nRm4k4jfVfQobYTRQAXV_uOzt8Bov_
+* CNN-Wendy-II: _https://www.youtube.com/playlist?list=PLNP_nRm4k4jdEQ-OM31xNqeE64svvx-aT_ 
 
 These are some episodes I went through and manually split into scenes. I wrote down how they were split in the description. For instance, in episode 54, I have identified following scenes, of the category "Hideout", "Battle", "Tournament", "Town". All the other parts of the video are categorized as "Other".  
 
-09:51-12:21 Hideout Tundra Bandits (Failed)
-18:47-19:44 Battle with Sea Raiders
-20:50-21:46 Battle with Sea Raiders
-22:54-23:42 Battle with Sea Raiders
-34:06-37:44 Tournament won in Tihr
-38:46-40:48 Town escape for Boyar Vlan 
+- 09:51-12:21 Hideout Tundra Bandits (Failed)
+- 18:47-19:44 Battle with Sea Raiders
+- 20:50-21:46 Battle with Sea Raiders
+- 22:54-23:42 Battle with Sea Raiders
+- 34:06-37:44 Tournament won in Tihr
+- 38:46-40:48 Town escape for Boyar Vlan 
 
-To prepare the data set, I had set up [a companion project](https://github.com/diegoami/DA_split_youtube_frames_s3/tree/support_playlists):
+To prepare the data set, I had set up a companion project under _https://github.com/diegoami/DA_split_youtube_frames_s3/tree/support_playlists_:
  
 This project:
 - Downloads the relevant videos from youtube, using the youtube-dl python library, in a 640x360 format
@@ -43,14 +43,14 @@ This project:
 - Scrape the description from the youtube description
 - Distribute the files over directories named by the categories.
 
-This way, I created first a dataset that [I uploaded to a S3 bucket](https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data.zip) and made public.
+This way, I created first a dataset that I uploaded to a S3 bucket: _https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data.zip_ and made public.
 
 
 ## PROBLEM ANALYSIS
 
 ### DATASET ANALYSIS
 
-The amount of images I have generated first in this way, using the current set of videos broken down in scenes, was 45718, divided over the three categorie . They are contained in [this zip file](https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data.zip) on S3 (3.4 GB).
+The amount of images I have generated first in this way, using the current set of videos broken down in scenes, was 45718, divided over eight categories categorie . They are contained in the zip file _https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data.zip_ on S3 (3.4 GB).
 
 This was the breakdown of the images I collected over the 8 classes I mentioned above 
 
@@ -64,14 +64,16 @@ This was the breakdown of the images I collected over the 8 classes I mentioned 
 * OTHER : ~67.6%
 
 As it can be seen, some categories have few samples, so it was going to be expected that we could have trouble with those
-A sanity check whether the images are in the correct directory can be done using [this notebook](analysis.ipynb):
+A sanity check whether the images are in the correct directory can be done using the notebook _analysis.ipynb_.
 
 For instance battle images should look like that:
-![Battle images](docimages/battle_images.png)
+
+![Battle images](docimages/battle-images.png)
 
 
 ### FIRST ITERATION
-Notebook: [Wendy_CNN.ipynb](Wendy_CNN.ipynb)
+
+Notebook: _Wendy_CNN.ipynb_
 
 The simplest way I chose to verify whether a model is viable was to start and set up a Convolutional Neural Network in Pytorch, as I was pretty sure that 
 
@@ -80,7 +82,6 @@ The simplest way I chose to verify whether a model is viable was to start and se
 * analyzing the result of the model would give me more information on what I would have to be looking for
 
 Convolutional Neural Network are, as a matter of fact, a very standard approach for categorizing images. A simple to use and flexible topology I decided to use was VGG, which is included in the Pytorch library. 
-
 
 As the images extracted from game walkthrough are not related to real world images, using a pretrained net and expand it with a transfer learning does not seem to make sense. Instead, I opted for a full train.
 In the preprocessing phase, in this iteration, I resized images to 128 x 72, which should be enough for the algorithm to recognize features ( original images are all 640 x 360). As I already have around 48000 images, I thought I would do not need any kind of data augmentation (like, use mirrored images), also because it is not given that the game may actually show mirrored images.
@@ -115,7 +116,7 @@ Confidence Matrix
   | 6   | Training   |  0.87   |0.70   | 0.77   |        770|
   | 7   | Town       |  1.00   |0.09   | 0.16   |        89 |
 
-It turned out that the Siege class is not a problem (as a matter of fact, images belonging to this category are pretty distinctive). However, the classes Trap, Town and Training tended all to be misclassified. After checking the confidence matrix, I decided that it would make sense to remove these three categories, so that Training is classified as Other (Training is not interesting anyway) whil Trap and Town are classified as Battle.
+It turned out that the Siege class is not that big a problem (as a matter of fact, images belonging to this category are pretty distinctive). However, the classes Trap, Town and Training tended all to be misclassified. After checking the confidence matrix, I decided that it would make sense to remove these three categories, so that Training is classified as Other (Training is not interesting anyway) whil Trap and Town are classified as Battle.
 
 ### SECOND ITERATION
 
@@ -129,67 +130,90 @@ First, I make sure to create a second dataset, where I map Trap and Town to Batt
 
 I chose a smaller format for the images I save, as they are already too big for any model I can realistically train. The dataset becomes therefore much smaller: 
 
-I also add a preprocessing step to correct the mistakes that I find in the dataset. For this, I use a [list of images that were misclassified](letsplay_classifier/misclassified.json) produced by the script [verify_model](letsplay_classifier/verify_model.py). Using [a little tool](letsplay_classifier/sel_image.py) I try and sort between images that have a very high probability of being classified wrongly, and write down in files those images for which [I confirm the expected label](letsplay_classifier/confirmed.json)), and those images where [I reject the expected label for the predicted one](letsplay_classifier/rejected.json).
+I also add a preprocessing step to correct some of the wrongly classified images that are in the dataset. 
 
-
-
+Now, creating a basic VGG net (type B) on the full images, having image_height x image_width = 160 x 90, with 5 epochs, and just 5 categories, and then running the model on the full dataset, gives this result.
 
 Avg acc (test): 0.9915
+
 Confidence Matrix
-[[ 6077     1    43     0     6]
- [   19  1128     4     4     2]
- [  135    10 31405     1    23]
- [    3     1     0   189     0]
- [    9     1   122     3  6524]]
-              precision    recall  f1-score   support
 
-           0       0.97      0.99      0.98      6127
-           1       0.99      0.97      0.98      1157
-           2       0.99      0.99      0.99     31574
-           3       0.96      0.98      0.97       193
-           4       1.00      0.98      0.99      6659
+| X| 0    | 1   | 2   | 3   | 4   | 
+|--|------|-----|-----|-----|-----|
+| 0|  6077|    1|   43|    0|    6|
+| 1|    19| 1128|    4|    4|    2|    
+| 2|   135|   10|31405|    1|   23|    
+| 3|     3|    1|    0|  189|    0|    
+| 4|     9|    1|  122|    3| 6524|    
 
-    accuracy                           0.99     45710
-   macro avg       0.98      0.98      0.98     45710
-weighted avg       0.99      0.99      0.99     45710
+|class|precision | recall | f1-score |support|
+|-----|----------|--------|----------|-------|
+|    0|      0.97|    0.99|      0.98|   6127|
+|    1|      0.99|    0.97|      0.98|   1157|
+|    2|      0.99|    0.99|      0.99|  31574|
+|    3|      0.96|    0.98|      0.97|    193|
+|    4|      1.00|    0.98|      0.99|   6659|
 
-              precision    recall  f1-score   support
-
-           0       0.97      0.99      0.98      6127
-           1       0.99      0.97      0.98      1157
-           2       0.99      0.99      0.99     31574
-           3       0.96      0.98      0.97       193
-           4       1.00      0.98      0.99      6659
-
-    accuracy                           0.99     45710
-   macro avg       0.98      0.98      0.98     45710
-weighted avg       0.99      0.99      0.99     45710
-
-[[ 6077     1    43     0     6]
- [   19  1128     4     4     2]
- [  135    10 31405     1    23]
- [    3     1     0   189     0]
- [    9     1   122     3  6524]]
 
 ## IMPLEMENTATION
 
-For the implementation, we work with Sagemaker notebooks and Pytorch version 1.6, which we take care to include with torchvision, torchdata and scikit-learn (for preprocessing) taking advantage of the possibility of including a requirement.txt file.
-We load the full datasets of images, but we split in a random and stratified way in a train and validation dataset. We the provide a script, train.py, that allows to train a VGG16 neural network, specifying the desired image width and height to which to resize, the amount of epochs, and the kind of layer layout in the VGG16 model that we desire.
-In the provided Jupyter Notebook, we can trigger this training, and a standard run on this training script gives us an average loss of 0.003, and an average accuracy of 0.97, proving that the images contain enough information to allow a categorization.
+I tried to set up scripts and notebooks that would work both locally and on Sagemaker. However, some things work better locally, while some other work better on Sagemaker.
 
-I saved then the model and created an endpoint and a predictor. For simplicity, this predictor accepts and returns messages in JSON format. In the file endpoint.py, which acts as a client we call this predictor to calculate metrics using a random subset of images from our full dataset. I make sure that the client using the service does not use pytorch. 
-The client keeps track of labels and predictions so that at the end it is able to print a confidence matrix and f1, precision and recall of the analyed subsets.
+A pytorch/conda environment, as the one in Sagemaker, is assumed - the missing libaries are in the [requirements.txt](letsplay_classifier/requirements.txt) file
+
+### REQUIRED ENVIRONMENT VARIABLES
+
+All scripts require following environment variables
+
+* SM_CHANNEL_TRAIN: location of the data
+* SM_MODEL_DIR: where to save the model
+* SM_HOSTS: should be "[]"
+* SM_CURRENT_HOST: should be ""
+
+### TRAINING SCRIPT
+
+The [training script](letsplay_classifier/train.py) accepts following arguments:
+* img-width: width to which resize images
+* img-height: height to which resize images
+* epochs: for how many epochs to train
+* batch-size: size of the batch while training
+* layer-cfg: what type of VGG net to use
+
+These are the steps that are executed:
+* using the information in the file [rejected.json](letsplay_classifier/rejected.json) and [misclassified.json](letsplay_classifier/misclassified.json) to move misclassifed frames to their correct directory  
+* use an image loader from pytorch to create a generator scanning all files in the data directory.
+* use a transformator to resize images
+* divide the dataset in a stratified and shuffled train and validation set
+* load a VGG neural network, modified so that the output layers produce a category from our domain (5 in total in the final version)
+* For each epoch, execute a training step and evaluation step, trying to minimize the cross entropy loss in the validation set
+* Save the model so that it can be further used by other steps
+
+ 
+The cross entropy is the most useful metrics while training a  classifier with C classes, therefore it is used here.
+
+
+### MISCLASSIFIED IMAGES
+
+For this, I use a list of images that were misclassified (_misclassified.json_) produced by the script _verify_model.py_ . Using a small GUI in the file _sel_image.py_ I try and sort between images that have a very high probability of being classified wrongly, and write down the images  where I reject the expected label for the predicted one under _rejected.json_. All of t
+
+### VERIFICATION
+
+
+### MODEL DEPLOY
+
+### ENDPOINT CALL
+The way we exchange data between the client and the service could be improved, as the performance and the time needed to get results on a batch of images is considerable.
 
 ## RESULTS
 
 This is the classification report of the selected model. Avg accuracy is 0.98. Classes having enough samples get a F1-value of 0.97, while classes not having enough samples have much worse results. To get better values on this, we would definitely need more samples. Oversampling or working with weight might not give results which are good enough, as the variance between images is too great. 	
 
-The way we exchange data between the client and the service could be improved, as the performance and the time needed to get results on a batch of images is considerable.
  
 ## CONCLUSIONS
 
 This project proved to me that it is possible to reliably build a classification model for images. I could apply this technique also to other video games, as the breakdown in scenes is something that is common.
 
+The next step would be
 I am planning to use this tool to build a client that would take a video as input, extract frames every two seconds and suggest the splitting of videos in sequences. 
 
 

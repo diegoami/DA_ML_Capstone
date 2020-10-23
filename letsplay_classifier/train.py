@@ -10,7 +10,7 @@ import torch.utils.data
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import shutil
+
 
 from torch.autograd import Variable
 from model import VGGLP
@@ -20,7 +20,7 @@ import torchdata as td
 import torchvision
 from torchvision import transforms
 
-from verify_model import verify
+from util import move_files_to_right_place
 
 def save_model(model, model_dir):
     """
@@ -76,9 +76,9 @@ def save_model_metrics(model_dir, best_acc, best_loss):
 def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_size=8):
     """
     Builds the data loader objects for retrieving images from a specific directory
-    img_dir - the directory where images are located
-    img_height - the height to which to compress images
-    img_width - the width to which compress images
+    :param img_dir - the directory where images are located
+    :param img_height - the height to which to compress images
+    :param img_width - the width to which compress images
     returns - the data loaders, the daset sizes, and the names of the labels
     """
     total_count = sum([len(files) for r, d, files in os.walk(img_dir)])
@@ -123,48 +123,16 @@ def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_
     class_names = model_dataset.classes
     return dataloaders, dataset_sizes, class_names
 
-def move_files_to_right_place(data_dir, class_names):
-    help_dict = [{} for c in range(len(class_names))]
-
-    if os.path.isfile('misclassified.json'):
-        with open('misclassified.json', 'r') as f:
-            misclassified = json.load(f)
-    else:
-        misclassified = {}
-
-    for miskey in misclassified:
-        label, predicted = map(int,miskey.split(':'))
-        files_to_check = [x[0] for x in misclassified[miskey]]
-        for file_to_check in files_to_check:
-            help_dict[label][file_to_check] = predicted
-
-
-
-    if os.path.isfile('rejected.json'):
-        with open('rejected.json', 'r') as f:
-            rejected = json.load(f)
-    else:
-        rejected = {}
-
-    for label_idx, cur_dict in enumerate(help_dict):
-        for key_help in cur_dict:
-            if key_help in rejected:
-                target_idx = rejected[key_help]
-                source_file = os.path.join(data_dir, class_names[label_idx], key_help)
-                target_file = os.path.join(data_dir, class_names[target_idx], key_help)
-                if not os.path.isfile(target_file) and os.path.isfile(source_file):
-                    print(f'Moving {source_file} to  {target_file}')
-                    shutil.move(source_file, target_file)
 
 def train_model(model, dataloaders, dataset_sizes, criterion, optimizer,  num_epochs=10):
     """
     trains the model using a set of images
-    model - the model to be trained
-    dataloaders - a map of dataloaders for retrieving load images for train and val-idation
-    dataset_sizes - a map of int containing the size of datasets for train and validation
-    criterion - the criterion used to evaluate the model
-    optimizer - the optimizer used to train the model
-    num_epoch - the number of epochs to train
+    :param model - the model to be trained
+    :param dataloaders - a map of dataloaders for retrieving load images for train and val-idation
+    :param dataset_sizes - a map of int containing the size of datasets for train and validation
+    :param criterion - the criterion used to evaluate the model
+    :param optimizer - the optimizer used to train the model
+    :param num_epoch - the number of epochs to train
     returns the trained model, accuracy and loss
     """
     use_gpu = torch.cuda.is_available()

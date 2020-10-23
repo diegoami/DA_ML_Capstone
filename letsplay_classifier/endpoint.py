@@ -4,7 +4,7 @@ import json
 from PIL import Image
 import numpy as np
 import random
-
+from util import move_files_to_right_place
 
 from sagemaker.predictor import RealTimePredictor
 
@@ -12,10 +12,10 @@ def evaluate(endpoint_name, data_dir, percentage=1):
     """
     Does an evaluation on a subset of the images on the endpoint.
     
-    endpoint_name : the name of the endpoint where 
-    data_dir : the local directory where files can be found
-    percentage : the percentage of image to check
-    return list of predictions and true values
+    :param endpoint_name : the name of the endpoint where
+    :param data_dir : the local directory where files can be found
+    :param percentage : the percentage of image to check
+    :return: list of predictions and true values
     """
 
     count = 0
@@ -31,8 +31,9 @@ def evaluate(endpoint_name, data_dir, percentage=1):
          accept='application/json')
     
     # we scan dirs in alphabetical orders, as the data loaders do
-    dirs = sorted(os.listdir(data_dir))
-    
+    dirs = [s for s in sorted(os.listdir(data_dir)) if os.path.isdir(os.path.join(data_dir, s))]
+    move_files_to_right_place(class_names=dirs, data_dir=data_dir)
+
     for dir in dirs:
         curr_img_dir = os.path.join(data_dir, dir)
         images = os.listdir(curr_img_dir)
