@@ -31,7 +31,6 @@ def verify(model, data_dir, percentage=1):
 
     misclassified = defaultdict(list)
     for dir in dirs:
-
         curr_img_dir = os.path.join(data_dir, dir)
         images = os.listdir(curr_img_dir)
         for image in images:
