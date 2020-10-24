@@ -4,7 +4,7 @@ import json
 from PIL import Image
 import numpy as np
 import random
-from util import move_files_to_right_place
+from .util import move_files_to_right_place
 
 from sagemaker.predictor import RealTimePredictor
 
