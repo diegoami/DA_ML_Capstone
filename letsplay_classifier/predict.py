@@ -83,10 +83,7 @@ def predict_fn(input_data, model):
     image_resized = transforms.Resize((IMG_HEIGHT, IMG_WIDTH))(input_data)
     image_tensor = transforms.ToTensor()(image_resized)
     image_unsqueezed = image_tensor.unsqueeze(0)
-    if torch.cuda.is_available():
-        inputs = Variable(image_unsqueezed.cuda(), volatile=True)
-    else:
-        inputs = Variable(image_unsqueezed, volatile=True)
+    inputs = image_unsqueezed.cuda() if torch.cuda.is_available() else image_unsqueezed
     # Compute the result of applying the model to the input data.
     out = model(inputs)
     # The variable `result` should be a numpy array; a single value 0-1
