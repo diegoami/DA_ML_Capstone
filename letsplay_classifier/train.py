@@ -10,8 +10,6 @@ import torch.utils.data
 import torch
 import torch.nn as nn
 import torch.optim as optim
-
-
 from torch.autograd import Variable
 from model import VGGLP
 
@@ -35,13 +33,13 @@ def save_model(model, model_dir):
     
 def save_model_params(model_dir, num_classes, img_width, img_height, epochs, layer_cfg):
     """
-    Save the paramaters using for creating the model
-    model_dir : where to save the model
-    num_classes : the amount of categories
-    img_width: the width to which resize images
-    img_height: the height to which resize images
-    epochs: number of epochs in iteration
-    layer_cfg: what configuration of layers to use in the VGG model ()
+    Save the parameters using for creating the model
+    :param model_dir : where to save the model
+    :param num_classes : the amount of categories
+    :param img_width: the width to which resize images
+    :param img_height: the height to which resize images
+    :param epochs: number of epochs in iteration
+    :param layer_cfg: what configuration of layers to use in the VGG model ()
     """    
     model_info_path = os.path.join(model_dir, 'model_info.pth')
     with open(model_info_path, 'wb') as f:
@@ -57,12 +55,12 @@ def save_model_params(model_dir, num_classes, img_width, img_height, epochs, lay
 def save_model_metrics(model_dir, best_acc, best_loss):
     """
     Save the metrics found while training
-    model_dir : where to save the model
-    num_classes : the amount of categories
-    img_width: the width to which resize images
-    img_height: the height to which resize images
-    epochs: number of epochs in iteration
-    layer_cfg: what configuration of layers to use in the VGG model ()
+    :param model_dir : where to save the model
+    :param num_classes : the amount of categories
+    :param img_width: the width to which resize images
+    :param img_height: the height to which resize images
+    :param: number of epochs in iteration
+    :param layer_cfg: what configuration of layers to use in the VGG model ()
     """
     model_metrics_path = os.path.join(model_dir, 'model_metrics.pth')
     with open(model_metrics_path, 'wb') as f:
@@ -94,7 +92,6 @@ def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_
     im_folder = torchvision.datasets.ImageFolder(img_dir, transform=data_transform)
     model_dataset = td.datasets.WrapDataset(im_folder)
 
-    
     train_count = int(0.75 * total_count)
     valid_count = total_count - train_count
     
@@ -272,7 +269,10 @@ if __name__ == '__main__':
         torch.cuda.manual_seed(args.seed)
     class_names = sorted(os.listdir(args.data_dir))
 
+    # preprocessing step to move files into their correct directory, if necessary
     move_files_to_right_place(class_names=class_names, data_dir=args.data_dir)
+
+
     # retrieves train and validation data loaders and datasets, and the label names         
     dataloaders, dataset_sizes, class_names = get_data_loaders(img_dir=args.data_dir,  img_height=args.img_height, img_width=args.img_width, batch_size=args.batch_size )
 
@@ -286,6 +286,8 @@ if __name__ == '__main__':
 
     # retrieves the trained model, along with best accuracy and loss
     model, best_acc, best_loss = train_model(model, dataloaders, dataset_sizes, criterion, optimizer_ft, num_epochs=args.epochs)
+
+
     save_model(model, args.model_dir)
 
     #  save the parameters used to construct the model

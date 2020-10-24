@@ -8,17 +8,26 @@ October 2020
 
 During the last few years it has become more and more common to stream on platforms such as Youtube and Twitch while playing video games, or to upload recorded sessions. The volume of videos produced is overwhelming. In many of the videos games being streamed there are different types of scenes. Both for content producers and consumers it would be useful to be able to automatically split videos, to find out in what time intervals different types of scenes run. For instance, having as an input the video recording of a Minecraft speedrun, we could be able to produce the time intervals when the game is taking place in the Overworld surface, in caves, in the Nether and the End respectively - the four main settings of this game.
 
+### PROJECT LOCATION & FILES
+
+* Main repository on Github: _https://github.com/diegoami/DA_ML_Capstone_
+* Companion project: _https://github.com/diegoami/DA_split_youtube_frames_s3.git_
+* Data : _https://da-youtube-ml.s3.eu-central-1.amazonaws.com/_
+
+
 ### PROJECT SCOPE 
+
+
  
 The game that I have chosen to analyze is _Mount of Blade: Warband_, of which I made several walkthroughs. In this game, I have identified seven types of scenes to which an image belongs:
 
 * BATTLE: any battle taking place in an open field or in a village 
 * TOURNAMENT: Tournaments in arena 
 * HIDEOUT: the warband assaults a bandit hideout 
-* TRAINING: the hero trains in a field or in a village 
+* TRAINING: the hero trains in a field or in a village (later remapped to OTHER)
 * SIEGE: a town is sieged 
-* TRAP: hero falls into a trap and must fight their way out 
-* TOWN (escape): escape from the town or castle prison 
+* TRAP: hero falls into a trap and must fight their way out (later remapped to BATLE)
+* TOWN (escape): escape from the town or castle prison (later remapped to BATTLE)
 * OTHER : everything else 
 
 To create a dataset I took some videos from a game walkthrough of mine, the adventures of Wendy. I used the episodes from 41 to 66 from following public playlists on youtube: 
@@ -26,7 +35,9 @@ To create a dataset I took some videos from a game walkthrough of mine, the adve
 * CNN-Wendy-I: _https://www.youtube.com/playlist?list=PLNP_nRm4k4jfVfQobYTRQAXV_uOzt8Bov_
 * CNN-Wendy-II: _https://www.youtube.com/playlist?list=PLNP_nRm4k4jdEQ-OM31xNqeE64svvx-aT_ 
 
-These are some episodes I went through and manually split into scenes. I wrote down how they were split in the description. For instance, in episode 54, I have identified following scenes, of the category "Hideout", "Battle", "Tournament", "Town". All the other parts of the video are categorized as "Other".  
+These are the episodes I went through and manually split into scenes. I wrote down how they were split in the video description on youtube. 
+
+For instance, in episode 54, I have identified following scenes, of the category "Hideout", "Battle", "Tournament", "Town". All the other parts of the video are categorized as "Other". These lines can be found in the video description.  
 
 - 09:51-12:21 Hideout Tundra Bandits (Failed)
 - 18:47-19:44 Battle with Sea Raiders
@@ -39,18 +50,18 @@ To prepare the data set, I had set up a companion project under _https://github.
  
 This project:
 - Downloads the relevant videos from youtube, using the youtube-dl python library, in a 640x360 format
-- Extract at every two seconds a frame and save it an jpeg file, using the opencv python library
-- Scrape the description from the youtube description
+- Extract at every two seconds a frame and save it an jpeg file, using the opencv python library, resizing to the practical format 320x180
+- Download the text from the youtube description and save it along the video ( _metadata_ )
 - Distribute the files over directories named by the categories.
 
-This way, I created first a dataset that I uploaded to a S3 bucket: _https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data.zip_ and made public.
+This way, I created first a dataset that I uploaded to a S3 bucket: _https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data.zip_ (3.2 Gb) and made public.
 
 
 ## PROBLEM ANALYSIS
 
 ### DATASET ANALYSIS
 
-The amount of images I have generated first in this way, using the current set of videos broken down in scenes, was 45718, divided over eight categories categorie . They are contained in the zip file _https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data.zip_ on S3 (3.4 GB).
+The amount of images I had  generated first, in this way,  was 45718, split in eight categories. 
 
 This was the breakdown of the images I collected over the 8 classes I mentioned above 
 
@@ -83,10 +94,10 @@ The simplest way I chose to verify whether a model is viable was to start and se
 
 Convolutional Neural Network are, as a matter of fact, a very standard approach for categorizing images. A simple to use and flexible topology I decided to use was VGG, which is included in the Pytorch library. 
 
-As the images extracted from game walkthrough are not related to real world images, using a pretrained net and expand it with a transfer learning does not seem to make sense. Instead, I opted for a full train.
-In the preprocessing phase, in this iteration, I resized images to 128 x 72, which should be enough for the algorithm to recognize features ( original images are all 640 x 360). As I already have around 48000 images, I thought I would do not need any kind of data augmentation (like, use mirrored images), also because it is not given that the game may actually show mirrored images.
+As the images extracted from game walkthrough are not related to real world images, using a pretrained net and expand it with transfer learning did not seem to make sense. Instead, I opted for a full train.
+In the preprocessing phase, in this iteration, I resized images to 128 x 72, which should be enough for the algorithm to recognize features ( original images were all 640 x 360). As I already have over 45000 images, I thought I would do not need any kind of data augmentation (like, use mirrored images), also because it is not given that the game may actually show mirrored images.
 
-The flaw in the dataset, regrettably, is that some categories, such as SIEGE, TRAP and TOWN, have relatively few samples. Looking at the confidence matrix I got, there were however some surprises in the report I got when I decided to test the produced model with 10% of the dataset. 
+The flaw in the dataset, regrettably, is that some categories, such as *Siege*, *Trap* and *Town*, have relatively few samples. Looking at the confidence matrix I got, there were however some surprises in the report I got when I decided to test the produced model with 10% of the dataset. 
 
 
 Confidence Matrix
@@ -116,23 +127,25 @@ Confidence Matrix
   | 6   | Training   |  0.87   |0.70   | 0.77   |        770|
   | 7   | Town       |  1.00   |0.09   | 0.16   |        89 |
 
-It turned out that the Siege class is not that big a problem (as a matter of fact, images belonging to this category are pretty distinctive). However, the classes Trap, Town and Training tended all to be misclassified. After checking the confidence matrix, I decided that it would make sense to remove these three categories, so that Training is classified as Other (Training is not interesting anyway) whil Trap and Town are classified as Battle.
+It turned out that the *Siege* class is not that big a problem (as a matter of fact, images belonging to this category are pretty distinctive). However, the classes *Trap*, *Town* and *Training* tended to be misclassified often. After checking the confidence matrix, I decided that it would make sense to remove these three categories, so that the category *Training* is classified as Other (Training is not interesting anyway) while Trap and Town are classified as Battle.
 
 ### SECOND ITERATION
 
 First, I make sure to create a second dataset, where I map Trap and Town to Battle, and Training to Other. So that I end up with 5 categories:
 
-* Battle      : 5943 
-* Hideout     : 1153
-* Other       : 31650  
-* Siege       : 194
-* Tournament  : 6770
+* Battle      : 5943 (13.0%) 
+* Hideout     : 1153 (2.5%)
+* Other       : 31650  (69.2%)
+* Siege       : 194 (0.4%)
+* Tournament  : 6770 (14.8%)
 
-I chose a smaller format for the images I save, as they are already too big for any model I can realistically train. The dataset becomes therefore much smaller: 
+TOTAL : 45710
 
-I also add a preprocessing step to correct some of the wrongly classified images that are in the dataset. 
+I chose a smaller format for the images I save, as 640x480 is  too big for any model I can realistically train. The dataset becomes therefore much smaller: 1.0 Gb and can be found at _https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data_2.zip_
 
-Now, creating a basic VGG net (type B) on the full images, having image_height x image_width = 160 x 90, with 5 epochs, and just 5 categories, and then running the model on the full dataset, gives this result.
+I also added a preprocessing step to correct some of the wrongly classified images that are in the dataset, and that I discovered using a simple self-made tool. 
+
+Now, creating a basic VGG net (type B) on the full images, having image_height x image_width = 160 x 90, with 5 epochs, and just 5 categories, and then running the model on the full dataset, gives this result:
 
 Avg acc (test): 0.9915
 
@@ -154,25 +167,28 @@ Confidence Matrix
 |    3|      0.96|    0.98|      0.97|    193|
 |    4|      1.00|    0.98|      0.99|   6659|
 
+which is a much better result than the first run. I decided that I could keep this model.
 
 ## IMPLEMENTATION
 
-I tried to set up scripts and notebooks that would work both locally and on Sagemaker. However, some things work better locally, while some other work better on Sagemaker.
+I set up scripts and notebooks so that they would work both locally and on Sagemaker, if b. However, some things work better locally, while some other work better on Sagemaker.
 
-A pytorch/conda environment, as the one in Sagemaker, is assumed - the missing libaries are in the [requirements.txt](letsplay_classifier/requirements.txt) file
+A pytorch/conda environment, as the one in Sagemaker, is assumed - the missing libaries from the default sagemaker conda pytorch environment are in the _/requirements.txt_ file.
+
+The code root directory is letsplay_classifier - scripts should be executed from this  directory, or the directory should be included in PYTHONPATH.
 
 ### REQUIRED ENVIRONMENT VARIABLES
 
-All scripts require following environment variables
+All scripts require following environment variables, which are the ones required by Sagemaker containers.
 
-* SM_CHANNEL_TRAIN: location of the data
-* SM_MODEL_DIR: where to save the model
+* SM_CHANNEL_TRAIN: location of data - the directory where you unzipped the required data
+* SM_MODEL_DIR: where to save the model 
 * SM_HOSTS: should be "[]"
 * SM_CURRENT_HOST: should be ""
 
 ### TRAINING SCRIPT
 
-The [training script](letsplay_classifier/train.py) accepts following arguments:
+The training script ,at _train.py_ accepts following arguments:
 * img-width: width to which resize images
 * img-height: height to which resize images
 * epochs: for how many epochs to train
@@ -180,23 +196,33 @@ The [training script](letsplay_classifier/train.py) accepts following arguments:
 * layer-cfg: what type of VGG net to use
 
 These are the steps that are executed:
-* using the information in the file [rejected.json](letsplay_classifier/rejected.json) and [misclassified.json](letsplay_classifier/misclassified.json) to move misclassifed frames to their correct directory  
+
+* preprocessing to  to move misclassifed frames to their correct directory  
 * use an image loader from pytorch to create a generator scanning all files in the data directory.
-* use a transformator to resize images
-* divide the dataset in a stratified and shuffled train and validation set
+* use a pytorchvision transformer to resize images
+* divide the dataset in train and validation sets, using stratification and shuffling
 * load a VGG neural network, modified so that the output layers produce a category from our domain (5 in total in the final version)
 * For each epoch, execute a training step and evaluation step, trying to minimize the cross entropy loss in the validation set
-* Save the model so that it can be further used by other steps
-
+* Save the model so that it can be further used by the following steps
  
 The cross entropy is the most useful metrics while training a  classifier with C classes, therefore it is used here.
 
+### VERIFICATION SCRIPT
+
+The verification script  _verify_model.py_ works only locally, as it assumes the model and the dataset is saved locally from the previous step. It requires the same environment variables as the training script.
+
+* Loads the model created in the previous step
+* Walks through all the images in the dataset, one by one, and retrieve the predicted label
+* Print average accuracy, a classification report based on discrepancies, and a confidence matrix
+* Save discrepancies in a _misclassified_ file, that can be used later in a preprocessing step 
+ 
 
 ### MISCLASSIFIED IMAGES
 
+To find out about images in the training / validation set that I might have misclassified, I created a simple graphical tool under  _letsplay_classifier/requirements.txt_ . 
+
 For this, I use a list of images that were misclassified (_misclassified.json_) produced by the script _verify_model.py_ . Using a small GUI in the file _sel_image.py_ I try and sort between images that have a very high probability of being classified wrongly, and write down the images  where I reject the expected label for the predicted one under _rejected.json_. All of t
 
-### VERIFICATION
 
 
 ### MODEL DEPLOY

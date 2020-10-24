@@ -2,6 +2,33 @@ import os
 import shutil
 import json
 
+
+def arg_max_list(list):
+    """
+    argmax as in numpy but on a regular list
+    :param list: the list, where to find the max
+    :return: the index where the max is found
+    """
+    pred_index, maxx = 0, -100
+    for i, ol in enumerate(list):
+        if ol > maxx:
+            maxx = ol
+            pred_index = i
+    return pred_index
+
+def retrieve_or_create_dict(json_file):
+    """
+    retrieve a dictionary from a json file or create a new empty one
+    :param json_file: the json file containing the dictionrary
+    :return:
+    """
+    if os.path.isfile(json_file):
+        with open(json_file, 'r') as f:
+            json_dict = json.load(f)
+    else:
+        json_dict = {}
+    return json_dict
+
 def move_files_to_right_place(data_dir, class_names):
     """
     move the files that we know are miscategorized in the correct directory
@@ -9,30 +36,26 @@ def move_files_to_right_place(data_dir, class_names):
     :param class_names: the category names
     :return:
     """
-    help_dict = [{} for c in range(len(class_names))]
 
-    if os.path.isfile('misclassified.json'):
-        with open('misclassified.json', 'r') as f:
-            misclassified = json.load(f)
-    else:
-        misclassified = {}
+    # list of dict, one for each category, each in form file --> true class
+    tv_dict_list = [{} for c in range(len(class_names))]
 
+    misclassified = retrieve_or_create_dict('misclassified.json')
+    rejected = retrieve_or_create_dict('rejected.json')
+
+    # build the true_values dictionary list, using misclassified
     for miskey in misclassified:
-        label, predicted = map(int,miskey.split(':'))
+        label, predicted = map(int, miskey.split(':'))
         files_to_check = [x[0] for x in misclassified[miskey]]
         for file_to_check in files_to_check:
-            help_dict[label][file_to_check] = predicted
+            tv_dict_list[label][file_to_check] = predicted
 
 
-
-    if os.path.isfile('rejected.json'):
-        with open('rejected.json', 'r') as f:
-            rejected = json.load(f)
-    else:
-        rejected = {}
-
-    for label_idx, cur_dict in enumerate(help_dict):
+    # for each possible class (label), retrieved its dictionary { file_name --> true value }
+    for label_idx, cur_dict in enumerate(tv_dict_list):
         for key_help in cur_dict:
+
+            # the rejected map {file_name --> targeted value} contains entries that have been confirmed by users
             if key_help in rejected:
                 target_idx = rejected[key_help]
                 source_file = os.path.join(data_dir, class_names[label_idx], key_help)

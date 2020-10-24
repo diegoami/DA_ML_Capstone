@@ -3,36 +3,31 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import json
 import os
+from util import retrieve_or_create_dict
+import argparse
+
+
 THRESHOLD = 2.5
 
 class_names = ['Battle', 'Hideout', 'Other', 'Siege', 'Tournament']
 data_dir = '../wendy_cnn_frames_data_2'
-if os.path.isfile('misclassified.json'):
-    with open('misclassified.json', 'r') as f:
-        misclassified = json.load(f)
 
-if os.path.isfile('confirmed.json'):
-    with open('confirmed.json', 'r') as f:
-        confirmed = json.load(f)
-else:
-    confirmed = {}
-
-if os.path.isfile('rejected.json'):
-    with open('rejected.json', 'r') as f:
-        rejected = json.load(f)
-else:
-    rejected = {}
-
+rejected = retrieve_or_create_dict('rejected.json')
+misclassified = retrieve_or_create_dict('misclassified.json')
+confirmed = retrieve_or_create_dict('confirmed.json')
 
 class App:
     """
-    Helper small application to check on images that may have been misclassified by a model. Will show an       image and ask the user to select between predicted and expected label.
+    Helper small application to check on images that may have been misclassified by a model. Will show an        image and ask the user to select between predicted and expected label.
     """
 
-    def __init__(self, master=tk.Tk(), image_name=''):
+    def __init__(self, master=tk.Tk(), data_dir=data_dir, class_names=class_names, threshold=THRESHOLD):
 
         self.master = master
-        self.all_images = list(get_next_image())
+        self.data_dir = data_dir
+        self.class_names = class_names
+        self.threshold = threshold
+        self.all_images = list(get_next_image(self.threshold))
         self.images_index = 0
         self.fig_size = [1200, 720]
         self.frame = tk.Frame(master)
@@ -57,10 +52,7 @@ class App:
         self.frame.bind("<Escape>", self.close)
         self.frame.pack()
         self.frame.focus_set()
-
         self.is_active = True
-
-
 
     def load_image(self, filename=None):
         if (filename):
@@ -81,50 +73,59 @@ class App:
             json.dump(rejected, f)
 
     def update(self, *args):
-        file_name = ''
+
         while True:
+            if self.images_index >= len(self.all_images):
+                self.close()
+
+            label_pred, (file_name, prediction_prob) = self.all_images[self.images_index]
             self.images_index += 1
 
-            key, (file_name, maxx) = self.all_images[self.images_index]
             if not (file_name in confirmed or file_name in rejected):
                 break
-        label_index, pred_index = map(int,(key.split(':')))
+        label_index, pred_index = map(int, (label_pred.split(':')))
 
-        file_name_full = os.path.join(data_dir, class_names[label_index], file_name)
-        self.button_left.config(text=class_names[label_index])
-        self.button_right.config(text=class_names[pred_index])
+        file_name_full = os.path.join(self.data_dir, self.class_names[label_index], file_name)
+        self.button_left.config(text=self.class_names[label_index])
+        self.button_right.config(text=self.class_names[pred_index])
         self.load_image(file_name_full)
         self.image_label.config(image=self.fig_image)
-        self.maxx_label.config(text=maxx)
+        self.maxx_label.config(text=prediction_prob)
         return file_name, label_index, pred_index
 
     def close(self, *args):
-        print('GUI closed...')
         self.master.quit()
         self.is_active = False
 
     def is_closed(self):
         return not self.is_active
 
-
-
     def mainloop(self):
         self.master.mainloop()
 
 
-        print('mainloop closed...')
-
-def get_next_image():
+def get_next_image(threshold=THRESHOLD):
+    """
+    generator going through misclassified images
+    :return: yields in a generator all misclassified images
+    """
     for key in misclassified.keys():
         values = misclassified[key]
         for value in values:
-            if (value[1] > THRESHOLD):
-            #print(key, value)
+            if (value[1] > threshold):
                 yield key, value
+
+
 if __name__ == '__main__':
-    app = App()
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--data-dir', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
+    parser.add_argument('--threshold', type=float, default=2.5, metavar='N',
+                        help='min log probability of true value for checking on image')
+
+    args = parser.parse_args()
+    class_names = [s for s in sorted(os.listdir(args.data_dir)) if os.path.isdir(os.path.join(args.data_dir, s))]
+    app = App(data_dir=args.data_dir, class_names=class_names, threshold=args.threshold)
     app.mainloop()
 
-    #print(next(get_next_image()))
-    #print(next(get_next_image()))
-    #print(next(get_next_image()))
+
