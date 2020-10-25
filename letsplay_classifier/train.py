@@ -269,9 +269,6 @@ if __name__ == '__main__':
         torch.cuda.manual_seed(args.seed)
     class_names = sorted(os.listdir(args.data_dir))
 
-    # preprocessing step to move files into their correct directory, if necessary
-    move_files_to_right_place(class_names=class_names, data_dir=args.data_dir)
-
 
     # retrieves train and validation data loaders and datasets, and the label names         
     dataloaders, dataset_sizes, class_names = get_data_loaders(img_dir=args.data_dir,  img_height=args.img_height, img_width=args.img_width, batch_size=args.batch_size )

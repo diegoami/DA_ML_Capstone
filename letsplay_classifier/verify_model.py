@@ -7,7 +7,7 @@ from PIL import Image
 import random
 from sklearn.metrics import classification_report
 
-from util import move_files_to_right_place, arg_max_list, save_dict_to_json
+from util import  arg_max_list
 
 from predict import model_fn, predict_fn, output_fn
 
@@ -39,11 +39,6 @@ def verify(model, data_dir, percentage=1):
 
     # true values and predictions
     y_true, y_pred = [], []
-
-    # collection of misclassified images, in the format label:prediction --> [(image_name, prob of predictions)...]
-    misclassified = defaultdict(list)
-
-    move_files_to_right_place(class_names=dirs, data_dir=args.data_dir)
 
     # loop all directory / label names
     for dir in dirs:
@@ -78,11 +73,6 @@ def verify(model, data_dir, percentage=1):
                     y_true.append(label_index)
                     y_pred.append(pred_index)
 
-                    # updates the misclassified collection if the prediction is different from the true value
-                    if (pred_index != label_index and prediction_log_prob > 1):
-                        misckey = f'{label_index}:{pred_index}'
-                        misclassified[misckey].append((image, prediction_log_prob))
-                        misclassified[misckey].sort(key=lambda x: x[1], reverse=True)
 
                     if (images_processed % 500 == 0):
                         print("{} processed up to {}".format(images_processed, images_total))
@@ -90,7 +80,7 @@ def verify(model, data_dir, percentage=1):
         label_index += 1
 
     report = classification_report(y_true=y_true, y_pred=y_pred)
-    return report, np_conf_matrix, misclassified
+    return report, np_conf_matrix
 
 if __name__ == '__main__':
     # All of the model parameters and training parameters are sent as arguments
@@ -109,12 +99,11 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     model = model_fn(args.model_dir)
-    report, np_conf_matrix, misclassified = verify(model, args.data_dir, 1)
+    report, np_conf_matrix = verify(model, args.data_dir, 1)
 
     print("Confusion Matrix")
     print(np_conf_matrix)
     print(report)
 
-    save_dict_to_json(misclassified, 'misclassified.json')
 
 

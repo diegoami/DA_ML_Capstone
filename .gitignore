@@ -10,3 +10,4 @@ ytframe/__pycache__/
 model/
 wendy_cnn_frames_data_2.zip
 wendy_cnn_frames_data_2/
+*.pyc
