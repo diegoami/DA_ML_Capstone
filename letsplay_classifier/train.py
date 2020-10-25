@@ -18,7 +18,6 @@ import torchdata as td
 import torchvision
 from torchvision import transforms
 
-from util import move_files_to_right_place
 
 def save_model(model, model_dir):
     """
@@ -261,8 +260,13 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    print(f'Data Dir: {args.data_dir}')
+    print(f'Model Dir: {args.model_dir}')
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    
+
+
+
     # set the seed for generating random numbers
     torch.manual_seed(args.seed)
     if torch.cuda.is_available():

@@ -61,7 +61,7 @@ This way, I created first a dataset that I uploaded to a S3 bucket: _https://da-
 
 ### DATASET ANALYSIS
 
-The amount of images I had  generated first, in this way,  was 45718, split in eight categories. 
+The amount of images I had  generated first, in this way,  was 45710, split in eight categories. 
 
 This was the breakdown of the images I collected over the 8 classes I mentioned above 
 
@@ -147,7 +147,7 @@ TOTAL : 45710
 
 I chose a smaller format for the images I save, as 640x480 is  too big for any model I can realistically train. The dataset becomes therefore much smaller: 1.0 Gb and can be found at _https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data_2.zip_
 
-I also added a preprocessing step to correct some of the wrongly classified images that are in the dataset, and that I discovered using a simple self-made tool. 
+I noticed that some images in the dataset were misclassified and I tried to fix this with a preprocessing step, but this approach turned out to be unpractical. 
 
 Now, creating a basic VGG net (type B) on the full images, having image_height x image_width = 160 x 90, with 5 epochs, and just 5 categories, and then running the model on the full dataset, gives this result:
 
@@ -175,7 +175,7 @@ confusion Matrix
 
 with accuracy of 0.98 %
     
-which is a much better result than the first run. I decided that I could keep this model.
+which is a much better result than the first run. I decided that I could keep this model. I describe the third and the last iteration in the "Result" chapter
 
 ## IMPLEMENTATION
 
@@ -220,14 +220,16 @@ The verification script  _verify_model.py_ works only locally, as it assumes the
 
 * Loads the model created in the previous step
 * Walks through all the images in the dataset, one by one, and retrieve the predicted label
-* Print average accuracy, a classification report based on discrepancies, and a confusion matrix
+* Print average accuracy, a classification report based on discrepancies, a confusion matrix, and a list of images whose predicted category does not coincide with their labels
 
- 
+
 
 ### MISCLASSIFIED IMAGES
 
 
-I found out that there were images in the training / validation set that were misclassified, therefore I thought about correcting the dataset using a GUI. It would have gone through  images that have a very high probability of being classified wrongly, and save the images where I reject the expected label for the predicted one under _rejected.json_. I dropped this approach and it turned out require a lot of overhead and was error-prone
+I found out that there were images in the training / validation set that were misclassified. At first I tried correcting the dataset using a GUI, where I would correct image that were classified wrongly accorting to _verify_model.py_, and save this information so that images could be moved to the correct place. I dropped this approach and it turned out require a lot of overhead and was error-prone.
+
+I decided instead to have the suspiciously classified images printed from _verify_model.py_, and correct the data at the source, in the video metadata and description. This way I found out a bug in the way I was generating frames (as I was consistently misclassifying the first and last frame)
 
 
 ### PREDICTOR
@@ -258,6 +260,7 @@ These are the jupyter notebooks I created while making this project:
 
 ### IMAGE CLASSIFICATION
  
+
 The classification report and confusion matrix of the finally selected model are shown above.
 
 ### INTERVAL IDENTIFICATION

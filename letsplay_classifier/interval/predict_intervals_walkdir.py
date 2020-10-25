@@ -20,15 +20,6 @@ if __name__ == '__main__':
     parser.add_argument('--model-dir', type=str, default=os.environ['SM_MODEL_DIR'])
     parser.add_argument('--data-dir', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
 
-    parser.add_argument('--img-width', type=int, default=IMG_WIDTH, metavar='N',
-                        help='width of image (default: 128)')
-    parser.add_argument('--img-height', type=int, default=IMG_HEIGHT, metavar='N',
-                        help='height of image (default: 72)')
-    parser.add_argument('--layer-cfg', type=str, default='D', metavar='N',
-                        help='layer type for VGG')
-    parser.add_argument('--batch-size', type=int, default=8, metavar='N',
-                        help='input batch size for training (default: 8)')
-
 
     args = parser.parse_args()
     model = model_fn(args.model_dir)

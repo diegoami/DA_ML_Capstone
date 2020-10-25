@@ -9,6 +9,7 @@ from sklearn.metrics import classification_report
 
 from util import  arg_max_list
 
+THRESHOLD = 2.5
 from predict import model_fn, predict_fn, output_fn
 
 def verify(model, data_dir, percentage=1):
@@ -40,6 +41,8 @@ def verify(model, data_dir, percentage=1):
     # true values and predictions
     y_true, y_pred = [], []
 
+    dubious_preds = []
+
     # loop all directory / label names
     for dir in dirs:
         curr_img_dir = os.path.join(data_dir, dir)
@@ -66,7 +69,11 @@ def verify(model, data_dir, percentage=1):
                     pred_index = arg_max_list(pred_output)
 
                     # the log probability of a prediction
-                    prediction_log_prob = pred_output[pred_index]
+                    label_log_prob = pred_output[label_index]
+
+                    if (label_log_prob < THRESHOLD):
+                        dubious_preds.append((curr_img, label_log_prob))
+
 
                     # comparing predictions and labels, updating metrics, confidence metrics and classification report
                     np_conf_matrix[label_index, pred_index] += 1
@@ -80,7 +87,8 @@ def verify(model, data_dir, percentage=1):
         label_index += 1
 
     report = classification_report(y_true=y_true, y_pred=y_pred)
-    return report, np_conf_matrix
+    dubious_preds.sort(key=lambda x: x[1] )
+    return report, np_conf_matrix, dubious_preds
 
 if __name__ == '__main__':
     # All of the model parameters and training parameters are sent as arguments
@@ -98,12 +106,16 @@ if __name__ == '__main__':
     parser.add_argument('--data-dir', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
 
     args = parser.parse_args()
+
+    print(f'Data Dir: {args.data_dir}')
+    print(f'Model Dir: {args.model_dir}')
+
     model = model_fn(args.model_dir)
-    report, np_conf_matrix = verify(model, args.data_dir, 1)
+    report, np_conf_matrix, dubious_preds = verify(model, args.data_dir, 1)
 
     print("Confusion Matrix")
     print(np_conf_matrix)
     print(report)
-
+    print(dubious_preds)
 
 
