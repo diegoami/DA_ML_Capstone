@@ -7,17 +7,17 @@ from PIL import Image
 import random
 from sklearn.metrics import classification_report
 
-from util import move_files_to_right_place, arg_max_list, retrieve_or_create_dict
+from util import move_files_to_right_place, arg_max_list, save_dict_to_json
 
 from predict import model_fn, predict_fn, output_fn
 
 def verify(model, data_dir, percentage=1):
     """
-    Give a classification report and a confidence matrix of a model
+    uses a model to predict the categories of a dataset, compare them with the true values and to return appropriate reports
     :param model: the model to analyze
     :param data_dir: the directory containing data
     :param percentage: the percentage of data to analyze (0-1)
-    :return:
+    :return: a classification report, a confidence matrix, a map of possibly misclassified data points
     """
 
     # goes through labels
@@ -29,6 +29,7 @@ def verify(model, data_dir, percentage=1):
     # images for which a prediction was made
     images_processed = 0
 
+    images_total = 0
 
     # directories and label names, sorted alphabetically
     dirs = [s for s in sorted(os.listdir(data_dir)) if os.path.isdir(os.path.join(data_dir, s))]
@@ -52,6 +53,7 @@ def verify(model, data_dir, percentage=1):
         # loop on all images in a directory, belonging to a label
         for image_index, image in enumerate(images):
             curr_img = os.path.join(curr_img_dir, image)
+            images_total += 1
 
             # only for a given percentage of images
             if (random.uniform(0, 1) <= percentage):
@@ -85,13 +87,11 @@ def verify(model, data_dir, percentage=1):
                         misclassified[misckey].sort(key=lambda x: x[1], reverse=True)
 
                     if (images_processed % 500 == 0):
-                        print("{} processed up to {}".format(images_processed, image_index))
+                        print("{} processed up to {}".format(images_processed, images_total))
 
         label_index += 1
 
     report = classification_report(y_true=y_true, y_pred=y_pred)
-
-
     return report, np_conf_matrix, misclassified
 
 if __name__ == '__main__':
@@ -117,7 +117,6 @@ if __name__ == '__main__':
     print(np_conf_matrix)
     print(report)
 
-    with open('misclassified.json', 'w', encoding='utf-8') as f:
-        json.dump(misclassified, f, ensure_ascii=False, indent=4)
+    save_dict_to_json(misclassified, 'misclassified.json')
 
 

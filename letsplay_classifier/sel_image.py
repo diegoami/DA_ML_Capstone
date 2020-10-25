@@ -1,16 +1,15 @@
 
 import tkinter as tk
 from PIL import Image, ImageTk
-import json
 import os
-from util import retrieve_or_create_dict
+from util import retrieve_or_create_dict, save_dict_to_json
 import argparse
 
 
-THRESHOLD = 2.5
+THRESHOLD = 3
 
-class_names = ['Battle', 'Hideout', 'Other', 'Siege', 'Tournament']
-data_dir = '../wendy_cnn_frames_data_2'
+
+
 
 rejected = retrieve_or_create_dict('rejected.json')
 misclassified = retrieve_or_create_dict('misclassified.json')
@@ -21,7 +20,7 @@ class App:
     Helper small application to check on images that may have been misclassified by a model. Will show an        image and ask the user to select between predicted and expected label.
     """
 
-    def __init__(self, master=tk.Tk(), data_dir=data_dir, class_names=class_names, threshold=THRESHOLD):
+    def __init__(self,  data_dir, class_names, threshold=THRESHOLD, master=tk.Tk()):
 
         self.master = master
         self.data_dir = data_dir
@@ -63,14 +62,12 @@ class App:
     def update_left(self, *args):
         file_name, left_index, right_index = self.update()
         confirmed[file_name] = left_index
-        with open('confirmed.json', 'w') as f:
-            json.dump(confirmed, f)
+        save_dict_to_json(confirmed, 'confirmed.json')
 
     def update_right(self, *args):
         file_name, left_index, right_index = self.update()
         rejected[file_name] = right_index
-        with open('rejected.json', 'w') as f:
-            json.dump(rejected, f)
+        save_dict_to_json(rejected, 'rejected.json')
 
     def update(self, *args):
 

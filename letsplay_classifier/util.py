@@ -20,14 +20,20 @@ def retrieve_or_create_dict(json_file):
     """
     retrieve a dictionary from a json file or create a new empty one
     :param json_file: the json file containing the dictionrary
-    :return:
+    :return: a dictionary with data from the json file
     """
-    if os.path.isfile(json_file):
-        with open(json_file, 'r') as f:
+    os.makedirs('json', exist_ok=True)
+    if os.path.isfile(os.path.join('json', json_file)):
+        with open(os.path.join('json', json_file), 'r') as f:
             json_dict = json.load(f)
     else:
         json_dict = {}
     return json_dict
+
+def save_dict_to_json(dict, json_file):
+    os.makedirs('json', exist_ok=True)
+    with open(os.path.join('json', json_file), 'w', encoding='utf-8') as f:
+        json.dump(dict, f, ensure_ascii=False, indent=4)
 
 def move_files_to_right_place(data_dir, class_names):
     """

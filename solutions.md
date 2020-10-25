@@ -221,11 +221,26 @@ The verification script  _verify_model.py_ works only locally, as it assumes the
 
 To find out about images in the training / validation set that I might have misclassified, I created a simple graphical tool under  _letsplay_classifier/requirements.txt_ . 
 
-For this, I use a list of images that were misclassified (_misclassified.json_) produced by the script _verify_model.py_ . Using a small GUI in the file _sel_image.py_ I try and sort between images that have a very high probability of being classified wrongly, and write down the images  where I reject the expected label for the predicted one under _rejected.json_. All of t
+For this, I use a list of images that were misclassified (_misclassified.json_) produced by the script _verify_model.py_ . Using a small GUI tool,  _sel_image.py_ I can go through  images that have a very high probability of being classified wrongly, and save the images where I reject the expected label for the predicted one under _rejected.json_. These files are used then everywhere when I train or evaluate a model from locally saved datasets, to move files to their correct label directories.
 
 
 
-### MODEL DEPLOY
+### PREDICTOR
+
+The file _predict.py_ contains the methods that are necessary to deploy the model to an endpoint. It works both locally and on a Sagemaker container and requires a previously trained model.
+
+* input_fn: this is be the endpoint entry point, which converts a JSON payload to a Pillow Image
+* model_fn: predicts a category using a previously trained model, from an image in the domain space (a screenshot from Mount Blade in format 320 x 180)
+* output_fn: returns the model output as a list of log probabilites for each class 
+
+
+### ENDPOINT 
+
+The file _endpoint.py_ contains a method to call an endpoint with a subset of model and collect predictions, to show a classification report and a confidence matrix. It requires locally saved data, but the model is accessed through a published endpoint, unlike the _verify_model.py_ component which serves a similar purpose.
+
+_endpoint.py_ works only in Sagemaker, when called from a Jupyter Notebook. Examples can be seen in the jupyter notebooks, for instance in CNN_Solution.ipynb
+
+### JUPYTER NOTEBOOKS
 
 ### ENDPOINT CALL
 The way we exchange data between the client and the service could be improved, as the performance and the time needed to get results on a batch of images is considerable.

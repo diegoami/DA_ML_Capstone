@@ -31,11 +31,11 @@ def save_model(model, model_dir):
     # save state dictionary
     torch.save(model.cpu().state_dict(), path)
     
-def save_model_params(model_dir, num_classes, img_width, img_height, epochs, layer_cfg):
+def save_model_params(model_dir, class_names, img_width, img_height, epochs, layer_cfg):
     """
     Save the parameters using for creating the model
     :param model_dir : where to save the model
-    :param num_classes : the amount of categories
+    :param classes : categories
     :param img_width: the width to which resize images
     :param img_height: the height to which resize images
     :param epochs: number of epochs in iteration
@@ -44,7 +44,7 @@ def save_model_params(model_dir, num_classes, img_width, img_height, epochs, lay
     model_info_path = os.path.join(model_dir, 'model_info.pth')
     with open(model_info_path, 'wb') as f:
         model_info = {
-            'num_classes': num_classes,
+            'class_names': class_names,
             'img_width': img_width,
             'img_height': img_height,
             'epochs': epochs,
@@ -77,7 +77,7 @@ def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_
     :param img_dir - the directory where images are located
     :param img_height - the height to which to compress images
     :param img_width - the width to which compress images
-    returns - the data loaders, the daset sizes, and the names of the labels
+    :returns - the data loaders, the daset sizes, and the names of the labels
     """
     total_count = sum([len(files) for r, d, files in os.walk(img_dir)])
 
@@ -130,7 +130,7 @@ def train_model(model, dataloaders, dataset_sizes, criterion, optimizer,  num_ep
     :param criterion - the criterion used to evaluate the model
     :param optimizer - the optimizer used to train the model
     :param num_epoch - the number of epochs to train
-    returns the trained model, accuracy and loss
+    :returns the trained model, accuracy and loss
     """
     use_gpu = torch.cuda.is_available()
     since = time.time()
@@ -291,7 +291,7 @@ if __name__ == '__main__':
     save_model(model, args.model_dir)
 
     #  save the parameters used to construct the model
-    save_model_params(args.model_dir, len(class_names), args.img_width, args.img_height, args.epochs, args.layer_cfg)
+    save_model_params(args.model_dir, class_names, args.img_width, args.img_height, args.epochs, args.layer_cfg)
 
     # saves the best accuracy and loss in this model
     save_model_metrics(args.model_dir, best_acc, best_loss)

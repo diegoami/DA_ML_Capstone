@@ -4,7 +4,7 @@ import json
 from PIL import Image
 import numpy as np
 import random
-from .util import move_files_to_right_place
+from util import move_files_to_right_place, arg_max_list
 
 from sagemaker.predictor import RealTimePredictor
 
@@ -18,8 +18,8 @@ def evaluate(endpoint_name, data_dir, percentage=1):
     :return: list of predictions and true values
     """
 
-    count = 0
-    image_total = 0
+    images_processed = 0
+    images_total = 0
     
     # label of images
     label_index = 0
@@ -41,43 +41,26 @@ def evaluate(endpoint_name, data_dir, percentage=1):
         # scanning all images belonging to a label
         for image in images:
             curr_img = os.path.join(curr_img_dir, image)
-            image_total += 1
+            images_total += 1
             
             # we use only a random subset (performance)
             if (random.uniform(0, 1) > percentage):
                 continue
-            count += 1
+            images_processed += 1
             
             with open(curr_img, 'rb') as f:
-                
-                # pass image as a json
-                imagef = Image.open(f)
-                image_data = json.dumps(np.array(imagef).tolist())
+                image_data = json.dumps(np.array(Image.open(f)).tolist())
                 output = predictor.predict(image_data)
                 output_list = json.loads(output)
 
-                pred_index, maxx = 0, -100
-                
-                # "argmax" on a list to find the most likely label
-                for i, ol in enumerate(output_list):
-                    if ol > maxx:
-                        maxx = ol
-                        pred_index = i
+                pred_index = arg_max_list(output_list)
 
-                count += 1
+                images_processed += 1
                 y_true.append(label_index)
                 y_pred.append(pred_index)
-                if (count % 50 == 0):
-                    print("{} processed up to {}".format(count, image_total))
+                if (images_processed % 200 == 0):
+                    print("{} processed up to {}".format(images_processed, images_total))
         label_index += 1
     return y_true,  y_pred
 
 
-
-if __name__ == '__main__':
-    
-    endpoint_name='DA-ML-endpoint'
-    avg_acc, avg_loss, count = evaluate(endpoint_name, '../wendy_cnn_frames_data', 0.05)
-    print("{} processed of {}".format(count, image_total))
-    print("Avg loss : {:.4f}".format(avg_loss))
-    print("Avg acc : {:.4f}".format(avg_acc))
