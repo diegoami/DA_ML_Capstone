@@ -30,9 +30,9 @@ def remove_outliers(seqs, short_classes):
         else:
             seq_x = seqs[i+1]
         curr_x = x
-        if ((curr_x.count('_') > 15) and (pred_x.count('_') < 5) and(seq_x.count('_') < 5)):
-            curr_x = ''.join([(pred_x+seq_x).count(short_classes[x])*short_classes[x] for x in range(0,5)])
-        if ((curr_x.count('_') < 15) and (pred_x.count('_') > 5) and(seq_x.count('_') > 5)):
+        if ((curr_x.count('_') > 12) and (pred_x.count('_') < 10) and(seq_x.count('_') < 10)):
+            curr_x = ''.join([(pred_x+seq_x).count(short_classes[x])//2*short_classes[x] for x in range(0,5)])
+        if ((curr_x.count('_') < 12) and (pred_x.count('_') > 10) and(seq_x.count('_') > 10)):
             curr_x = ''.join([((pred_x+seq_x).count(short_classes[x])//2)*short_classes[x] for x in range(0,5)])
         mseq.append(curr_x)
     return mseq
@@ -58,7 +58,7 @@ def convert_to_intervals(ev_seqs, short_classes, class_names):
         print(f'{current_time} {x} {y} {z}')
         second_tot += 2
         if not in_battle:
-            if z.count('_') < 8:
+            if z.count('_') < 10:
                 start_battle = current_time
                 in_battle = True
         else:

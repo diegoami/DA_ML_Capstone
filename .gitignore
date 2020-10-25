@@ -6,4 +6,5 @@ letsplay_classifier/__pycache__/
 wendy_cnn_frames_data.zip
 wendy_cnn_frames_data/
 ytframe/__pycache__/
-
+wendy_cnn_frames_data_2/
+*.pyc

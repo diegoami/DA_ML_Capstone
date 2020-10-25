@@ -151,31 +151,30 @@ I also added a preprocessing step to correct some of the wrongly classified imag
 
 Now, creating a basic VGG net (type B) on the full images, having image_height x image_width = 160 x 90, with 5 epochs, and just 5 categories, and then running the model on the full dataset, gives this result:
 
-Avg acc (test): 0.9915
+
 
 confusion Matrix
 
 | X| 0    | 1   | 2   | 3   | 4   | 
 |--|------|-----|-----|-----|-----|
-| 0|  6077|    1|   43|    0|    6|
-| 1|    19| 1128|    4|    4|    2|    
-| 2|   135|   10|31405|    1|   23|    
-| 3|     3|    1|    0|  189|    0|    
-| 4|     9|    1|  122|    3| 6524|    
+| 0|  5878|    6|   44|    6|    9|
+| 1|     7| 1131|    3|    9|    3|    
+| 2|   299|   23|31231|    3|   94|    
+| 3|     1|    1|    1|  191|    0|    
+| 4|    10|   30|  171|    3| 6586|    
 
 |class name|class|precision | recall | f1-score |support|
 |----------|-----|----------|--------|----------|-------|
-| Batle    |    0|      0.99|    0.97|      0.98|   6127|
-| Hideout  |    1|      0.95|    0.99|      0.97|   1157|
-| Other    |    2|      1.00|    0.99|      0.99|  31574|
-| Siege    |    3|      0.97|    0.98|      0.97|    193|
-| Tournam  |    4|      0.95|    0.99|      0.97|   6659|
-|  macro avg     |      0.97|    0.98|      0.98|  45710|
-|  weighted avg  |      0.99|    0.99|      0.99|  45710|
+| Batle    |    0|      0.95|    0.99|      0.97|   5943|
+| Hideout  |    1|      0.97|    0.98|      0.98|   1153|
+| Other    |    2|      0.99|    0.99|      0.99|  31650|
+| Siege    |    3|      0.91|    0.98|      0.95|    194|
+| Tournam  |    4|      0.98|    0.97|      0.98|   6770|
+|  macro avg     |      0.96|    0.98|      0.97|  45710|
+|  weighted avg  |      0.99|    0.98|      0.98|  45710|
 
-with accuracy of 0.99 %
+with accuracy of 0.98 %
     
-
 which is a much better result than the first run. I decided that I could keep this model.
 
 ## IMPLEMENTATION
@@ -197,7 +196,7 @@ All scripts require following environment variables, which are the ones required
 
 ### TRAINING SCRIPT
 
-The training script ,at _train.py_ accepts following arguments:
+The training script  _train.py_ accepts following arguments:
 * img-width: width to which resize images
 * img-height: height to which resize images
 * epochs: for how many epochs to train
@@ -206,7 +205,6 @@ The training script ,at _train.py_ accepts following arguments:
 
 These are the steps that are executed:
 
-* preprocessing to  to move misclassifed frames to their correct directory  
 * use an image loader from pytorch to create a generator scanning all files in the data directory. This works only if data is local and not on Sagemaker, for which I have to update the dataset.
 * use a pytorchvision transformer to resize images
 * divide the dataset in train and validation sets, using stratification and shuffling
@@ -223,18 +221,13 @@ The verification script  _verify_model.py_ works only locally, as it assumes the
 * Loads the model created in the previous step
 * Walks through all the images in the dataset, one by one, and retrieve the predicted label
 * Print average accuracy, a classification report based on discrepancies, and a confusion matrix
-* Save discrepancies in a _misclassified_ file, that can be used later in a preprocessing step 
+
  
 
 ### MISCLASSIFIED IMAGES
 
 
-I found out that there were images in the training / validation set that were misclassified, therefore I thought about correcting the dataset
-
-For this, I use a list of images that were misclassified (_misclassified.json_) produced by the script _verify_model.py_ . Using a small GUI tool,  _sel_image.py_ I can go through  images that have a very high probability of being classified wrongly, and save the images where I reject the expected label for the predicted one under _rejected.json_. These files are used then everywhere when I train or evaluate a model from locally saved datasets, to move files to their correct label directories.
-
-Although this led to even better accuracy, I decided to drop this approach, as it turned out that models produced on a "corrected" dataset gave worse results when used to split videos in scenes
-
+I found out that there were images in the training / validation set that were misclassified, therefore I thought about correcting the dataset using a GUI. It would have gone through  images that have a very high probability of being classified wrongly, and save the images where I reject the expected label for the predicted one under _rejected.json_. I dropped this approach and it turned out require a lot of overhead and was error-prone
 
 
 ### PREDICTOR
@@ -265,19 +258,38 @@ These are the jupyter notebooks I created while making this project:
 
 ### IMAGE CLASSIFICATION
  
-This is the classification report of the final selected model. 	
+The classification report and confusion matrix of the finally selected model are shown above.
 
 ### INTERVAL IDENTIFICATION
 
 However, this is not the only result I was striving for. I wanted to create a tool not just to categorize images, but to split videos in scenes. Therefore I created two *intervals predictor* that I could use locally (_predict_intervals_dataloader_ and _predict_intervals_walkdir_, and one that I could use on Sagemaker: _predict_intervals_endpoint_) . 
 
-I chose the next episode in the pla 
+The approach I use in this script is to ignore one or two frames that are wrapped inside a scene. Moreover, long sequences of frames that are not classified as "other" (battles, sieges, tournaments, hideouts) are clumped together, as they can sometimes be confused with each other. Therefore, I 
+I chose the next episode in the playlist, E67, and this was the result:
+
+|  INTERVAL         | PREDICTION                                       | REALITY                                |
+|-------------------|--------------------------------------------------|----------------------------------------|
+| 23:04-28:04       | Hideout : 18% , Other : 6% , Siege : 72%         | Siege of Unuzdaq Castle                |
+| 46:24-47:44       | Battle : 68% , Other : 19% , Tournament : 10%    | Battle with Desert Bandits             |
+| 52:30-53:02       | Battle : 54% , Hideout : 26% , Other : 16%       | Trap in Dirigh Abana (Battle)          |
+| 54:38-56:00       | Battle : 77% , Other : 10% , Tournament : 12%    | Battle with Boyar Gerluch              |
+| 01:03:52-01:05:42 | Battle : 35% , Other : 13% , Tournament : 42%    | Battle with Steppe Bandits (knockd out)|
+| 01:14:00-01:16:36 | Battle : 75% , Other : 8% , Tournament : 15%     | Battle with Emir Atis                  |
+| 01:17:50-01:19:16 | Battle : 83% , Other : 10%                       | Battle with Emir Hamezan               |
+| 01:33:12-01:34:22 | Battle : 93%                                     | Battle with Emir Rafard                |
+| 01:38:18-01:43:50 | Battle : 64% , Other : 8% , Tournament : 26%     | Battle with Emir Dashwhal (1)          |
+| 01:43:54-01:46:06 | Battle : 56% , Other : 7% , Tournament : 36%     | Battle with Emir Dashwhal (2)          |
+| 01:49:00-01:50:38 | Battle : 91% , Other : 6%                        | Battle with Emir Ralcha   (1)          |
+| 01:50:50-01:53:32 | Battle : 94%                                     | Battle with Emir Ralcha   (2)          |
+| 01:55:52-01:57:46 | Battle : 88% , Other : 6%                        | Battle with Emir Azadun                |
+
+
+
+Compare this with the actual transcript I created after watching the video
  
 ## CONCLUSIONS
 
-This project proved to me that it is possible to reliably build a classification model for images. I could apply this technique also to other video games, as the breakdown in scenes is something that is common.
+This project proved to me that it is possible to reliably build a classification model for images. I could apply this technique also to other video games, as the requirement of splitting game walkthroughs in scenes is something that is common over many games.
 
-The next step would be
-I am planning to use this tool to build a client that would take a video as input, extract frames every two seconds and suggest the splitting of videos in sequences. 
-
+It als proved that this model can be used to successfully split videos into scenes, with some postprocessing.
 
