@@ -36,9 +36,8 @@ if __name__ == '__main__':
     classes = model_info['class_names']
     short_classes = get_short_classes(classes)
     work_dir = os.path.join(args.data_dir, 'uncategorized')
-    images = sorted([s for s in os.listdir(work_dir)])
 
-    # loop on all images in a directory, belonging to a label
+    images = sorted([s for s in os.listdir(work_dir)])
     ev_seqs = []
 
     for image_index, image in enumerate(images):

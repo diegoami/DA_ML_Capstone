@@ -63,9 +63,12 @@ def move_files_to_right_place(data_dir, class_names):
 
             # the rejected map {file_name --> targeted value} contains entries that have been confirmed by users
             if key_help in rejected:
-                target_idx = rejected[key_help]
-                source_file = os.path.join(data_dir, class_names[label_idx], key_help)
-                target_file = os.path.join(data_dir, class_names[target_idx], key_help)
-                if not os.path.isfile(target_file) and os.path.isfile(source_file):
-                    print(f'Moving {source_file} to  {target_file}')
-                    shutil.move(source_file, target_file)
+                if target_idx != label_idx:
+                    target_idx = rejected[key_help]
+                    source_file = os.path.join(data_dir, class_names[label_idx], key_help)
+                    target_file = os.path.join(data_dir, class_names[target_idx], key_help)
+                    if not os.path.isfile(target_file) and os.path.isfile(source_file):
+                        print(f'Moving {source_file} to  {target_file}')
+                        shutil.move(source_file, target_file)
+                    else:
+                        print(f'Cannot move {source_file} to {target_file}')

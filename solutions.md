@@ -126,6 +126,10 @@ Confusion Matrix
   | 5   | Trap       |  0.43   |0.05   | 0.09   |         60|
   | 6   | Training   |  0.87   |0.70   | 0.77   |        770|
   | 7   | Town       |  1.00   |0.09   | 0.16   |        89 |
+  | avg              |  0.89   |0.69   | 0.72   |      45710|
+  | weighted avg     |  0.97   |0.97   | 0.96   |      45710|
+  
+with accuracy of 0.97% (regrettably not relevant)
 
 It turned out that the *Siege* class is not that big a problem (as a matter of fact, images belonging to this category are pretty distinctive). However, the classes *Trap*, *Town* and *Training* tended to be misclassified often. After checking the confusion matrix, I decided that it would make sense to remove these three categories, so that the category *Training* is classified as Other (Training is not interesting anyway) while Trap and Town are classified as Battle.
 
@@ -159,19 +163,24 @@ confusion Matrix
 | 3|     3|    1|    0|  189|    0|    
 | 4|     9|    1|  122|    3| 6524|    
 
-|class|precision | recall | f1-score |support|
-|-----|----------|--------|----------|-------|
-|    0|      0.97|    0.99|      0.98|   6127|
-|    1|      0.99|    0.97|      0.98|   1157|
-|    2|      0.99|    0.99|      0.99|  31574|
-|    3|      0.96|    0.98|      0.97|    193|
-|    4|      1.00|    0.98|      0.99|   6659|
+|class name|class|precision | recall | f1-score |support|
+|----------|-----|----------|--------|----------|-------|
+| Batle    |    0|      0.99|    0.97|      0.98|   6127|
+| Hideout  |    1|      0.95|    0.99|      0.97|   1157|
+| Other    |    2|      1.00|    0.99|      0.99|  31574|
+| Siege    |    3|      0.97|    0.98|      0.97|    193|
+| Tournam  |    4|      0.95|    0.99|      0.97|   6659|
+|  macro avg     |      0.97|    0.98|      0.98|  45710|
+|  weighted avg  |      0.99|    0.99|      0.99|  45710|
+
+with accuracy of 0.99 %
+    
 
 which is a much better result than the first run. I decided that I could keep this model.
 
 ## IMPLEMENTATION
 
-I set up scripts and notebooks so that they would work both locally and on Sagemaker, if b. However, some things work better locally, while some other work better on Sagemaker.
+I set up scripts and notebooks so that they would work both locally and on Sagemaker. However, some things work better locally, while some other work better on Sagemaker.
 
 A pytorch/conda environment, as the one in Sagemaker, is assumed - the missing libaries from the default sagemaker conda pytorch environment are in the _/requirements.txt_ file.
 
@@ -198,7 +207,7 @@ The training script ,at _train.py_ accepts following arguments:
 These are the steps that are executed:
 
 * preprocessing to  to move misclassifed frames to their correct directory  
-* use an image loader from pytorch to create a generator scanning all files in the data directory.
+* use an image loader from pytorch to create a generator scanning all files in the data directory. This works only if data is local and not on Sagemaker, for which I have to update the dataset.
 * use a pytorchvision transformer to resize images
 * divide the dataset in train and validation sets, using stratification and shuffling
 * load a VGG neural network, modified so that the output layers produce a category from our domain (5 in total in the final version)
@@ -242,18 +251,24 @@ _endpoint.py_ works only in Sagemaker, when called from a Jupyter Notebook. Exam
 
 ### JUPYTER NOTEBOOKS
 
-These are the jupyter notebooks 
+These are the jupyter notebooks I created while making this project:
 
+* analysis.ipynb: just to analyse data
+* CNN_First_Iteration.ipynb : First iteration with 8 classes 
+* CNN_Second_Iteration.ipynb : Second iteration with 5 classes and some corrections in the data set 
+* CNN_Third_Iteration.ipynb : Third iteration with more correction and verification how the model splits videos 
 
 ## RESULTS
 
 ### IMAGE CLASSIFICATION
  
-This is the classification report of the final selected model. Avg accuracy is 0.98. Classes having enough samples get a F1-value of 0.97, while classes not having enough samples have much worse results. To get better values on this, we would definitely need more samples. Oversampling or working with weight might not give results which are good enough, as the variance between images is too great. 	
+This is the classification report of the final selected model. 	
 
 ### INTERVAL IDENTIFICATION
 
-However, this is not the only result I was striving for,
+However, this is not the only result I was striving for. I wanted to create a tool not just to categorize images, but to split videos in scenes. Therefore I created two *intervals predictor* that I could use locally (_predict_intervals_dataloader_ and _predict_intervals_walkdir_, and one that I could use on Sagemaker: _predict_intervals_endpoint_) . 
+
+I chose the next episode in the pla 
  
 ## CONCLUSIONS
 

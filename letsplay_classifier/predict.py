@@ -44,7 +44,8 @@ def model_fn(model_dir_arg):
 
     # Determine the device and construct the model.
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = VGGLP(len(model_info['class_names']), model_info['layer_cfg'])
+    num_classes = model_info.get('num_classes', len(model_info.get('class_names', [])))
+    model = VGGLP(num_classes, model_info['layer_cfg'])
 
     # Load the stored model parameters.
     model_path = os.path.join(model_dir, 'model.pth')
