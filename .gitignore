@@ -1,9 +1,12 @@
 .idea/
 .ipynb_checkpoints/
 *.pt
+*.tar.gz
 letsplay_classifier/.ipynb_checkpoints/
 letsplay_classifier/__pycache__/
 wendy_cnn_frames_data.zip
 wendy_cnn_frames_data/
 ytframe/__pycache__/
-
+model/
+wendy_cnn_frames_data_2.zip
+wendy_cnn_frames_data_2/
