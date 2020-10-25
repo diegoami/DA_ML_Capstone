@@ -61,7 +61,7 @@ def evaluate(endpoint_name, data_dir, percentage=1):
                 y_true.append(label_index)
                 y_pred.append(pred_index)
 
-                if (images_processed % 200 == 0):
+                if (images_processed % 5000 == 0):
                     print("{} processed up to {}".format(images_processed, images_total))
         label_index += 1
     return y_true,  y_pred

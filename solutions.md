@@ -242,13 +242,18 @@ _endpoint.py_ works only in Sagemaker, when called from a Jupyter Notebook. Exam
 
 ### JUPYTER NOTEBOOKS
 
-### ENDPOINT CALL
-The way we exchange data between the client and the service could be improved, as the performance and the time needed to get results on a batch of images is considerable.
+These are the jupyter notebooks 
+
 
 ## RESULTS
 
-This is the classification report of the selected model. Avg accuracy is 0.98. Classes having enough samples get a F1-value of 0.97, while classes not having enough samples have much worse results. To get better values on this, we would definitely need more samples. Oversampling or working with weight might not give results which are good enough, as the variance between images is too great. 	
+### IMAGE CLASSIFICATION
+ 
+This is the classification report of the final selected model. Avg accuracy is 0.98. Classes having enough samples get a F1-value of 0.97, while classes not having enough samples have much worse results. To get better values on this, we would definitely need more samples. Oversampling or working with weight might not give results which are good enough, as the variance between images is too great. 	
 
+### INTERVAL IDENTIFICATION
+
+However, this is not the only result I was striving for,
  
 ## CONCLUSIONS
 
