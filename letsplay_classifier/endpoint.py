@@ -23,6 +23,8 @@ def evaluate(endpoint_name, data_dir, percentage=1):
     
     # label of images
     label_index = 0
+
+    # true values and predictions
     y_true, y_pred = [], []
     
     # set up a predictor from the endpoint
@@ -49,15 +51,16 @@ def evaluate(endpoint_name, data_dir, percentage=1):
             images_processed += 1
             
             with open(curr_img, 'rb') as f:
+                # retrive most likely category from predictor
                 image_data = json.dumps(np.array(Image.open(f)).tolist())
                 output = predictor.predict(image_data)
                 output_list = json.loads(output)
-
                 pred_index = arg_max_list(output_list)
 
                 images_processed += 1
                 y_true.append(label_index)
                 y_pred.append(pred_index)
+
                 if (images_processed % 200 == 0):
                     print("{} processed up to {}".format(images_processed, images_total))
         label_index += 1

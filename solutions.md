@@ -97,10 +97,10 @@ Convolutional Neural Network are, as a matter of fact, a very standard approach 
 As the images extracted from game walkthrough are not related to real world images, using a pretrained net and expand it with transfer learning did not seem to make sense. Instead, I opted for a full train.
 In the preprocessing phase, in this iteration, I resized images to 128 x 72, which should be enough for the algorithm to recognize features ( original images were all 640 x 360). As I already have over 45000 images, I thought I would do not need any kind of data augmentation (like, use mirrored images), also because it is not given that the game may actually show mirrored images.
 
-The flaw in the dataset, regrettably, is that some categories, such as *Siege*, *Trap* and *Town*, have relatively few samples. Looking at the confidence matrix I got, there were however some surprises in the report I got when I decided to test the produced model with 10% of the dataset. 
+The flaw in the dataset, regrettably, is that some categories, such as *Siege*, *Trap* and *Town*, have relatively few samples. Looking at the confusion matrix I got, there were however some surprises in the report I got when I decided to test the produced model with 10% of the dataset. 
 
 
-Confidence Matrix
+Confusion Matrix
  
 | X| 0    | 1   | 2   | 3   | 4   | 5   | 6   | 7   | 
 |--|------|-----|-----|-----|-----|-----|-----|-----|
@@ -127,7 +127,7 @@ Confidence Matrix
   | 6   | Training   |  0.87   |0.70   | 0.77   |        770|
   | 7   | Town       |  1.00   |0.09   | 0.16   |        89 |
 
-It turned out that the *Siege* class is not that big a problem (as a matter of fact, images belonging to this category are pretty distinctive). However, the classes *Trap*, *Town* and *Training* tended to be misclassified often. After checking the confidence matrix, I decided that it would make sense to remove these three categories, so that the category *Training* is classified as Other (Training is not interesting anyway) while Trap and Town are classified as Battle.
+It turned out that the *Siege* class is not that big a problem (as a matter of fact, images belonging to this category are pretty distinctive). However, the classes *Trap*, *Town* and *Training* tended to be misclassified often. After checking the confusion matrix, I decided that it would make sense to remove these three categories, so that the category *Training* is classified as Other (Training is not interesting anyway) while Trap and Town are classified as Battle.
 
 ### SECOND ITERATION
 
@@ -149,7 +149,7 @@ Now, creating a basic VGG net (type B) on the full images, having image_height x
 
 Avg acc (test): 0.9915
 
-Confidence Matrix
+confusion Matrix
 
 | X| 0    | 1   | 2   | 3   | 4   | 
 |--|------|-----|-----|-----|-----|
@@ -213,7 +213,7 @@ The verification script  _verify_model.py_ works only locally, as it assumes the
 
 * Loads the model created in the previous step
 * Walks through all the images in the dataset, one by one, and retrieve the predicted label
-* Print average accuracy, a classification report based on discrepancies, and a confidence matrix
+* Print average accuracy, a classification report based on discrepancies, and a confusion matrix
 * Save discrepancies in a _misclassified_ file, that can be used later in a preprocessing step 
  
 
@@ -236,7 +236,7 @@ The file _predict.py_ contains the methods that are necessary to deploy the mode
 
 ### ENDPOINT 
 
-The file _endpoint.py_ contains a method to call an endpoint with a subset of model and collect predictions, to show a classification report and a confidence matrix. It requires locally saved data, but the model is accessed through a published endpoint, unlike the _verify_model.py_ component which serves a similar purpose.
+The file _endpoint.py_ contains a method to call an endpoint with a subset of model and collect predictions, to show a classification report and a confusion matrix. It requires locally saved data, but the model is accessed through a published endpoint, unlike the _verify_model.py_ component which serves a similar purpose.
 
 _endpoint.py_ works only in Sagemaker, when called from a Jupyter Notebook. Examples can be seen in the jupyter notebooks, for instance in CNN_Solution.ipynb
 

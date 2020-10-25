@@ -99,7 +99,7 @@ In the end, I decided to use a VGG16 net, fully retrained.
 To verify how well the model categorizes images in videos, as this is a problem of categorization with multiple and unbalanced labels, I will use the log loss as a metric for optimizing the model, or rather cross entropy which is used in case of multiple possible categories. This is because I am interested in a model which returns the probability of categories for each image.
 
 
-We are also interested in a good average F1 and especially on a good recall when identifying images categorized in a different way as “OTHER”. For that, after setting up a predictor, I retrieve a confidence matrix and the prediction / recall scores for each class.
+We are also interested in a good average F1 and especially on a good recall when identifying images categorized in a different way as “OTHER”. For that, after setting up a predictor, I retrieve a confusion matrix and the prediction / recall scores for each class.
 
 
 ## Project Design 

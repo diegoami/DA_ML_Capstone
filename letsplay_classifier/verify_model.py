@@ -17,7 +17,7 @@ def verify(model, data_dir, percentage=1):
     :param model: the model to analyze
     :param data_dir: the directory containing data
     :param percentage: the percentage of data to analyze (0-1)
-    :return: a classification report, a confidence matrix, a map of possibly misclassified data points
+    :return: a classification report, a confusion matrix, a map of possibly misclassified data points
     """
 
     # goes through labels
@@ -34,7 +34,7 @@ def verify(model, data_dir, percentage=1):
     # directories and label names, sorted alphabetically
     dirs = [s for s in sorted(os.listdir(data_dir)) if os.path.isdir(os.path.join(data_dir, s))]
 
-    # confidence matrix in numpy format
+    # confusion matrix in numpy format
     np_conf_matrix = np.zeros((len(dirs), len(dirs)), dtype='uint')
 
     # true values and predictions
@@ -74,8 +74,6 @@ def verify(model, data_dir, percentage=1):
                     prediction_log_prob = pred_output[pred_index]
 
                     # comparing predictions and labels, updating metrics, confidence metrics and classification report
-                    acc_sum += (pred_index == label_index)
-                    avg_acc = acc_sum / images_processed
                     np_conf_matrix[label_index, pred_index] += 1
                     y_true.append(label_index)
                     y_pred.append(pred_index)
@@ -113,7 +111,7 @@ if __name__ == '__main__':
     model = model_fn(args.model_dir)
     report, np_conf_matrix, misclassified = verify(model, args.data_dir, 1)
 
-    print("Confidence Matrix")
+    print("Confusion Matrix")
     print(np_conf_matrix)
     print(report)
 
