@@ -228,9 +228,12 @@ The verification script  _verify_model.py_ works only locally, as it assumes the
 
 ### MISCLASSIFIED IMAGES
 
-To find out about images in the training / validation set that I might have misclassified, I created a simple graphical tool under  _letsplay_classifier/requirements.txt_ . 
+
+I found out that there were images in the training / validation set that were misclassified, therefore I thought about correcting the dataset
 
 For this, I use a list of images that were misclassified (_misclassified.json_) produced by the script _verify_model.py_ . Using a small GUI tool,  _sel_image.py_ I can go through  images that have a very high probability of being classified wrongly, and save the images where I reject the expected label for the predicted one under _rejected.json_. These files are used then everywhere when I train or evaluate a model from locally saved datasets, to move files to their correct label directories.
+
+Although this led to even better accuracy, I decided to drop this approach, as it turned out that models produced on a "corrected" dataset gave worse results when used to split videos in scenes
 
 
 

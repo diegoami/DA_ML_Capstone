@@ -33,8 +33,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     model = model_fn(args.model_dir)
     model_info = get_model_info(args.model_dir)
-    classes = model_info['class_names']
-    short_classes = get_short_classes(classes)
+    class_names = model_info.get('class_names', ['Battle', 'Hideout', 'Other', 'Siege', 'Tournament'])
+    short_classes = get_short_classes(class_names)
     work_dir = os.path.join(args.data_dir, 'uncategorized')
 
     images = sorted([s for s in os.listdir(work_dir)])
@@ -53,4 +53,4 @@ if __name__ == '__main__':
             categor_str = ''.join([min(int(out_work[x]), 20) * short_classes[x] for x in range(0, 5)]).rjust(20,'_')
             ev_seqs.append(categor_str)
 
-    convert_to_intervals(ev_seqs, short_classes, classes)
+    convert_to_intervals(ev_seqs, short_classes, class_names)

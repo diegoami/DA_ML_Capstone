@@ -12,10 +12,7 @@ from torchvision import transforms
 from interval.predict_intervals_utils import convert_to_intervals, get_short_classes
 
 if __name__ == '__main__':
-    # All of the model parameters and training parameters are sent as arguments
-    # when this script is executed, during a training job
     use_gpu = torch.cuda.is_available()
-    # Here we set up an argument parser to easily access the parameters
     parser = argparse.ArgumentParser()
 
     # SageMaker parameters, like the directories for training data and saving models; set automatically
@@ -36,10 +33,12 @@ if __name__ == '__main__':
                         help='input batch size for training (default: 8)')
 
     args = parser.parse_args()
+
     model = model_fn(args.model_dir)
     model_info = get_model_info(args.model_dir)
-    classes = model_info['classes']
+    classes = model_info['class_names']
     short_classes = get_short_classes(classes)
+
     total_count = sum([len(files) for r, d, files in os.walk(args.data_dir)])
 
     data_transform = torchvision.transforms.Compose(
@@ -50,6 +49,7 @@ if __name__ == '__main__':
     )
 
     # build a dataset of images from the img_dir directory
+
     im_folder = torchvision.datasets.ImageFolder(args.data_dir, transform=data_transform)
     model_dataset = td.datasets.WrapDataset(im_folder)
     dataset_loader = torch.utils.data.DataLoader(model_dataset)
