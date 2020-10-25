@@ -55,7 +55,7 @@ def convert_to_intervals(ev_seqs, short_classes, class_names):
     ev_battle_str = ''
     for i, (x, y, z) in enumerate(zip(ev_seqs, one_n, two_n)):
         current_time = get_hour_format(second_tot)
-        print(f'{current_time} {x} {y} {z}')
+        #print(f'{current_time} {x} {y} {z}')
         second_tot += 2
         if not in_battle:
             if z.count('_') < 10:
@@ -71,6 +71,10 @@ def convert_to_intervals(ev_seqs, short_classes, class_names):
             else:
                 ev_battle_str += z
     for start_battle, end_battle, ev_battle_str in time_seqs:
-        prob_list = [int(ev_battle_str.count(short_classes[x]) / len(ev_battle_str) * 100) for x in range(0, 5)]
-        prob_str = ', '.join([f'{class_names[x]} : {prob_list[x]}% ' for x in range(0, 5) if prob_list[x] > 5])
-        print(f'{start_battle}-{end_battle} | {prob_str}')
+        if len(ev_battle_str) > 0:
+            prob_list = [int(ev_battle_str.count(short_classes[x]) / len(ev_battle_str) * 100) for x in range(0, 5)]
+            prob_str = ', '.join([f'{class_names[x]} : {prob_list[x]}% ' for x in range(0, 5) if prob_list[x] > 5])
+            print(f'{start_battle}-{end_battle} | {prob_str}')
+        else:
+            print(f'{start_battle}-{end_battle} | ????? ')
+            

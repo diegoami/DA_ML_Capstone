@@ -4,7 +4,7 @@ import json
 from PIL import Image
 import numpy as np
 import random
-from util import move_files_to_right_place, arg_max_list
+from .util import arg_max_list
 
 from sagemaker.predictor import RealTimePredictor
 
@@ -34,7 +34,6 @@ def evaluate(endpoint_name, data_dir, percentage=1):
     
     # we scan dirs in alphabetical orders, as the data loaders do
     dirs = [s for s in sorted(os.listdir(data_dir)) if os.path.isdir(os.path.join(data_dir, s))]
-    move_files_to_right_place(class_names=dirs, data_dir=data_dir)
 
     for dir in dirs:
         curr_img_dir = os.path.join(data_dir, dir)

@@ -3,7 +3,7 @@ import os
 import json
 import numpy as np
 
-from interval.predict_intervals_utils import convert_to_intervals, get_short_classes
+from .predict_intervals_utils import convert_to_intervals, get_short_classes
 from PIL import Image
 from sagemaker.predictor import RealTimePredictor
 
@@ -33,4 +33,4 @@ def evaluate(endpoint_name, data_dir, class_names):
             categor_str = ''.join([min(int(out_work[x]), 20) * short_classes[x] for x in range(0, 5)]).rjust(20,'_')
             ev_seqs.append(categor_str)
 
-    convert_to_intervals(ev_seqs)
+    convert_to_intervals(ev_seqs, short_classes, class_names)
