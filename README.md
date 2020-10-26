@@ -2,7 +2,7 @@
 
 ## BACKGROUND
 
-For more of the background on this, check these [solutions.md](solutions.md) and [proposal.md](proposal.md).
+For more of the background on this project, check these [solutions.md](solutions.md) and [proposal.md](proposal.md).
 
 
 ## REQUIRED FILES
@@ -23,7 +23,8 @@ unzip -qq -n wendy_cnn_frames_67.zip -d <YOUR TEST DIR>
 ```
 
 ## SET ENVIRONMENT VARIABLES
-Set up the _model_dir_ and _channel_train_ to point to where you pu
+
+Set up the _model_dir_ and _channel_train_ to point to where you put the files you downloaded, and where you want to keep the generated models
 
 ```
 export SM_HOSTS=[]
@@ -37,11 +38,11 @@ Set up a python environment using the libraries listed in `requirements-freezed.
 
 ##  BASE DIRECTORY
 
-Make sure that you `cd letsplay_classifier` before executing these scripts.
+Make sure that you `cd letsplay_classifier` before executing scripts locally.
 
 ## TRAIN
 
-This script creates a model to categorize the frame
+This script creates a model to categorize frames in the train data directory
 
 ```
 python train.py --epochs=5 --img-width=320 --img-height=180 --layer-cfg=B --batch-size=16
@@ -57,11 +58,13 @@ python verify_model.py
 
 ## SPLIT VIDEOS IN SCENES
 
-To test how well the model is able to split videos into scenes, you can use the following command, to verify how the created model splits a video whose frames have not been used during training
+To test how well the model is able to split videos into scenes, you can use the following command, to verify how the created model splits a video whose frames have not been used during training.
+*Data-dir* here is the directory of the images that you want to classify.
 
 ```
 PYTHONPATH=$(pwd) python interval/predict_intervals_endpoint.py --data-dir=/media/diego/QData/youtube_ml/wendy-cnn-2b/frames/E67/
 ```
+
 ## ON SAGEMAKER
 
-To deploy the model on sagemaker, check the Juypter Notebooks, especially [CNN_Third_iteration.ipynb](CNN_Third_iteration.ipynb).
+To deploy the model on sagemaker, check the Juypter Notebooks, especially [CNN_Third_iteration.ipynb](CNN_Third_iteration.ipynb), and follow the instructions on them.

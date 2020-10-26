@@ -17,6 +17,7 @@ if __name__ == '__main__':
     parser.add_argument('--hosts', type=list, default=json.loads(os.environ['SM_HOSTS']))
     parser.add_argument('--current-host', type=str, default=os.environ['SM_CURRENT_HOST'])
     parser.add_argument('--model-dir', type=str, default=os.environ['SM_MODEL_DIR'])
+    # this is actually the directory of the frames to predicted, not to be used for training
     parser.add_argument('--data-dir', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
 
 
@@ -28,7 +29,9 @@ if __name__ == '__main__':
     work_dir = os.path.join(args.data_dir, 'uncategorized')
 
     images = sorted([s for s in os.listdir(work_dir)])
-    ev_seqs = []
+
+    # list of visualizations for each frame in the teddst dataset
+    frame_visualizations = []
 
     for image_index, image in enumerate(images):
         curr_img = os.path.join(work_dir, image)
@@ -39,8 +42,11 @@ if __name__ == '__main__':
             output_json = output_fn(prediction)
             pred_output = json.loads(output_json)
             out_exps = np.exp(pred_output)
-            out_work = (out_exps / sum(out_exps) * 20) .astype(int)
-            categor_str = ''.join([min(int(out_work[x]), 20) * short_classes[x] for x in range(0, 5)]).rjust(20,'_')
-            ev_seqs.append(categor_str)
+            out_normalized = (out_exps / sum(out_exps) * 20) .astype(int)
 
-    convert_to_intervals(ev_seqs, short_classes, class_names)
+            # visualization showing a breakdown of probabilities, what is shown in an image
+            frame_visualization = ''.join([min(int(out_normalized[x]), 20) * short_classes[x] for x in range(0, 5)]).rjust(20, '_')
+            frame_visualizations.append(frame_visualization)
+
+    # converts visualization to scenes intervals
+    convert_to_intervals(frame_visualizations, short_classes, class_names)
