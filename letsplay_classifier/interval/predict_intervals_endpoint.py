@@ -8,6 +8,13 @@ from PIL import Image
 from sagemaker.predictor import RealTimePredictor
 
 def evaluate(endpoint_name, data_dir, class_names):
+    """
+    Method used to show scenes intervals on sagemaker
+    :param endpoint_name: name of endpoint to call
+    :param data_dir: location of the frames to categorize
+    :param class_names: names of categories
+    :return:
+    """
     work_dir = os.path.join(data_dir, 'uncategorized')
     # loop on all images in a directory, belonging to a label
     images = sorted([s for s in os.listdir(work_dir)])

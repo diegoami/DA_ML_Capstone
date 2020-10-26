@@ -84,7 +84,7 @@ For instance battle images should look like that:
 
 ### FIRST ITERATION
 
-Notebook: _Wendy_CNN.ipynb_
+Notebook: _CNN_First_Iteration.ipynb_
 
 The simplest way I chose to verify whether a model is viable was to start and set up a Convolutional Neural Network in Pytorch, as I was pretty sure that 
 
@@ -95,7 +95,12 @@ The simplest way I chose to verify whether a model is viable was to start and se
 Convolutional Neural Network are, as a matter of fact, a very standard approach for categorizing images. A simple to use and flexible topology I decided to use was VGG, which is included in the Pytorch library. 
 
 As the images extracted from game walkthrough are not related to real world images, using a pretrained net and expand it with transfer learning did not seem to make sense. Instead, I opted for a full train.
+
 In the preprocessing phase, in this iteration, I resized images to 128 x 72, which should be enough for the algorithm to recognize features ( original images were all 640 x 360). As I already have over 45000 images, I thought I would do not need any kind of data augmentation (like, use mirrored images), also because it is not given that the game may actually show mirrored images.
+
+I decided to split the dataset into train and validation set dynamically while training, and not to split the set in different files, as that would have been unpractical. I did not set aside an holdout dataset, as I was planning to use following episodes, not still in the dataset, for that. 
+
+
 
 The flaw in the dataset, regrettably, is that some categories, such as *Siege*, *Trap* and *Town*, have relatively few samples. Looking at the confusion matrix I got, there were however some surprises in the report I got when I decided to test the produced model with 10% of the dataset. 
 
@@ -147,13 +152,13 @@ TOTAL : 45710
 
 I chose a smaller format for the images I save, as 640x480 is  too big for any model I can realistically train. The dataset becomes therefore much smaller: 1.0 Gb and can be found at _https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data_2.zip_
 
-I noticed that some images in the dataset were misclassified and I tried to fix this with a preprocessing step, but this approach turned out to be unpractical. 
+I noticed that some images in the dataset were misclassified and I tried to fix this with a preprocessing step, while using a GUI tool to find the misclassified images manually, but this approach turned out to be unpractical. 
 
-Now, creating a basic VGG net (type B) on the full images, having image_height x image_width = 160 x 90, with 5 epochs, and just 5 categories, and then running the model on the full dataset, gives this result:
+Now, creating a basic VGG13 net (type B) on the full images, having image_height x image_width = 160 x 90, with 5 epochs, and just 5 categories, and then running the model on the full dataset, gives this result:
 
+Accuracy on validation set of 98% and cross entropy loss of 0.005
 
-
-confusion Matrix
+Confusion Matrix
 
 | X| 0    | 1   | 2   | 3   | 4   | 
 |--|------|-----|-----|-----|-----|
@@ -165,7 +170,7 @@ confusion Matrix
 
 |class name|class|precision | recall | f1-score |support|
 |----------|-----|----------|--------|----------|-------|
-| Batle    |    0|      0.95|    0.99|      0.97|   5943|
+| Battle   |    0|      0.95|    0.99|      0.97|   5943|
 | Hideout  |    1|      0.97|    0.98|      0.98|   1153|
 | Other    |    2|      0.99|    0.99|      0.99|  31650|
 | Siege    |    3|      0.91|    0.98|      0.95|    194|
@@ -258,38 +263,68 @@ These are the jupyter notebooks I created while making this project:
 
 ## RESULTS
 
+In the end, I opted for a VGG13 model (layer configuration "B" in pytorch) trained on full image size (320 x 190). 
+I used for that a corrected version of the dataset (https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data_2b.zip) with fewer mistakes.
+
 ### IMAGE CLASSIFICATION
  
+When training it in 5 epochs, it gives a 98.5 % accuracy and a cross entropy loss of 0.0035 both on train and validation set. The improvements are due both to cleaning the dataset and using a greater format for images.
 
-The classification report and confusion matrix of the finally selected model are shown above.
+Classification report on full dataset: 
+Accuracy = 0.99
+
+|class name|class|precision | recall | f1-score |support|
+|----------|-----|----------|--------|----------|-------|
+| Battle   |    0|      0.97|    0.99|      0.98|   6125|
+| Hideout  |    1|      0.99|    0.97|      0.98|   1162|
+| Other    |    2|      0.99|    0.99|      0.99|  31430|
+| Siege    |    3|      0.85|    0.99|      0.92|    195|
+| Tournam  |    4|      0.99|    0.97|      0.98|   6798|
+|  macro avg     |      0.96|    0.98|      0.97|  45710|
+|  weighted avg  |      0.99|    0.99|      0.99|  45710|
+
+Confusion Matrix
+
+| X| 0    | 1   | 2   | 3   | 4   | 
+|--|------|-----|-----|-----|-----|
+| 0|  6055|    0|   55|    8|    7|
+| 1|     4| 1131|    5|   22|    0|    
+| 2|   153|   13|31212|    2|   50|    
+| 3|     0|    0|    1|  194|    0|    
+| 4|    8 |   2 |  197|    1| 6590|    
+
+
 
 ### INTERVAL IDENTIFICATION
 
-However, this is not the only result I was striving for. I wanted to create a tool not just to categorize images, but to split videos in scenes. Therefore I created two *intervals predictor* that I could use locally (_predict_intervals_dataloader_ and _predict_intervals_walkdir_, and one that I could use on Sagemaker: _predict_intervals_endpoint_) . 
+However, this is not the only result I was striving for. I wanted to create a tool not just to categorize images, but to split videos in scenes. Now, this problem would be worth a project in itself, possibly building a model on top of another model, or maybe considering RNN. At the moment I think this would make the problem too complex, as I expect this tool just to be able to help redact description, and not create them withouth human supervision. 
 
+
+Anyway, to find out scenes  I created an *intervals predictor* script that I could use locally (_predict_intervals_walkdir_), and one that I could use on Sagemaker: _predict_intervals_endpoint_) . 
+ 
 The approach I use in this script is to ignore one or two frames that are wrapped inside a scene. Moreover, long sequences of frames that are not classified as "other" (battles, sieges, tournaments, hideouts) are clumped together, as they can sometimes be confused with each other. Therefore, I 
 I chose the next episode in the playlist, E67, and this was the result:
 
 |  INTERVAL         | PREDICTION                                       | REALITY                                |
 |-------------------|--------------------------------------------------|----------------------------------------|
-| 23:04-28:04       | Hideout : 18% , Other : 6% , Siege : 72%         | Siege of Unuzdaq Castle                |
-| 46:24-47:44       | Battle : 68% , Other : 19% , Tournament : 10%    | Battle with Desert Bandits             |
-| 52:30-53:02       | Battle : 54% , Hideout : 26% , Other : 16%       | Trap in Dirigh Abana (Battle)          |
-| 54:38-56:00       | Battle : 77% , Other : 10% , Tournament : 12%    | Battle with Boyar Gerluch              |
-| 01:03:52-01:05:42 | Battle : 35% , Other : 13% , Tournament : 42%    | Battle with Steppe Bandits (knockd out)|
-| 01:14:00-01:16:36 | Battle : 75% , Other : 8% , Tournament : 15%     | Battle with Emir Atis                  |
-| 01:17:50-01:19:16 | Battle : 83% , Other : 10%                       | Battle with Emir Hamezan               |
-| 01:33:12-01:34:22 | Battle : 93%                                     | Battle with Emir Rafard                |
-| 01:38:18-01:43:50 | Battle : 64% , Other : 8% , Tournament : 26%     | Battle with Emir Dashwhal (1)          |
-| 01:43:54-01:46:06 | Battle : 56% , Other : 7% , Tournament : 36%     | Battle with Emir Dashwhal (2)          |
-| 01:49:00-01:50:38 | Battle : 91% , Other : 6%                        | Battle with Emir Ralcha   (1)          |
-| 01:50:50-01:53:32 | Battle : 94%                                     | Battle with Emir Ralcha   (2)          |
-| 01:55:52-01:57:46 | Battle : 88% , Other : 6%                        | Battle with Emir Azadun                |
+| 23:04-28:04       | Siege : 87%                                      | Siege of Unuzdaq Castle                |
+| 42:48-42:52       | Tournament : 85%                                 |                                        |
+| 43:44-43:52       | Tournament : 88%                                 |                                        |
+| 46:24-47:44       | Battle : 53% , Tournament : 39%                  | Battle with Desert Bandits             |
+| 52:28-53:02       | Battle : 53% , Hideout : 26% ,  Siege : 31%      | Trap in Dirigh Abana (Battle)          |
+| 54:38-56:00       | Battle : 69% , Tournament : 23%                  | Battle with Boyar Gerluch              |
+| 01:03:52-01:05:42 | Battle : 81%                                     | Battle with Steppe Bandits (knockd out)|
+| 01:14:00-01:16:36 | Battle : 86%                                     | Battle with Emir Atis                  |
+| 01:17:50-01:19:16 | Battle : 90%                                     | Battle with Emir Hamezan               |
+| 01:33:12-01:34:22 | Battle : 94%                                     | Battle with Emir Rafard                |
+| 01:38:16-01:43:50 | Battle : 83%                                     | Battle with Emir Dashwhal (1)          |
+| 01:43:56-01:46:06 | Battle : 84% ,  Tournament : 7%                  | Battle with Emir Dashwhal (2)          |
+| 01:49:00-01:50:38 | Battle : 93%                                     | Battle with Emir Ralcha   (1)          |
+| 01:50:48-01:53:32 | Battle : 94%                                     | Battle with Emir Ralcha   (2)          |
+| 01:55:52-01:57:46 | Battle : 94%                                     | Battle with Emir Azadun                |
 
+There are some discrepancies, but the result is usable. And the model can only get better adding more data.
 
-
-Compare this with the actual transcript I created after watching the video
- 
 ## CONCLUSIONS
 
 This project proved to me that it is possible to reliably build a classification model for images. I could apply this technique also to other video games, as the requirement of splitting game walkthroughs in scenes is something that is common over many games.
