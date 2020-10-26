@@ -53,6 +53,7 @@ This project:
 * downloads the text from the youtube description and save it along the video ( _metadata_ )
 * Copy files to directories named by the image categories.
 
+\newpage
 
 ## PROBLEM ANALYSIS
 
@@ -113,7 +114,7 @@ Confusion Matrix
 | 6|     8|    1|  175|    0|   49|    0|  537|    0|
 | 7|    13|    1|   62|    0|    1|    4|    0|    8|
   
-
+\newpage
 
 
   |class| class_name |precision|recall |f1-score|   support |
@@ -174,8 +175,9 @@ Confusion Matrix
 | |weighted avg  |      0.99|    0.98|      0.98|  45710|
 
 
-which is a much better result than the first run. I decided that I could keep this model. I describe the third and the last iteration in the "Result" chapter
-.
+which is a much better result than the first run. I decided that I could keep this model. I describe the third and the last iteration in the "Result" chapter.
+
+
 ## IMPLEMENTATION
 
 I set up scripts and notebooks so that they would work both locally and on Sagemaker. 
