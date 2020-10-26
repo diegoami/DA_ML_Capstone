@@ -1,8 +1,3 @@
-import os
-import shutil
-import json
-
-
 def arg_max_list(list):
     """
     argmax as in numpy but on a regular list

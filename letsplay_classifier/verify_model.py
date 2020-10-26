@@ -1,13 +1,12 @@
 import argparse
-from collections import defaultdict
 import os
 import json
 import numpy as np
 from PIL import Image
 import random
 from sklearn.metrics import classification_report
-
 from util import  arg_max_list
+
 
 THRESHOLD = 2.5
 from predict import model_fn, predict_fn, output_fn
@@ -111,11 +110,11 @@ if __name__ == '__main__':
     print(f'Model Dir: {args.model_dir}')
 
     model = model_fn(args.model_dir)
-    report, np_conf_matrix, dubious_preds = verify(model, args.data_dir, 1)
+    report, np_conf_matrix, dubious_predictions = verify(model, args.data_dir, 1)
 
     print("Confusion Matrix")
     print(np_conf_matrix)
     print(report)
-    print(dubious_preds)
+    print(dubious_predictions)
 
 
