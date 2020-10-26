@@ -24,6 +24,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     model = model_fn(args.model_dir)
     model_info = get_model_info(args.model_dir)
+    print(model_info)
     class_names = model_info.get('class_names', ['Battle', 'Hideout', 'Other', 'Siege', 'Tournament'])
     short_classes = get_short_classes(class_names)
     work_dir = os.path.join(args.data_dir, 'uncategorized')

@@ -75,7 +75,7 @@ def get_hour_format(seconds):
     return current_time
 
 
-def convert_to_intervals(frame_visualizations, short_classes, class_names):
+def convert_to_intervals(frame_visualizations, short_classes, class_names, print_lines=False):
     second_tot = 0
 
     # visualization without single mismatching frames
@@ -98,7 +98,8 @@ def convert_to_intervals(frame_visualizations, short_classes, class_names):
         current_time = get_hour_format(second_tot)
 
         # shows visualization
-        print(f'{current_time} {x} {visualization}')
+        if (print_lines):
+            print(f'{current_time} {x} {visualization}')
         second_tot += 2
 
         if not in_scene:

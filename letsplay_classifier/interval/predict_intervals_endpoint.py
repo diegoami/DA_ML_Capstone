@@ -7,7 +7,7 @@ from .predict_intervals_utils import convert_to_intervals, get_short_classes
 from PIL import Image
 from sagemaker.predictor import RealTimePredictor
 
-def evaluate(endpoint_name, data_dir, class_names):
+def evaluate(endpoint_name, data_dir, class_names, print_lines=False):
     """
     Method used to show scenes intervals on sagemaker
     :param endpoint_name: name of endpoint to call
@@ -22,7 +22,7 @@ def evaluate(endpoint_name, data_dir, class_names):
 
     # loop on all images in a directory, belonging to a label
     short_classes = get_short_classes(class_names)
-    ev_seqs = []
+    frame_visualizations = []
     predictor = RealTimePredictor(endpoint_name,
                                   content_type='application/json',
                                   accept='application/json')
@@ -36,8 +36,10 @@ def evaluate(endpoint_name, data_dir, class_names):
             output_json = predictor.predict(image_data)
             pred_output = json.loads(output_json)
             out_exps = np.exp(pred_output)
-            out_work = (out_exps / sum(out_exps) * 20) .astype(int)
-            categor_str = ''.join([min(int(out_work[x]), 20) * short_classes[x] for x in range(0, 5)]).rjust(20,'_')
-            ev_seqs.append(categor_str)
+            out_normalized = (out_exps / sum(out_exps) * 20) .astype(int)
+            frame_visualization = ''.join([min(int(out_normalized[x]), 20) * short_classes[x] for x in range(0, 5)]).rjust(20,'_')
+            frame_visualizations.append(frame_visualization)
 
-    convert_to_intervals(ev_seqs, short_classes, class_names)
+    convert_to_intervals(frame_visualizations, short_classes, class_names)
+    
+#    evaluate('pytorch-inference-2020-10-26-04-51-38-837', '/home/ec2-user/SageMaker/DA_ML_Capstone/wendy_cnn_frames_E67/E67', class_names= ['Battle', 'Hideout', 'Other', 'Siege', 'Tournament'], print_lines=True)
