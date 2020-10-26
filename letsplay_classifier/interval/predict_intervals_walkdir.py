@@ -3,7 +3,6 @@ import argparse
 import os
 import json
 import numpy as np
-from constants import IMG_WIDTH, IMG_HEIGHT
 from interval.predict_intervals_utils import convert_to_intervals, get_short_classes
 from PIL import Image
 
