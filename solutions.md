@@ -259,9 +259,9 @@ These are the jupyter notebooks I created while making this project:
 
 ## RESULTS
 
-In the end, I opted for a VGG13 model (layer configuration "B" in pytorch) trained on full image size (320 x 190). 
+In the end, I opted for a VGG13 model (layer configuration "B" in pytorch) trained on full image size (320 x 180). 
 I used for that a corrected version of the dataset (_https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data_2b.zip_) with fewer misclassified images.
-The result can be seen in the _CNN_Third_iteration.ipynb_ notebook.
+The results refer to runs I executed locally on my computer. On Sagemaker the results are somewhat different, as can be seen in the _CNN_Third_iteration.ipynb_ notebook, but I could not figure out why.
 
 ### IMAGE CLASSIFICATION
  
