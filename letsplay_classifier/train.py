@@ -91,34 +91,105 @@ def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_
     im_folder = torchvision.datasets.ImageFolder(img_dir, transform=data_transform)
     model_dataset = td.datasets.WrapDataset(im_folder)
 
-    train_count = int(0.75 * total_count)
-    valid_count = total_count - train_count
-    
+
+
     # stratify the dataset
-    train_idx, valid_idx = train_test_split(
+    train_idx, valid_test_idx = train_test_split(
         np.arange(len(model_dataset)),
-        test_size=0.25,
+        test_size=0.35,
         shuffle=True,
         stratify=model_dataset.targets)
+
+
+
+    valid_idx, test_idx = train_test_split(
+        np.array(valid_test_idx),
+        test_size=0.4,
+        shuffle=True,
+        stratify=np.array(model_dataset.targets)[valid_test_idx])
+
+    train_count, valid_count, test_count = len(train_idx), len(valid_idx), len(test_idx)
 
     # create two data loaders for training and validation dataset
     train_sampler = torch.utils.data.SubsetRandomSampler(train_idx)
     valid_sampler = torch.utils.data.SubsetRandomSampler(valid_idx)
+    test_sampler = torch.utils.data.SubsetRandomSampler(test_idx)
 
     train_dataset_loader = torch.utils.data.DataLoader(model_dataset, batch_size=batch_size, sampler=train_sampler)
     valid_dataset_loader = torch.utils.data.DataLoader(model_dataset, batch_size=batch_size, sampler=valid_sampler)
+    test_dataset_loader = torch.utils.data.DataLoader(model_dataset, batch_size=batch_size, sampler=test_sampler)
 
     dataloaders = {
         'train': train_dataset_loader,
-        'val': valid_dataset_loader
+        'val': valid_dataset_loader,
+        'test': test_dataset_loader
     }
     dataset_sizes = {
         'train': train_count,
-        'val': valid_count
+        'val': valid_count,
+        'test': test_count,
+
     }
     class_names = model_dataset.classes
     return dataloaders, dataset_sizes, class_names
 
+
+def test_model(model,  criterion, test_data_loader, test_count):
+    """
+    executes a test of the model on the holdout set
+    :param model: the model to test
+    :param criterion: the criterion to use to optimize
+    :param test_data_loader: the data loader for test data
+    :param test_count:
+    :return:
+    """
+    use_gpu = torch.cuda.is_available()
+    since = time.time()
+    loss_test = 0
+    acc_test = 0
+    y_pred, y_true = [], []
+    test_batches = len(test_data_loader)
+    print("Evaluating model")
+    print('-' * 10)
+
+    for i, data in enumerate(test_data_loader):
+        if i % 100 == 0:
+            print("\rTest batch {}/{}".format(i, test_batches), end='', flush=True)
+
+        model.train(False)
+        model.eval()
+        if torch.cuda.is_available():
+            model.cuda()
+        inputs, labels = data
+
+        if use_gpu:
+            inputs, labels = Variable(inputs.cuda(), volatile=True), Variable(labels.cuda(), volatile=True)
+        else:
+            inputs, labels = Variable(inputs, volatile=True), Variable(labels, volatile=True)
+
+        outputs = model(inputs)
+
+        _, preds = torch.max(outputs.data, 1)
+        loss = criterion(outputs, labels)
+
+        loss_test += loss.data
+        acc_test += torch.sum(preds == labels.data)
+        y_pred = y_pred + list(preds.detach().cpu().numpy())
+        y_true = y_true + list(labels.data.detach().cpu().numpy())
+
+        del inputs, labels, outputs, preds
+        torch.cuda.empty_cache()
+
+    avg_loss = torch.true_divide(loss_test, test_count)
+    avg_acc = torch.true_divide(acc_test, test_count)
+
+    elapsed_time = time.time() - since
+    print()
+    print("Evaluation completed in {:.0f}m {:.0f}s".format(elapsed_time // 60, elapsed_time % 60))
+    print("Avg loss (test): {:.4f}".format(avg_loss))
+    print("Avg acc (test): {:.4f}".format(avg_acc))
+    print('-' * 10)
+    return y_pred, y_true
 
 def train_model(model, dataloaders, dataset_sizes, criterion, optimizer,  num_epochs=10):
     """
@@ -262,7 +333,7 @@ if __name__ == '__main__':
 
     print(f'Data Dir: {args.data_dir}')
     print(f'Model Dir: {args.model_dir}')
-
+    os.makedirs(args.model_dir, exist_ok=True)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -289,6 +360,7 @@ if __name__ == '__main__':
     model, best_acc, best_loss = train_model(model, dataloaders, dataset_sizes, criterion, optimizer_ft, num_epochs=args.epochs)
 
 
+
     save_model(model, args.model_dir)
 
     #  save the parameters used to construct the model
@@ -297,3 +369,11 @@ if __name__ == '__main__':
     # saves the best accuracy and loss in this model
     save_model_metrics(args.model_dir, best_acc, best_loss)
 
+    y_pred, y_true = test_model(model, criterion, dataloaders['test'], dataset_sizes['test'])
+    from sklearn.metrics import classification_report
+    report = classification_report(y_true=y_true, y_pred=y_pred)
+    print(report)
+
+    from sklearn.metrics import confusion_matrix
+
+    print(confusion_matrix(y_true, y_pred))

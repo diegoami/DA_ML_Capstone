@@ -1,0 +1,3 @@
+Data Dir: /media/diego/QData/youtube_ml/wendy-cnn-2b/frames/all/
+Model Dir: /media/diego/QData/models/cnn-wendy/v2b-a
+model_info: {'class_names': ['Battle', 'Hideout', 'Other', 'Siege', 'Tournament'], 'img_width': 320, 'img_height': 180, 'epochs': 5, 'layer_cfg': 'B'}
