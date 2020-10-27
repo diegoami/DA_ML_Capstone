@@ -28,7 +28,7 @@ The game that I have chosen to analyze is _Mount of Blade: Warband_, of which I 
 * TOWN (escape): escape from the town or castle prison (later remapped to BATTLE)
 * OTHER : everything else 
 
-To create a dataset I took some videos from a game walkthrough of mine, the adventures of Wendy. I used the episodes from 41 to 66 from following public playlists on youtube: 
+To create a dataset I took some videos from a game walkthrough of mine, the adventures of Wendy. I used the episodes from 41 to 67 from following public playlists on youtube: 
 
 * CNN-Wendy-I: _https://www.youtube.com/playlist?list=PLNP_nRm4k4jfVfQobYTRQAXV_uOzt8Bov_
 * CNN-Wendy-II: _https://www.youtube.com/playlist?list=PLNP_nRm4k4jdEQ-OM31xNqeE64svvx-aT_ 

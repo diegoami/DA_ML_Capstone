@@ -22,45 +22,6 @@ def get_short_classes(class_names):
             used_letters.append(catu[2])
     return short_classes
 
-def smooth_unmatching_frames(frame_visualizations, short_classes):
-    """
-    Frames which seems to be in a separate scenes as the previous and following one are replaced with an average from the previous and following frame
-    :param frame_visualizations: list of visualizations associated with frames
-    :param short_classes: list of short names for categories to show on cat
-    :return:
-    """
-
-    # list of smoothed visualizations. Will be a clone of frame visualization, apart from record sandwiched between very different ones
-    smoothed_visualizations = []
-
-    # default visualization to use in edge cases (non-scene)
-    default_visualization = '_'*20
-
-    # going through all visualizations in the source list
-    for i, current_visualization in enumerate(frame_visualizations):
-
-        # retrieve precedent and following visualization to work with
-        if i == 0:
-            pred_visualization = default_visualization
-        else:
-            pred_visualization = frame_visualizations[i - 1]
-        if i == len(frame_visualizations)-1:
-            seq_visualization = default_visualization
-        else:
-            seq_visualization = frame_visualizations[i + 1]
-
-        # will just clone visualization
-        to_add_visualization = current_visualization
-
-        # non-scene frame surrounded by scene frames
-        if ((to_add_visualization.count('_') > 12) and (pred_visualization.count('_') < 10) and(seq_visualization.count('_') < 10)):
-            to_add_visualization = ''.join([(pred_visualization+seq_visualization).count(short_classes[x])//2*short_classes[x] for x in range(0,5)])
-        # scene frame surrounded by non scene frames
-        if ((to_add_visualization.count('_') < 12) and (pred_visualization.count('_') > 10) and(seq_visualization.count('_') > 10)):
-            to_add_visualization = ''.join([((pred_visualization+seq_visualization).count(short_classes[x])//2)*short_classes[x] for x in range(0,5)])
-        smoothed_visualizations.append(to_add_visualization)
-    return smoothed_visualizations
-
 
 def get_hour_format(seconds):
     """
@@ -78,12 +39,14 @@ def get_hour_format(seconds):
 def convert_to_intervals(frame_visualizations, short_classes, class_names, print_lines=False):
     second_tot = 0
 
-    # visualization without single mismatching frames
-    once_smoothed_visualizations = smooth_unmatching_frames(frame_visualizations, short_classes)
-    interval_descriptions = []
+    # description of scenes found
+    scenes_description = []
 
     # in loop, whether we are in a scene
     in_scene = False
+
+
+    in_spell = False
 
     # scene start
     start_scene = None
@@ -93,26 +56,35 @@ def convert_to_intervals(frame_visualizations, short_classes, class_names, print
 
     # loops through frame visualizations to show them and build scene interval descriptions
 
-    for i, (x, visualization) in enumerate(zip(frame_visualizations, once_smoothed_visualizations)):
+    for i, visualization in enumerate(frame_visualizations):
 
         current_time = get_hour_format(second_tot)
 
         # shows visualization
         if (print_lines):
-            print(f'{current_time} {x} {visualization}')
+            if (visualization.count('_') >= 20):
+                if in_spell:
+                    pass
+                else:
+                    in_spell = True
+                    print()
+            else:
+                in_spell = False
+                print(f'{current_time}  {visualization}')
+
         second_tot += 2
 
         if not in_scene:
             # start of a scene, if a not in one
-            if visualization.count('_') < 10:
+            if visualization.count('_') <= 15:
                 start_scene = current_time
                 in_scene = True
         else:
             # end of a scene, if in one
-            if visualization.count('_') > 12:
+            if visualization.count('_') >= 20:
                 end_scene = current_time
                 # a new interval description has been  generated
-                interval_descriptions.append((start_scene, end_scene, scene_description))
+                scenes_description.append((start_scene, end_scene, scene_description))
                 start_scene, end_scene = None, None
                 in_scene = False
                 scene_description = ''
@@ -121,7 +93,7 @@ def convert_to_intervals(frame_visualizations, short_classes, class_names, print
                 scene_description += visualization
 
     # loops through interval descriptions
-    for start_scene, end_scene, scene_description in interval_descriptions:
+    for start_scene, end_scene, scene_description in scenes_description:
         if len(scene_description) > 0:
             # build the scene type probability string
             prob_list = [int(scene_description.count(short_classes[x]) / len(scene_description) * 100) for x in range(0, 5)]

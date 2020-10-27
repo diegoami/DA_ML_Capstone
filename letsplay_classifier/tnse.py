@@ -13,7 +13,7 @@ import pandas as pd
 import torchdata as td
 import torchvision
 from torchvision import transforms
-from predict import model_fn, predict_fn, output_fn
+from predict import model_fn, get_model_info
 
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
@@ -45,7 +45,7 @@ def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_
     return dataset_loader, total_count
 
 
-def get_feature_matrix_from_dataset():
+def get_feature_matrix_from_dataset(dataloader):
 
     X, y = None, None
     for i, data in enumerate(dataloader):
@@ -63,6 +63,51 @@ def get_feature_matrix_from_dataset():
         else:
             X = np.vstack([X, np_step])
             y = np.hstack([y, labels])
+    return X, y
+
+def create_pcadf(X, y):
+
+    df = pd.DataFrame(X)
+    df['y'] = y
+    df['label'] = df['y'].apply(lambda i: str(i))
+    pca = PCA(n_components=3)
+    pca_result = pca.fit_transform(X)
+    df['pca-one'] = pca_result[:, 0]
+    df['pca-two'] = pca_result[:, 1]
+    df['pca-three'] = pca_result[:, 2]
+    print('Explained variation per principal component: {}'.format(pca.explained_variance_ratio_))
+    print(df[['pca-one', 'pca-two', 'pca-three', 'y']])
+    return df
+
+
+def plot_3d_tse(plt, df):
+    ax = plt.figure(figsize=(16, 10)).gca(projection='3d')
+    ax.scatter(
+        xs=df["pca-one"],
+        ys=df["pca-two"],
+        zs=df["pca-three"],
+        c=df["y"],
+        cmap='tab10'
+    )
+    ax.set_xlabel('pca-one')
+    ax.set_ylabel('pca-two')
+    ax.set_zlabel('pca-three')
+    plt.show()
+    plt.savefig('3d_tse.png')
+
+
+def plot_2d_tse(plt, df, num_classes):
+    plt.figure(figsize=(16, 10))
+    sns.scatterplot(
+        x="pca-one", y="pca-two",
+        hue="y",
+        palette=sns.color_palette("hls", num_classes),
+        data=df,
+        legend="full",
+        alpha=0.3
+    )
+    plt.show()
+    plt.savefig('2d_tse.png')
 
 
 if __name__ == '__main__':
@@ -92,6 +137,7 @@ if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     use_gpu = torch.cuda.is_available()
     model = model_fn(args.model_dir)
+    model_info = get_model_info(args.model_dir)
     args = parser.parse_args()
 
 
@@ -107,41 +153,10 @@ if __name__ == '__main__':
     # retrieves data loaders and datasets, and the label names
     dataloader, dataset_size = get_data_loaders(img_dir=args.data_dir,  img_height=args.img_height, img_width=args.img_width, batch_size=args.batch_size)
 
-    X, y = get_feature_matrix_from_dataset(dataloader, dataset_size)
+    X, y = get_feature_matrix_from_dataset(dataloader)
 
-    df = pd.DataFrame(X)
-    df['y'] = y
-    df['label'] = df['y'].apply(lambda i: str(i))
+    df = create_pcadf(X, y)
 
-    pca = PCA(n_components=3)
-    pca_result = pca.fit_transform(X)
-    df['pca-one'] = pca_result[:, 0]
-    df['pca-two'] = pca_result[:, 1]
-    df['pca-three'] = pca_result[:, 2]
-    print('Explained variation per principal component: {}'.format(pca.explained_variance_ratio_))
-    print(df[['pca-one', 'pca-two', 'pca-three', 'y']])
+    plot_2d_tse(plt, df, len(model_info['class_names']))
 
-
-    ax = plt.figure(figsize=(16, 10)).gca(projection='3d')
-    ax.scatter(
-        xs=df["pca-one"],
-        ys=df["pca-two"],
-        zs=df["pca-three"],
-        c=df["y"],
-        cmap='tab10'
-    )
-    ax.set_xlabel('pca-one')
-    ax.set_ylabel('pca-two')
-    ax.set_zlabel('pca-three')
-    plt.show()
-
-    plt.figure(figsize=(16, 10))
-    sns.scatterplot(
-        x="pca-one", y="pca-two",
-        hue="y",
-         palette=sns.color_palette("hls", 5),
-         data=df,
-         legend="full",
-         alpha=0.3
-    )
-    plt.show()
+    plot_3d_tse(plt, df)
