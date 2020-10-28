@@ -1,8 +1,8 @@
+import io
 import os
 import json
 
 from PIL import Image
-import numpy as np
 import random
 from .util import arg_max_list
 
@@ -50,10 +50,12 @@ def evaluate(endpoint_name, data_dir, percentage=1):
             images_processed += 1
             
             with open(curr_img, 'rb') as f:
-                # retrive most likely category from predictor
-                body=bytearray(Image.open(f))
-                
-                output = predictor.predict(body)
+                image = Image.open(f)
+                imgByteArr = io.BytesIO()
+                image.save(imgByteArr, format=image.format)
+                image_data = imgByteArr.getvalue()
+                output = predictor.predict(image_data)
+
                 output_list = json.loads(output)
                 pred_index = arg_max_list(output_list)
 

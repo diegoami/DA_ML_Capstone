@@ -67,7 +67,6 @@ def input_fn(request_body, content_type='application/x-image'):
     """
 
     if content_type == 'application/x-image':
-        # converts images from json format
         image_data = Image.open(io.BytesIO(request_body))
         return image_data
     raise Exception(f'Requested unsupported ContentType in content_type {content_type}')

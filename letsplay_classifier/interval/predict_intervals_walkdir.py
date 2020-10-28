@@ -50,4 +50,4 @@ if __name__ == '__main__':
             frame_visualizations.append(frame_visualization)
 
     # converts visualization to scenes intervals
-    convert_to_intervals(frame_visualizations, short_classes, class_names)
+    convert_to_intervals(frame_visualizations, short_classes, class_names, True)
