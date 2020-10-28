@@ -110,7 +110,7 @@ For instance, in episode 54, I have identified following scenes, of the category
 * 20:50-21:46 Battle with Sea Raiders
 * 22:54-23:42 Battle with Sea Raiders
 * 34:06-37:44 Tournament won in Tihr
-* 38:46-40:48 Town escape for Boyar Vlan 
+*u 38:46-40:48 Town escape for Boyar Vlan 
 
 To prepare the data set, I had set up a companion project under _https://github.com/diegoami/DA_split_youtube_frames_s3/_:
 
