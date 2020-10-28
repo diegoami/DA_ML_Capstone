@@ -39,7 +39,7 @@ The hero can also take a walk in town, villages and castles.
 ![E_0064_00_52_16.jpg](docimages/other/E_0064_00_52_16.jpg)
  
     
-However, what we are interested in is locating the scenes when the warband engages enemies and the game switches to a tactical view, such as a battle in an open field...
+However, what we are interested in is locating the scenes when the warband engages enemies and the game switches to a tactical view, such as a battle in an open field or in a village...
 
 ![E_0060_00_44_20.jpg](docimages/other/E_0060_00_44_20.jpg)
 
@@ -75,18 +75,44 @@ The scene that are most challenging to recognize are quests and ambushes, as the
 
 <!-- The problem which needs to be solved is clearly defined. A strategy for solving the problem, including discussion of the expected solution, has been made. -->
 
-The goal is to create and deploy a model which is able to classify images from the game _Mount&Blade: Warband_ and return a category
+The goal is to create and deploy a model which is able to classify images from the game _Mount&Blade: Warband_ and return a category, such as "Battle", "Hideout", "Siege", "Tournament" and "Other". It is also desirable to find out an optimal number of categories. It would be ideal to have categories for less frequent scenes such as "Prison escape", "Ambush", "Quest", but this will be out of scope and such scenes will be lumped together with the closes "main" category.
+
+An additional goal is to have a model which identifies contiguous scenes in a gameplay video of _Mount&Blade: Warband_, providing the beginning and the end of the scenes, and its category.
+
+A necessary requirement for this project is to gather a dataset of screenshots taken from the game, as well as the category to which they belong.
 
 ### METRICS
 
 <!-- Metrics used to measure the performance of a model or result are clearly defined. Metrics are justified based on the characteristics of the problem. -->
 
+I will measure the performance of the image classifier using accuracy and cross-entropy loss on the training, validation and test (holdout) dataset. 
+
+I will also measure precision, recall, accuracy and F1 for each category,  as well as a total weighted and mean accuracy. I will also provide a confusion matrix.
 
 ## ANALYSIS
 
 ### DATA EXPLORATION
 
 <!-- If a dataset is present, features and calculated statistics relevant to the problem have been reported and discussed, along with a sampling of the data. In lieu of a dataset, a thorough description of the input space or input data has been made. Abnormalities or characteristics of the data or input that need to be addressed have been identified.  -->
+
+
+To create a dataset I took some videos from a game walkthrough of mine, the adventures of Wendy. I used the episodes from 41 to 67 from following public playlists on youtube: 
+
+* CNN-Wendy-I: _https://www.youtube.com/playlist?list=PLNP_nRm4k4jfVfQobYTRQAXV_uOzt8Bov_
+* CNN-Wendy-II: _https://www.youtube.com/playlist?list=PLNP_nRm4k4jdEQ-OM31xNqeE64svvx-aT_ 
+
+These are the episodes I went through and manually split into scenes. The scenes descriptions can be found in the video descriptions on youtube. 
+
+For instance, in episode 54, I have identified following scenes, of the category "Hideout", "Battle", "Tournament", "Town". All the other parts of the video are categorized as "Other". These lines can be found in the video description.  
+
+* 09:51-12:21 Hideout Tundra Bandits (Failed)
+* 18:47-19:44 Battle with Sea Raiders
+* 20:50-21:46 Battle with Sea Raiders
+* 22:54-23:42 Battle with Sea Raiders
+* 34:06-37:44 Tournament won in Tihr
+* 38:46-40:48 Town escape for Boyar Vlan 
+
+To prepare the data set, I had set up a companion project under _https://github.com/diegoami/DA_split_youtube_frames_s3/_:
 
 ### EXPLORATORY VISUALIZATION
 
