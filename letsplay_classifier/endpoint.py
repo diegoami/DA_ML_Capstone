@@ -30,7 +30,7 @@ def evaluate(endpoint_name, data_dir, percentage=1):
     # set up a predictor from the endpoint
     predictor = RealTimePredictor(endpoint_name,
          content_type='application/json',
-         accept='application/json')
+         accept='application/x-image')
     
     # we scan dirs in alphabetical orders, as the data loaders do
     dirs = [s for s in sorted(os.listdir(data_dir)) if os.path.isdir(os.path.join(data_dir, s))]
@@ -51,8 +51,9 @@ def evaluate(endpoint_name, data_dir, percentage=1):
             
             with open(curr_img, 'rb') as f:
                 # retrive most likely category from predictor
-                image_data = json.dumps(np.array(Image.open(f)).tolist())
-                output = predictor.predict(image_data)
+                body=bytearray(Image.open(f))
+                
+                output = predictor.predict(body)
                 output_list = json.loads(output)
                 pred_index = arg_max_list(output_list)
 
