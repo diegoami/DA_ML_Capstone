@@ -6,10 +6,10 @@ from PIL import Image
 import random
 from sklearn.metrics import classification_report
 from util import  arg_max_list
-
+import io
 
 THRESHOLD = 2.5
-from predict import model_fn, predict_fn, output_fn
+from predict import model_fn, predict_fn, output_fn, input_fn
 
 def verify(model, data_dir, percentage=1):
     """
@@ -58,7 +58,12 @@ def verify(model, data_dir, percentage=1):
                     images_processed += 1
 
                     # goes through predict_fn and output_fn in predict, but only using the model
-                    image_data = Image.open(f)
+                    image = Image.open(f)
+                    imgByteArr = io.BytesIO()
+                    image.save(imgByteArr, format=image.format)
+                    body = imgByteArr.getvalue()
+                    image_data = input_fn(body)
+
                     prediction = predict_fn(image_data, model)
                     output_json = output_fn(prediction)
 
@@ -110,7 +115,7 @@ if __name__ == '__main__':
     print(f'Model Dir: {args.model_dir}')
 
     model = model_fn(args.model_dir)
-    report, np_conf_matrix, dubious_predictions = verify(model, args.data_dir, 1)
+    report, np_conf_matrix, dubious_predictions = verify(model, args.data_dir, 0.1)
 
     print("Confusion Matrix")
     print(np_conf_matrix)

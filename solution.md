@@ -95,28 +95,56 @@ I will also measure precision, recall, accuracy and F1 for each category,  as we
 
 <!-- If a dataset is present, features and calculated statistics relevant to the problem have been reported and discussed, along with a sampling of the data. In lieu of a dataset, a thorough description of the input space or input data has been made. Abnormalities or characteristics of the data or input that need to be addressed have been identified.  -->
 
+#### CREATING A DATASET
 
-To create a dataset I took some videos from a game walkthrough of mine, the adventures of Wendy. I used the episodes from 41 to 67 from following public playlists on youtube: 
+To create a dataset I took some videos from a game walkthrough of mine, the adventures of Wendy. I used the episodes from 41 to 69 from following public playlists on youtube: 
 
 * CNN-Wendy-I: _https://www.youtube.com/playlist?list=PLNP_nRm4k4jfVfQobYTRQAXV_uOzt8Bov_
 * CNN-Wendy-II: _https://www.youtube.com/playlist?list=PLNP_nRm4k4jdEQ-OM31xNqeE64svvx-aT_ 
 
-These are the episodes I went through and manually split into scenes. The scenes descriptions can be found in the video descriptions on youtube. 
+I found scenes in these episodes and added scene descriptions, that can be found in the video descriptions on youtube. 
 
-For instance, in episode 54, I have identified following scenes, of the category "Hideout", "Battle", "Tournament", "Town". All the other parts of the video are categorized as "Other". These lines can be found in the video description.  
+For instance, in episode 54, I have identified following scenes, of the category "Hideout", "Battle", "Tournament", "Town" ("Town" is eventually remapped to "Battle"). All the other parts of the video are categorized as "Other". These lines can be found in the video description.  
 
 * 09:51-12:21 Hideout Tundra Bandits (Failed)
 * 18:47-19:44 Battle with Sea Raiders
 * 20:50-21:46 Battle with Sea Raiders
 * 22:54-23:42 Battle with Sea Raiders
 * 34:06-37:44 Tournament won in Tihr
-*u 38:46-40:48 Town escape for Boyar Vlan 
+* 38:46-40:48 Town escape for Boyar Vlan 
 
-To prepare the data set, I had set up a companion project under _https://github.com/diegoami/DA_split_youtube_frames_s3/_:
+#### COMPANION PROJECTS
+
+To prepare the data set, I had set up a companion project under _https://github.com/diegoami/DA_split_youtube_frames_s3/_. 
+
+ 
+This project:
+
+* downloads the relevant videos from youtube, using the *youtube-dl* python library, in a 640x360 format
+* extracts at every two seconds a frame and save it an jpeg file, using the *opencv* python library, resizing to the practical format 320x180
+* downloads the text from the youtube description and save it along the video ( _metadata_ )
+* Copy files to directories named by the image categories.
+
+#### DATASET CHARACTERISTICS
+
+The dataset contains 51216 images , 320 x 190, in jpeg format, categorized in this way
+
+| Category   |  Amount  | Percentage |
+|------------|----------|------------|
+| Battle     |      7198|      14.0% |
+| Hideout    |      1163|       2.2% |
+| Other      |     35425|      67.4% |
+| Siege      |       634|       1.2% |
+| Tournament |      6796|      13.3% |
+|   TOTAL    |     51216|
+
+You can browse them using the _analysis.ipynb_ notebooks.
 
 ### EXPLORATORY VISUALIZATION
 
 <!-- A visualization has been provided that summarizes or extracts a relevant characteristic or feature about the dataset or input data with thorough discussion. Visual cues are clearly defined. -->
+
+This is a PCA representation 
 
 ### ALGORITHMS AND TECHNIQUES
 
