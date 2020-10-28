@@ -31,22 +31,22 @@ If we have a video containing battles and other interesting scenes (such as an a
 
 In a battle
 
-![battle](docimages/battle1.png)
+![battle](docimagesold/battle1.png)
 
 Tournament
 
-![tournament](docimages/tourn1.png)
+![tournament](docimagesold/tourn1.png)
 
 Hideout
   
-![hideout](docimages/hideout1.png)
+![hideout](docimagesold/hideout1.png)
 
 Other Scenes
 
-![other](docimages/other1.png)
-![other](docimages/other2.png)
-![other](docimages/other3.png)
-![other](docimages/other4.png)
+![other](docimagesold/other1.png)
+![other](docimagesold/other2.png)
+![other](docimagesold/other3.png)
+![other](docimagesold/other4.png)
 
 ## Datasets and Inputs
 

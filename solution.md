@@ -14,14 +14,68 @@ CAPSTONE Project - Machine Learning Engineer Nanodegree - October 2020
 During the last few years it has become more and more common to stream on platforms such as Youtube and Twitch while playing video games, or to upload recorded sessions. The volume of videos produced is overwhelming. In many of the video games being streamed there are different types of scenes. Both for content producers and consumers it would be useful to be able to automatically split videos, to find out in what time intervals different types of scenes run. For instance, having as an input the video recording of a Minecraft speedrun, we could be able to produce the time intervals when the game is taking place in the Overworld surface, in caves, in the Nether and the End respectively - the four main settings of this game.
 
 
-The game that I have chosen to analyze is _Mount of Blade: Warband_, of which I made several walkthroughs. This is a game where you spend most of the time on a "strategic map", taking your warband to any of the towns or villages, following or running away from other warbands which can belong to friendly or rival factions, or looking for quest objectives. Here are some example of screenshots from the strategic map, scaled to 320 x 180.
+The game that I have chosen to analyze is _Mount of Blade: Warband_, of which I made several walkthroughs. This is a game where you spend most of the time on a "strategic map", taking your warband to any of the towns or villages, following or running away from other warbands which can belong to friendly or rival factions, or looking for quest objectives. 
+
+![E_00_41_00_09_28.jpg](docimages/other/E_0041_00_09_28.jpg)
+ 
+![E_0049_00_15_38.jpg](docimages/other/E_0049_00_15_38.jpg)
+
+![E_0063_00_17_06.jpg](docimages/other/E_0063_00_17_06.jpg)
+
+Other in-game screenshots can show the character's inventory, warband composition, allow interaction with in-game characters, display status messages...
+
+![E_0056_00_31_30.jpg](docimages/other/E_0056_00_31_30.jpg)
+
+![E_0056_00_58_08.jpg](docimages/other/E_0056_00_58_08.jpg)
+
+![E_0059_00_26_26.jpg](docimages/other/E_0059_00_26_26.jpg)
+
+The hero can also take a walk in town, villages and castles. 
+
+![E_0055_00_33_54.jpg](docimages/other/E_0055_00_33_54.jpg)
+
+... have training sessions with soldiers...
+
+![E_0064_00_52_16.jpg](docimages/other/E_0064_00_52_16.jpg)
+ 
+    
+However, what we are interested in is locating the scenes when the warband engages enemies and the game switches to a tactical view, such as a battle in an open field...
+
+![E_0060_00_44_20.jpg](docimages/other/E_0060_00_44_20.jpg)
+
+![E_0066_01_21_18.jpg](docimages/other/E_0066_01_21_18.jpg)
+
+![E_0065_00_29_08.jpg](docimages/other/E_0065_00_29_08.jpg)
+
+or a sieges to a town or a castle...
+
+![E_0068_00_20_08.jpg](docimages/other/E_0068_00_20_08.jpg)
+
+![E_0068_00_48_04.jpg](docimages/other/E_0068_00_48_04.jpg)
 
 
+or an assault to a bandit hideout, on foot.
 
+![E_0054_00_10_54.jpg](docimages/other/E_0054_00_10_54.jpg)
+
+![E_0042_00_05_08.jpg](docimages/other/E_0042_00_05_08.jpg)
+
+The hero often takes also part in tournaments.
+
+![E_0057_00_21_48.jpg](docimages/other/E_0057_00_21_48.jpg)
+
+![E_0061_00_25_56.jpg](docimages/other/E_0061_00_25_56.jpg)
+
+The scene that are most challenging to recognize are quests and ambushes, as they are pretty infrequent and the screenshots may look similar to more peaceful situations. For instance, screenshots from a scene when the hero is rescuing a lord from prison are not very different from scenes when he might be just taking a stroll in the town.
+
+![E_0054_00_40_24.jpg](docimages/other/E_0054_00_40_24.jpg)
+ 
 
 ### PROBLEM STATEMENT
 
 <!-- The problem which needs to be solved is clearly defined. A strategy for solving the problem, including discussion of the expected solution, has been made. -->
+
+The goal is to create and deploy a model which is able to classify images from the game _Mount&Blade: Warband_ and return a category
 
 ### METRICS
 
