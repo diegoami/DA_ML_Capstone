@@ -4,7 +4,7 @@ import torch.utils.data
 import json
 from PIL import Image
 from model import VGGLP
-import io
+import numpy as np
 
 
 from torchvision import transforms
