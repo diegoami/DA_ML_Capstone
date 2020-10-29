@@ -59,17 +59,16 @@ def model_fn(model_dir_arg):
     return model
 
 
-def input_fn(request_body, content_type='application/x-image'):
+def input_fn(request_body, content_type='application/json'):
     """
     predictor accepting an image in json format and converting it into a Pillow Image
     :param request_body a request containing a PIL image in JSON
     :returns the image as a PIL image
     """
 
-    if content_type == 'application/x-image':
+    if content_type == 'application/json':
         # converts images from json format
-        image_data = Image.open(io.BytesIO(request_body))
-        #image_data = Image.fromarray(np.array(json.loads(request_body), dtype='uint8'))
+        image_data = Image.fromarray(np.array(json.loads(request_body), dtype='uint8'))
         return image_data
     raise Exception(f'Requested unsupported ContentType in content_type {content_type}')
 

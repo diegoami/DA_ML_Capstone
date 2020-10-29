@@ -129,14 +129,14 @@ This project:
 
 The dataset contains 51216 images , 320 x 190, in jpeg format, categorized in this way
 
-| Category   |  Amount  | Percentage |
-|------------|----------|------------|
-| Battle     |      7198|      14.0% |
-| Hideout    |      1163|       2.2% |
-| Other      |     35425|      67.4% |
-| Siege      |       634|       1.2% |
-| Tournament |      6796|      13.3% |
-|   TOTAL    |     51216|
+|    | Category   |  Amount  | Percentage |
+|----|------------|----------|------------|
+|    | Battle     |      7198|      14.0% |
+|    | Hideout    |      1163|       2.2% |
+|    | Other      |     35425|      67.4% |
+|    | Siege      |       634|       1.2% |
+|    | Tournament |      6796|      13.3% |
+|    |   TOTAL    |     51216|
 
 You can browse them using the _analysis.ipynb_ notebooks.
 
@@ -144,11 +144,40 @@ You can browse them using the _analysis.ipynb_ notebooks.
 
 <!-- A visualization has been provided that summarizes or extracts a relevant characteristic or feature about the dataset or input data with thorough discussion. Visual cues are clearly defined. -->
 
-This is a PCA representation 
+This is a PCA representation of the features of the images dataset recovered from the last layer of a VGG13 model on the dataset.
+
+![pca_v4_2d.jpg](visualizations/pca_v4_2d.png)
+
+![pca_v4_3d.jpg](visualizations/pca_v4_3d.png)
+
+It can be seen that the class do show some distinction. There is some overlap between
+
+* Other --> Tournament: possibly Arena and Training scenes (categorized as Other, they are similar to Tournaments)
+* Battle --> Other : possibly Town escapes and Ambushes (categorized as Battle, but look like scenes in which the hero is strolling)
+
+There is not much to do about that as we have too few images that we could categorize as Arena, Ambush, Training... and we will accept that those frames may confuse the model.
 
 ### ALGORITHMS AND TECHNIQUES
 
 <!-- Algorithms and techniques used in the project are thoroughly discussed and properly justified based on the characteristics of the problem. -->
+
+#### GENERAL APPROACH
+
+
+The simplest way I chose to verify whether a model is viable was to start and set up a Convolutional Neural Network in Pytorch, as I was pretty sure that 
+
+* this was pretty much the most sensible way to approach the problem
+* I could use standard CNN topologies available in Pytorch
+* analyzing the result of the model would give me more information on what I would have to be looking for
+
+Convolutional Neural Network are, as a matter of fact, a very standard approach for categorizing images. A simple to use and flexible topology I decided to use was VGG, which is included in the Pytorch library. 
+
+As the images extracted from game walkthroughs are not related to real world images, using a pre-trained net and expanding it with transfer learning did not seem a sensible approach. Instead, I opted for a full train.
+
+In the pre-processing phase, I keep images to their original size 320 x 180. Resizing to a smaller size gave worse result. As I already have over 50000 images, I do not need any kind of data augmentation such as  mirrored images, also because the game may not produce mirrored images.
+
+
+I decided to split the dataset into train and validation set dynamically while training. I did not set aside an holdout dataset, as I was planning to use following episodes for testing, which are not in the dataset yet.  
 
 ### BENCHMARK
 
