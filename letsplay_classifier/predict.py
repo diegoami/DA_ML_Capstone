@@ -68,8 +68,10 @@ def input_fn(request_body, content_type='application/x-npy'):
 
     if content_type == 'application/x-npy':
         # converts images from json format
-        image_data = Image.fromarray(request_body)
-        image_resized = transforms.Resize((IMG_HEIGHT, IMG_WIDTH))(image_data)
+        stream = BytesIO(request_body)
+        image_data = np.load(stream)
+        image = Image.fromarray(image_data)
+        image_resized = transforms.Resize((IMG_HEIGHT, IMG_WIDTH))(image)
         image_tensor = transforms.ToTensor()(image_resized)
         image_unsqueezed = image_tensor.unsqueeze(0)
         return image_unsqueezed
@@ -83,8 +85,10 @@ def output_fn(prediction_output, accept='application/x-npy'):
     """
 
     if accept == 'application/x-npy':
-        result = prediction_output.cpu().detach().numpy()
-        return result
+        data = prediction_output.cpu().detach().numpy()
+        buffer = BytesIO()
+        np.save(buffer, data)
+        return buffer.getvalue()        
     raise Exception('Requested unsupported ContentType in Accept: ' + accept)
 
 def predict_fn(input_data, model):
