@@ -50,12 +50,14 @@ def evaluate(endpoint_name, data_dir, percentage=1):
                 continue
             images_processed += 1
             
-            with open(curr_img, 'rb') as f:
+            with open(curr_img, 'rb') as image:
                 # retrive most likely category from predictor
-                image_data = json.dumps(np.array(Image.open(f)).tolist())
-                output = predictor.predict(image_data)
-                output_list = json.loads(output)
-                pred_index = arg_max_list(output_list)
+
+                data = np.asarray(image)
+
+                output = predictor.predict(data)
+                output_sv = output[0]
+                pred_index = np.arg_max(output_sv)
 
                 images_processed += 1
                 y_true.append(label_index)

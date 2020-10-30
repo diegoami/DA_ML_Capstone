@@ -5,7 +5,7 @@ import json
 from PIL import Image
 from model import VGGLP
 import numpy as np
-
+from six import BytesIO
 
 from torchvision import transforms
 
@@ -59,31 +59,32 @@ def model_fn(model_dir_arg):
     return model
 
 
-def input_fn(request_body, content_type='application/json'):
+def input_fn(request_body, content_type='application/x-npy'):
     """
     predictor accepting an image in json format and converting it into a Pillow Image
     :param request_body a request containing a PIL image in JSON
     :returns the image as a PIL image
     """
 
-    if content_type == 'application/json':
+    if content_type == 'application/x-npy':
         # converts images from json format
-        image_data = Image.fromarray(np.array(json.loads(request_body), dtype='uint8'))
-        return image_data
+        image_data = Image.fromarray(request_body)
+        image_resized = transforms.Resize((IMG_HEIGHT, IMG_WIDTH))(image_data)
+        image_tensor = transforms.ToTensor()(image_resized)
+        image_unsqueezed = image_tensor.unsqueeze(0)
+        return image_unsqueezed
     raise Exception(f'Requested unsupported ContentType in content_type {content_type}')
 
 
-def output_fn(prediction_output, accept='application/json'):
+def output_fn(prediction_output, accept='application/x-npy'):
     """
     result of a request as an array of probabilities in json format
     :param prediction_output : the prediction returned from the model
     """
 
-    if accept == 'application/json':
-        arr = prediction_output.numpy()
-        listresult = arr.flatten().tolist()
-        json_res = json.dumps(listresult)
-        return json_res
+    if accept == 'application/x-npy':
+        result = prediction_output.cpu().detach().numpy()
+        return result
     raise Exception('Requested unsupported ContentType in Accept: ' + accept)
 
 def predict_fn(input_data, model):
@@ -91,11 +92,9 @@ def predict_fn(input_data, model):
     executes a prediction based on a model
     :param: input_data - a PIL image
     """
-    image_resized = transforms.Resize((IMG_HEIGHT, IMG_WIDTH))(input_data)
-    image_tensor = transforms.ToTensor()(image_resized)
-    image_unsqueezed = image_tensor.unsqueeze(0)
-    inputs = image_unsqueezed.cuda() if torch.cuda.is_available() else image_unsqueezed
+
+    inputs = input_data.cuda() if torch.cuda.is_available() else input_data
     # Compute the result of applying the model to the input data.
     out = model(inputs)
-    result = out.cpu().detach()
-    return result
+
+    return out

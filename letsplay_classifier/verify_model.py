@@ -59,21 +59,23 @@ def verify(model, data_dir, percentage=1):
 
                     # goes through predict_fn and output_fn in predict, but only using the model
                     image = Image.open(f)
-                    imgByteArr = io.BytesIO()
-                    image.save(imgByteArr, format=image.format)
-                    body = imgByteArr.getvalue()
-                    image_data = input_fn(body)
+                    data = np.asarray(image)
+#                    imgByteArr = io.BytesIO()
+#                    image.save(imgByteArr, format=image.format)
+#                    body = imgByteArr.getvalue()
+
+                    image_data = input_fn(data, content_type='application/x-npy')
 
                     prediction = predict_fn(image_data, model)
-                    output_json = output_fn(prediction)
+                    output = output_fn(prediction, accept='application/x-npy')
 
                     # prediction in log probabilities as output from the last step
-                    pred_output = json.loads(output_json)
 
-                    pred_index = arg_max_list(pred_output)
+                    output_sv = output[0]
+                    pred_index = np.argmax(output_sv)
 
                     # the log probability of a prediction
-                    label_log_prob = pred_output[label_index]
+                    label_log_prob = output_sv[label_index]
 
                     if (label_log_prob < THRESHOLD):
                         dubious_preds.append((curr_img, label_log_prob))
