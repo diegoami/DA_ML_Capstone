@@ -30,8 +30,8 @@ def evaluate(endpoint_name, data_dir, percentage=1):
     
     # set up a predictor from the endpoint
     predictor = RealTimePredictor(endpoint_name,
-         content_type='application/json',
-         accept='application/json')
+         content_type='application/x-npy',
+         accept='application/x-npy')
     
     # we scan dirs in alphabetical orders, as the data loaders do
     dirs = [s for s in sorted(os.listdir(data_dir)) if os.path.isdir(os.path.join(data_dir, s))]
