@@ -177,11 +177,17 @@ As the images extracted from game walkthroughs are not related to real world ima
 In the pre-processing phase, I keep images to their original size 320 x 180. Resizing to a smaller size gave worse result. As I already have over 50000 images, I do not need any kind of data augmentation such as  mirrored images, also because the game may not produce mirrored images.
 
 
-I decided to split the dataset into train and validation set dynamically while training. I did not set aside an holdout dataset, as I was planning to use following episodes for testing, which are not in the dataset yet.  
+I decided not to split the dataset into train, validation and test set, and to this split dynamically while training the model. As the dataset is expected to keep growing while I am going to add new videos and new frames, this was done to simplify dataset management.
+
+#### MODELS
+
+I chose to use Pytorch and the models that it includes 
 
 ### BENCHMARK
 
 <!-- Student clearly defines a benchmark result or threshold for comparing performances of solutions obtained. -->
+
+As 67.4 % of the images belong to the category "Other", a model should have an accuracy of at least 68% for being considered better than a model that always pick the Category "Other"
 
 
 ## METHODOLOGY

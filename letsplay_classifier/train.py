@@ -14,6 +14,9 @@ from torch.autograd import Variable
 from model import VGGLP
 
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
+
+
 import torchdata as td
 import torchvision
 from torchvision import transforms
@@ -370,10 +373,8 @@ if __name__ == '__main__':
     save_model_metrics(args.model_dir, best_acc, best_loss)
 
     y_pred, y_true = test_model(model, criterion, dataloaders['test'], dataset_sizes['test'])
-    from sklearn.metrics import classification_report
     report = classification_report(y_true=y_true, y_pred=y_pred)
     print(report)
 
-    from sklearn.metrics import confusion_matrix
 
     print(confusion_matrix(y_true, y_pred))
