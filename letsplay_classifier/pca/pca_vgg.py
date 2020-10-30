@@ -9,15 +9,17 @@ import torch.utils.data
 import torch
 import torch.nn as nn
 import numpy as np
-import pandas as pd
 import torchdata as td
 import torchvision
 from torchvision import transforms
 from predict import model_fn, get_model_info
 
-from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
-import seaborn as sns
+
+
+
+from pca.pca_commons import do_pca, df_from_pca, plot_2d_pca, plot_3d_pca
+
         
 def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_size=8):
     """
@@ -62,52 +64,8 @@ def get_feature_matrix_from_dataset(dataloader):
             y = labels
         else:
             X = np.vstack([X, np_step])
-            y = np.hstack([y, labels])
+            y = np.k([y, labels])
     return X, y
-
-def create_pcadf(X, y):
-
-    df = pd.DataFrame(X)
-    df['y'] = y
-    df['label'] = df['y'].apply(lambda i: str(i))
-    pca = PCA(n_components=3)
-    pca_result = pca.fit_transform(X)
-    df['pca-one'] = pca_result[:, 0]
-    df['pca-two'] = pca_result[:, 1]
-    df['pca-three'] = pca_result[:, 2]
-    print('Explained variation per principal component: {}'.format(pca.explained_variance_ratio_))
-    print(df[['pca-one', 'pca-two', 'pca-three', 'y']])
-    return df
-
-
-def plot_3d_tse(plt, df):
-    ax = plt.figure(figsize=(16, 10)).gca(projection='3d')
-    ax.scatter(
-        xs=df["pca-one"],
-        ys=df["pca-two"],
-        zs=df["pca-three"],
-        c=df["y"],
-        cmap='tab10'
-    )
-    ax.set_xlabel('pca-one')
-    ax.set_ylabel('pca-two')
-    ax.set_zlabel('pca-three')
-    plt.show()
-    plt.savefig('3d_tse.png')
-
-
-def plot_2d_tse(plt, df, num_classes):
-    plt.figure(figsize=(16, 10))
-    sns.scatterplot(
-        x="pca-one", y="pca-two",
-        hue="y",
-        palette=sns.color_palette("hls", num_classes),
-        data=df,
-        legend="full",
-        alpha=0.3
-    )
-    plt.show()
-    plt.savefig('2d_tse.png')
 
 
 if __name__ == '__main__':
@@ -155,8 +113,9 @@ if __name__ == '__main__':
 
     X, y = get_feature_matrix_from_dataset(dataloader)
 
-    df = create_pcadf(X, y)
 
-    plot_2d_tse(plt, df, len(model_info['class_names']))
+    Xp = do_pca(X, 100)
+    df = df_from_pca(Xp, y, model_info['class_names'])
 
-    plot_3d_tse(plt, df)
+    plot_2d_pca(df, len(model_info['class_names']))
+    plot_3d_pca(df, len(model_info['class_names']))

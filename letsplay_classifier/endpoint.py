@@ -9,7 +9,7 @@ from .util import arg_max_list
 
 from sagemaker.predictor import RealTimePredictor
 
-def evaluate(endpoint_name, data_dir, percentage=1):
+def evaluate(predictor, data_dir, percentage=1):
     """
     Does an evaluation on a subset of the images on the endpoint.
     
@@ -27,11 +27,7 @@ def evaluate(endpoint_name, data_dir, percentage=1):
 
     # true values and predictions
     y_true, y_pred = [], []
-    
-    # set up a predictor from the endpoint
-    predictor = RealTimePredictor(endpoint_name,
-         content_type='application/x-npy',
-         accept='application/x-npy')
+
     
     # we scan dirs in alphabetical orders, as the data loaders do
     dirs = [s for s in sorted(os.listdir(data_dir)) if os.path.isdir(os.path.join(data_dir, s))]
@@ -50,14 +46,15 @@ def evaluate(endpoint_name, data_dir, percentage=1):
                 continue
             images_processed += 1
             
-            with open(curr_img, 'rb') as image:
+            with open(curr_img, 'rb') as image_file:
                 # retrive most likely category from predictor
 
+                image = Image.open(image_file)
                 data = np.asarray(image)
 
                 output = predictor.predict(data)
                 output_sv = output[0]
-                pred_index = np.arg_max(output_sv)
+                pred_index = np.argmax(output_sv)
 
                 images_processed += 1
                 y_true.append(label_index)

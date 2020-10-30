@@ -1,11 +1,11 @@
-from predict import model_fn, predict_fn, output_fn, get_model_info
+from predict import model_fn, predict_fn, output_fn, get_model_info, input_fn
 import argparse
 import os
 import json
 import numpy as np
 from interval.predict_intervals_utils import convert_to_intervals, get_short_classes
 from PIL import Image
-
+from six import BytesIO
 
 if __name__ == '__main__':
 
@@ -38,10 +38,17 @@ if __name__ == '__main__':
         curr_img = os.path.join(work_dir, image)
 
         with open(curr_img, 'rb') as f:
-            image_data = Image.open(f)
+            image = Image.open(f)
+            data = np.asarray(image)
+
+            image_data = input_fn(data)
+
             prediction = predict_fn(image_data, model)
-            output_json = output_fn(prediction)
-            pred_output = json.loads(output_json)
+            output_body = output_fn(prediction)
+
+            # prediction in log probabilities as output from the last step
+            stream = BytesIO(output_body)
+            pred_output = np.load(stream)[0]
             out_exps = np.exp(pred_output)
             out_normalized = (out_exps / sum(out_exps) * 20) .astype(int)
 

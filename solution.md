@@ -60,7 +60,7 @@ or an assault to a bandit hideout, on foot.
 
 ![E_0042_00_05_08.jpg](docimages/other/E_0042_00_05_08.jpg)
 
-The hero often takes also part in tournaments.
+The hero often can also take part in tournaments, which are an important part of the game.
 
 ![E_0057_00_21_48.jpg](docimages/other/E_0057_00_21_48.jpg)
 
@@ -69,7 +69,8 @@ The hero often takes also part in tournaments.
 The scene that are most challenging to recognize are quests and ambushes, as they are pretty infrequent and the screenshots may look similar to more peaceful situations. For instance, screenshots from a scene when the hero is rescuing a lord from prison are not very different from scenes when he might be just taking a stroll in the town.
 
 ![E_0054_00_40_24.jpg](docimages/other/E_0054_00_40_24.jpg)
- 
+
+ ... or scenes when the hero is training his troops or sparring with them in the arena may be confused with Tournament scenes. 
 
 ### PROBLEM STATEMENT
 
@@ -143,14 +144,22 @@ You can browse them using the _analysis.ipynb_ notebooks.
 ### EXPLORATORY VISUALIZATION
 
 <!-- A visualization has been provided that summarizes or extracts a relevant characteristic or feature about the dataset or input data with thorough discussion. Visual cues are clearly defined. -->
+Using PCA on a flattened version of the image matrixes, in format 80x45, black and white, I produced visualizations in 2d of the dataset.
 
-This is a PCA representation of the features of the images dataset recovered from the last layer of a VGG13 model on the dataset.
+![pca_sklearn_2d.png](visualizations/pca_sklearn_2d.png)
+
+and here in 3d, using the same color scheme.
+![pca_sklearn_3d.png](visualizations/pca_sklearn_3d.png)
+
+It can be seen that "Other" scenes are separated in several clusters. "Battle", "Tournament", "Siege" and "Hideout" images do group in certain regions, but there is a lot of overlap beween each other and with some of the "Other" images.
+
+We move on to create a VGG13 model and do a PCA representation of the features of the images dataset recovered from the last layer .
 
 ![pca_v4_2d.jpg](visualizations/pca_v4_2d.png)
 
 ![pca_v4_3d.jpg](visualizations/pca_v4_3d.png)
 
-It can be seen that the class do show some distinction. There is some overlap between
+Here there are is much less overlap between regions where the different classes are located. That shows how the new created features are important for the categorization task.
 
 * Other --> Tournament: possibly Arena and Training scenes (categorized as Other, they are similar to Tournaments)
 * Battle --> Other : possibly Town escapes and Ambushes (categorized as Battle, but look like scenes in which the hero is strolling)
@@ -187,8 +196,59 @@ I chose to use Pytorch and the models that it includes
 
 <!-- Student clearly defines a benchmark result or threshold for comparing performances of solutions obtained. -->
 
-As 67.4 % of the images belong to the category "Other", a model should have an accuracy of at least 68% for being considered better than a model that always pick the Category "Other"
+As 67.4 % of the images belong to the category "Other", a model should have an accuracy of at least 68% for being considered better than a model that always pick the Category "Other".
 
+Other than that, I create a very simple model that would use flattened matrixes of images, possibly in black and white, using standard scikit-learn transformers and PCA.
+
+Using black/white images in 80x45 format, I got the following results using a RandomTreeForest an SGD on 50 PCA-produced features.
+
+#### RandomForestClassifier
+
+```
+Accuracy: 0.8816708081883801
+F1 Score: 0.8683343720512487
+              precision    recall  f1-score   support
+
+           0       0.73      0.80      0.76      2375
+           1       0.67      0.01      0.01       384
+           2       0.96      0.96      0.96     11691
+           3       1.00      0.00      0.01       209
+           4       0.70      0.79      0.74      2243
+
+    accuracy                           0.88     16902
+   macro avg       0.81      0.51      0.50     16902
+weighted avg       0.88      0.88      0.87     16902
+
+[[ 1895     0   195     0   285]
+ [  157     2    58     0   167]
+ [  265     0 11242     0   184]
+ [   57     0    22     1   129]
+ [  231     1   249     0  1762]]
+```
+
+#### SGDClassifier
+
+```
+Accuracy: 0.8071234173470595
+F1 Score: 0.7993071530691789
+              precision    recall  f1-score   support
+
+           0       0.49      0.67      0.57      2375
+           1       0.10      0.02      0.03       384
+           2       0.94      0.94      0.94     11691
+           3       0.15      0.10      0.12       209
+           4       0.59      0.44      0.51      2243
+
+    accuracy                           0.81     16902
+   macro avg       0.45      0.44      0.43     16902
+weighted avg       0.80      0.81      0.80     16902
+
+[[ 1595    29   228    60   463]
+ [  225     7    56     5    91]
+ [  542     9 11025     9   106]
+ [  118     1    34    21    35]
+ [  758    25   425    41   994]]
+```
 
 ## METHODOLOGY
 
@@ -196,6 +256,7 @@ As 67.4 % of the images belong to the category "Other", a model should have an a
 
 <!-- All preprocessing steps have been clearly documented. Abnormalities or characteristics of the data or input that needed to be addressed have been corrected. If no data preprocessing is necessary, it has been clearly justified. -->
 
+Starting from the image dataset
 
 ### IMPLEMENTATION
 

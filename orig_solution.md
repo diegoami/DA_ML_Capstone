@@ -221,7 +221,7 @@ The cross entropy is the most useful metrics while training a classifier with C 
 The verification script  _verify_model.py_ works only locally, as it assumes the model and the dataset is saved locally from the previous step. It requires the same environment variables as the training script.
 
 * Loads the model created in the previous step
-* Walks through all the images in the dataset, one by one, and retrievea the predicted label
+* Walks through all the images in the dataset, one by one, and retrieved the predicted label
 * Print average accuracy, a classification report based on discrepancies, a confusion matrix, and a list of images whose predicted category does not coincide with their labels, so that they can be checked.
 
 

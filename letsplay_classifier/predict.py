@@ -1,7 +1,6 @@
 import os
 import torch
 import torch.utils.data
-import json
 from PIL import Image
 from model import VGGLP
 import numpy as np
@@ -65,12 +64,14 @@ def input_fn(request_body, content_type='application/x-npy'):
     :param request_body a request containing a PIL image in JSON
     :returns the image as a PIL image
     """
-
     if content_type == 'application/x-npy':
         # converts images from json format
-        stream = BytesIO(request_body)
-        image_data = np.load(stream)
-        image = Image.fromarray(image_data)
+        if (type(request_body) == np.ndarray):
+            image = Image.fromarray(request_body)
+        else:
+            stream = BytesIO(request_body)
+            image_data = np.load(stream)
+            image = Image.fromarray(image_data)
         image_resized = transforms.Resize((IMG_HEIGHT, IMG_WIDTH))(image)
         image_tensor = transforms.ToTensor()(image_resized)
         image_unsqueezed = image_tensor.unsqueeze(0)

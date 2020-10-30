@@ -5,8 +5,7 @@ import numpy as np
 from PIL import Image
 import random
 from sklearn.metrics import classification_report
-from util import  arg_max_list
-import io
+from six import BytesIO
 
 THRESHOLD = 2.5
 from predict import model_fn, predict_fn, output_fn, input_fn
@@ -60,17 +59,15 @@ def verify(model, data_dir, percentage=1):
                     # goes through predict_fn and output_fn in predict, but only using the model
                     image = Image.open(f)
                     data = np.asarray(image)
-#                    imgByteArr = io.BytesIO()
-#                    image.save(imgByteArr, format=image.format)
-#                    body = imgByteArr.getvalue()
 
-                    image_data = input_fn(data, content_type='application/x-npy')
+                    image_data = input_fn(data)
 
                     prediction = predict_fn(image_data, model)
-                    output = output_fn(prediction, accept='application/x-npy')
+                    output_body = output_fn(prediction)
 
                     # prediction in log probabilities as output from the last step
-
+                    stream = BytesIO(output_body)
+                    output = np.load(stream)
                     output_sv = output[0]
                     pred_index = np.argmax(output_sv)
 
