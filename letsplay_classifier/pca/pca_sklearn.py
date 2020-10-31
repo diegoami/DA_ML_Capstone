@@ -70,12 +70,13 @@ def retrieve_df(data_dir, model_dir, width=80, height=45, mode=1, percentage=1, 
                             y = np.array([label_index])
                         else:
                             X = np.vstack([X, data])
-                            y = np.vstack([y, np.array(label_index)])
+                            y = np.hstack([y, np.array(label_index)])
                         if (images_processed % 500 == 0):
                             print("{} processed up to {}".format(images_processed, images_total))
 
             label_index += 1
-        df = np.hstack([X, y])
+
+        df = np.hstack([X, np.expand_dims(y, axis=1)])
         if do_save:
             print(f'Saving to {full_name_complete}')
             os.makedirs(model_dir, exist_ok=True)
@@ -123,13 +124,15 @@ if __name__ == '__main__':
                         help='image height')
     parser.add_argument('--img-mode', type=int, default=1,
                         help='image mode')
+    parser.add_argument('--percentage', type=int, default=100,
+                        help='percentage')
 
     args = parser.parse_args()
 
     print(f'Data Dir: {args.data_dir}')
     print(f'Model Dir: {args.model_dir}')
 
-    X, y = retrieve_df(args.data_dir, args.model_dir, args.img_width, args.img_height, args.img_mode, 1, True)
+    X, y = retrieve_df(args.data_dir, args.model_dir, args.img_width, args.img_height, args.img_mode, args.percentage / 100, True)
     Xp = do_pca(X, args.n_components)
     df = df_from_pca(Xp, y, get_labels(args.data_dir))
 

@@ -346,6 +346,26 @@ These are the jupyter notebooks I created while making this project:
 
 <!-- The final model’s qualities—such as parameters—are evaluated in detail. Some type of analysis is used to validate the robustness of the model’s solution. -->
 
+```
+
+Confusion Matrix
+[[ 7094    34    53     8     9]
+ [    1  1151     6     5     0]
+ [  197    15 35063     4   146]
+ [    3    18     1   612     0]
+ [   22     7   182     5  6580]]
+              precision    recall  f1-score   support
+
+           0       0.97      0.99      0.98      7198
+           1       0.94      0.99      0.96      1163
+           2       0.99      0.99      0.99     35425
+           3       0.97      0.97      0.97       634
+           4       0.98      0.97      0.97      6796
+
+    accuracy                           0.99     51216
+   macro avg       0.97      0.98      0.97     51216
+weighted avg       0.99      0.99      0.99     51216
+```
 
 
 ### JUSTIFICATION

@@ -17,9 +17,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import classification_report
 
-from pca.pca_commons import do_pca, df_from_pca, plot_2d_pca, plot_3d_pca
-from pca.pca_vgg import get_feature_matrix_from_dataset
-
 
 import torchdata as td
 import torchvision
