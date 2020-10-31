@@ -7,8 +7,6 @@ import numpy as np
 import random
 from .util import arg_max_list
 
-from sagemaker.predictor import RealTimePredictor
-
 def evaluate(predictor, data_dir, percentage=1):
     """
     Does an evaluation on a subset of the images on the endpoint.
