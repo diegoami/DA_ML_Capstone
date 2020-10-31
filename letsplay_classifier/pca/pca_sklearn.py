@@ -26,7 +26,7 @@ def retrieve_df(data_dir, model_dir, width=80, height=45, mode=1, percentage=1, 
     :param percentage:
     :return:
     """
-    file_name_complete = f'fullnpy_{width}_{height}_{mode}_{percentage}.py'
+    file_name_complete = f'fullnpy_{width}_{height}_{mode}_{percentage}.npy'
     full_name_complete = os.path.join(model_dir, file_name_complete)
     # goes through labels
     label_index = 0
@@ -44,6 +44,7 @@ def retrieve_df(data_dir, model_dir, width=80, height=45, mode=1, percentage=1, 
             df = np.load(f)
             X, y = df[:, :-1], df[:, -1]
     else:
+        print(f'{full_name_complete} not found')
         for dir in dirs:
             curr_img_dir = os.path.join(data_dir, dir)
             images = os.listdir(curr_img_dir)
@@ -77,7 +78,7 @@ def retrieve_df(data_dir, model_dir, width=80, height=45, mode=1, percentage=1, 
         df = np.hstack([X, y])
         if do_save:
             print(f'Saving to {full_name_complete}')
-
+            os.makedirs(model_dir, exist_ok=True)
             with open(full_name_complete, 'wb') as f:
                 np.save(f, df)
     return X, y

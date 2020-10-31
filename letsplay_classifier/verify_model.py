@@ -114,7 +114,7 @@ if __name__ == '__main__':
     print(f'Model Dir: {args.model_dir}')
 
     model = model_fn(args.model_dir)
-    report, np_conf_matrix, dubious_predictions = verify(model, args.data_dir, 0.1)
+    report, np_conf_matrix, dubious_predictions = verify(model, args.data_dir, 1)
 
     print("Confusion Matrix")
     print(np_conf_matrix)
