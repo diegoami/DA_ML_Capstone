@@ -14,7 +14,7 @@ import torchvision
 from torchvision import transforms
 from predict import model_fn, get_model_info
 
-import matplotlib.pyplot as plt
+
 
 
 
@@ -47,7 +47,7 @@ def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_
     return dataset_loader, total_count
 
 
-def get_feature_matrix_from_dataset(dataloader):
+def get_feature_matrix_from_dataset(dataloader, maxx=None):
 
     X, y = None, None
     for i, data in enumerate(dataloader):
@@ -61,10 +61,12 @@ def get_feature_matrix_from_dataset(dataloader):
         np_step = outputs.detach().cpu().numpy()
         if X is None:
             X = np_step
-            y = labels
+            y = np.array(labels)
         else:
             X = np.vstack([X, np_step])
-            y = np.k([y, labels])
+            y = np.hstack([y, np.array(labels)])
+        if maxx is not None and i > maxx:
+            break
     return X, y
 
 
@@ -106,16 +108,14 @@ if __name__ == '__main__':
     model.train(False)
     model.eval()
 
-
-
     # retrieves data loaders and datasets, and the label names
     dataloader, dataset_size = get_data_loaders(img_dir=args.data_dir,  img_height=args.img_height, img_width=args.img_width, batch_size=args.batch_size)
 
     X, y = get_feature_matrix_from_dataset(dataloader)
 
 
-    Xp = do_pca(X, 100)
+    Xp = do_pca(X, 3)
     df = df_from_pca(Xp, y, model_info['class_names'])
 
-    plot_2d_pca(df, len(model_info['class_names']))
-    plot_3d_pca(df, len(model_info['class_names']))
+    plot_2d_pca(df, model_info['class_names'])
+    plot_3d_pca(df, model_info['class_names'])

@@ -173,7 +173,10 @@ There is not much to do about that as we have too few images that we could categ
 #### GENERAL APPROACH
 
 
-The simplest way I chose to verify whether a model is viable was to start and set up a Convolutional Neural Network in Pytorch, as I was pretty sure that 
+The general idea is to create an image classifier to categorize the images extracted from gameplay videos as belonging to a particular type of scenes. Then to use this image classifier on frames extracted from other gameplay vidoes to identify how to split videos into scenese.
+
+Concentrating on the image classifier, at first I would 
+I chose to verify whether a model is viable was to start and set up a Convolutional Neural Network in Pytorch, as I was pretty sure that 
 
 * this was pretty much the most sensible way to approach the problem
 * I could use standard CNN topologies available in Pytorch
@@ -256,36 +259,22 @@ weighted avg       0.80      0.81      0.80     16902
 
 <!-- All preprocessing steps have been clearly documented. Abnormalities or characteristics of the data or input that needed to be addressed have been corrected. If no data preprocessing is necessary, it has been clearly justified. -->
 
-Starting from the image dataset
+The image dataset has been created extracting frames from video on youtube, and putting them in a directory - named like the category they belong with. This is the main dataset I have been working with. These images have also been resized are in 320 x 180 format and RGB. 
+
+When training and predicting, the only pre-processing step that  is to resize images and change their mode to black and white. We do this when training the benchmark models, but when training the deep learning models we use
 
 ### IMPLEMENTATION
 
 <!-- The process for which metrics, algorithms, and techniques were implemented with the given datasets or input data has been thoroughly documented. Complications that occurred during the coding process are discussed. -->
 
-### REFINEMENT
 
-<!-- The process of improving upon the algorithms and techniques used is clearly documented. Both the initial and final solutions are reported, along with intermediate solutions, if necessary. -->
+I set up scripts and notebooks so that they would work both locally and on Sagemaker. 
 
-## RESULTS
+A pytorch/conda environment, as the one in Sagemaker, is assumed - the missing libaries from the default sagemaker conda pytorch environment are in the _/requirements.txt_ file. 
 
-### MODEL EVALUATION AND VALIDATION
+The code root directory is _letsplay_classifier_ - scripts should be executed from this directory, or the directory should be included in PYTHONPATH.
 
-<!-- The final model’s qualities—such as parameters—are evaluated in detail. Some type of analysis is used to validate the robustness of the model’s solution. -->
-
-### JUSTIFICATION
-
-<!-- The final results are compared to the benchmark result or threshold with some type of statistical analysis. Justification is made as to whether the final model and solution is significant enough to have adequately solved the problem. -->
-
-### REQUIRED ENVIRONMENT VARIABLES
-
-All scripts require following environment variables, which are the ones required by Sagemaker containers.
-
-* SM_CHANNEL_TRAIN: location of data - the directory where you unzipped the required data
-* SM_MODEL_DIR: where to save the model 
-* SM_HOSTS: should be "[]"
-* SM_CURRENT_HOST: should be ""
-
-### TRAINING SCRIPT
+#### TRAINING SCRIPT
 
 The training script  _train.py_ accepts following arguments:
 
@@ -306,7 +295,7 @@ These are the steps that are executed:
  
 The cross entropy is the most useful metrics while training a classifier with C classes, therefore it is used here.
 
-### VERIFICATION SCRIPT
+#### VERIFICATION SCRIPT
 
 The verification script  _verify_model.py_ works only locally, as it assumes the model and the dataset is saved locally from the previous step. It requires the same environment variables as the training script.
 
@@ -315,7 +304,7 @@ The verification script  _verify_model.py_ works only locally, as it assumes the
 * Print average accuracy, a classification report based on discrepancies, a confusion matrix, and a list of images whose predicted category does not coincide with their labels, so that they can be checked.
 
 
-### MISCLASSIFIED IMAGES
+#### MISCLASSIFIED IMAGES
 
 
 I found out that there were images in the training / validation set that were misclassified. At first I tried correcting the dataset using a GUI, where I would correct images that were classified wrongly according to _verify_model.py_, and save this information so that images could be moved to the correct place. I dropped this approach aas it turned out require a lot of overhead and was error-prone.
@@ -323,7 +312,7 @@ I found out that there were images in the training / validation set that were mi
 I decided instead to have the suspiciously classified images printed from _verify_model.py_, and correct the data at the source, in the video metadata and description. This way I found out a bug in the way I was generating frames (as I was consistently misclassifying the first and last frame) and improved the training dataset.
 
 
-### PREDICTOR
+#### PREDICTOR
 
 The file _predict.py_ contains the methods that are necessary to deploy the model to an endpoint. It works both locally and on a Sagemaker container and requires a previously trained model.
 
@@ -332,13 +321,13 @@ The file _predict.py_ contains the methods that are necessary to deploy the mode
 * output_fn: returns the model output as a list of log probabilites for each class 
 
 
-### ENDPOINT 
+#### ENDPOINT 
 
 The file _endpoint.py_ contains a method to call an endpoint on Sagemaker, to collect predictions, to show a classification report and a confusion matrix. It requires locally saved data, but the model is accessed through a published endpoint, unlike the _verify_model.py_ component which requires a saved model locally.
 
 _endpoint.py_ works only in Sagemaker, when called from a Jupyter Notebook. Examples can be seen in the jupyter notebooks, for instance in CNN_Third_iteration.ipynb
 
-### JUPYTER NOTEBOOKS
+#### JUPYTER NOTEBOOKS
 
 These are the jupyter notebooks I created while making this project:
 
@@ -346,6 +335,23 @@ These are the jupyter notebooks I created while making this project:
 * _CNN_First_Iteration.ipynb_ : First iteration with 8 classes 
 * _CNN_Second_Iteration.ipynb_ : Second iteration with 5 classes and some corrections in the data set 
 * _CNN_Third_Iteration.ipynb_ : Third iteration with more correction, a more advanced model and verification how the model splits videos 
+
+### REFINEMENT
+
+<!-- The process of improving upon the algorithms and techniques used is clearly documented. Both the initial and final solutions are reported, along with intermediate solutions, if necessary. -->
+
+## RESULTS
+
+### MODEL EVALUATION AND VALIDATION
+
+<!-- The final model’s qualities—such as parameters—are evaluated in detail. Some type of analysis is used to validate the robustness of the model’s solution. -->
+
+
+
+### JUSTIFICATION
+
+<!-- The final results are compared to the benchmark result or threshold with some type of statistical analysis. Justification is made as to whether the final model and solution is significant enough to have adequately solved the problem. -->
+
 
 ## RESULTS
 
