@@ -44,13 +44,13 @@ def convert_to_intervals(frame_visualizations, short_classes, class_names, print
     # description of scenes found
     scenes_description = []
 
-    # in loop, whether we are in a scene
+    # in loop, whether we are in a scene ( a sequence of not "Other")
     in_scene = False
 
-
+    # whether we are in a "boring" scene ( a sequence of "Other" )
     in_boring_scene = False
 
-    # scene start
+    # scene start, in seconds
     start_scene = None
 
     # description of a scene
@@ -106,4 +106,3 @@ def convert_to_intervals(frame_visualizations, short_classes, class_names, print
             print(f'{start_cur_time}-{end_cur_time} | {prob_str}')
         else:
             print(f'{start_cur_time}-{end_cur_time} | ????? ')
-            

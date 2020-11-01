@@ -16,15 +16,18 @@ For more of the background on this project, check these [solutions.md](solutions
 
 ```
 wget -nc https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data_5.zip
-wget -nc https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_E69.zip
 unzip -qq -n wendy_cnn_frames_data_5.zip -d <YOUR SM_CHANNEL_TRAIN>
-unzip -qq -n wendy_cnn_frames_69.zip -d <YOUR TEST DIR>
 
+
+wget -nc https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_E69.zip
+unzip -qq -n wendy_cnn_frames_69.zip -d <YOUR TEST DIR>
+## Optional: repeat the two above steps for episodes E71, E72, E73, E74, E75, E76, E77
 ```
+
 
 ## SET ENVIRONMENT VARIABLES
 
-Set up the _model_dir_ and _channel_train_ to point to where you put the files you downloaded, and where you want to keep the generated models
+Set up the _model_dir_ and _channel_train_ to point to where you put the files you downloaded, and where you want to keep the generated models, respectively
 
 ```
 export SM_HOSTS=[]

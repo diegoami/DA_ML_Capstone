@@ -148,7 +148,7 @@ The dataset contains 51216 images , 320 x 190, in jpeg format, categorized in th
 |    |   TOTAL    |     51216|
 
 You can browse them using the _analysis.ipynb_ notebooks.
-Browsing images I found out that grayscale informati
+While having a look at images, it seemed to me that a format of 320x180, in grayscale, keeps most of the information necessary to categorize it.
 
 ### EXPLORATORY VISUALIZATION
 
@@ -214,52 +214,63 @@ Using greyscale images in 80x45 format, I got the following results using a Rand
 It is not surprising that these results do not look that bad at all, and are actually good as separating "Other" images from images depicting any kind of engagement / fight (Tournament, Battle, Siege, Hideout). That is expected, as there are some GUI components that appear only in these scenes.
 
 #### RandomForestClassifier
-
 ```
-Accuracy (validation) : 0.898
-F1 Score (validation) : 0.885
-              
-                precision    recall  f1-score   support
+RandomForestClassifier(n_estimators=200)
+Accuracy: 0.932
+F1 Score: 0.926
 
-           0       0.76      0.84      0.80      2375
-           1       0.83      0.01      0.03       384
-           2       0.97      0.97      0.97     11691
-           3       1.00      0.01      0.02       209
-           4       0.72      0.82      0.77      2243
-
-    accuracy                           0.90     16902
-   macro avg       0.86      0.53      0.52     16902
-weighted avg       0.90      0.90      0.88     16902
-```
-Confusion Matrix
-[[ 2150     0    84     0   141]
- [   99    73    27     1   184]
- [  169     0 11400     0   122]
- [   86     0    11    65    47]
- [  101     1    82     0  2059]]
-
-#### SGDClassifier(alpha=0.001, max_iter=10000) 
-
-```
-Accuracy: 0.848
-F1 Score: 0.848
               precision    recall  f1-score   support
 
-           0       0.56      0.82      0.67      2375
-           1       0.71      0.21      0.32       384
-           2       0.97      0.93      0.95     11691
-           3       0.56      0.20      0.30       209
-           4       0.66      0.60      0.63      2243
+           0       0.83      0.91      0.87      2375
+           1       0.99      0.18      0.31       384
+           2       0.98      0.97      0.98     11691
+           3       1.00      0.34      0.51       209
+           4       0.81      0.92      0.86      2243
 
-    accuracy                           0.85     16902
-   macro avg       0.69      0.55      0.57     16902
-weighted avg       0.86      0.85      0.85     16902
+    accuracy                           0.93     16902
+   macro avg       0.92      0.67      0.70     16902
+weighted avg       0.94      0.93      0.93     16902
+
 ```
-[[ 1957    14    66     4   334]
- [  225    79     6     3    71]
- [  479     2 10905    26   279]
- [  135     7     3    42    22]
- [  675     9   211     0  1348]]
+Confusion matrix:
+
+| X| 0    | 1   | 2   | 3   | 4   | 
+|--|------|-----|-----|-----|-----|
+| 0|  2154|    0|   79|    0|  142|
+| 1|   106|   70|   26|    0|  182|    
+| 2|   165|    0|11398|    0|  128|    
+| 3|    76|    0|   15|   71|   47|    
+| 3|    98|    1|   76|    2| 2068|    
+
+#### SGDClassifier
+```
+SGDClassifier(alpha=0.001, max_iter=10000)
+Accuracy: 0.841
+F1 Score: 0.843
+
+              precision    recall  f1-score   support
+
+           0       0.72      0.53      0.61      2375
+           1       0.53      0.37      0.44       384
+           2       0.97      0.93      0.95     11691
+           3       0.56      0.30      0.39       209
+           4       0.52      0.83      0.64      2243
+
+    accuracy                           0.84     16902
+   macro avg       0.66      0.59      0.60     16902
+weighted avg       0.86      0.84      0.84     16902
+
+```
+
+Confusion matrix:
+
+| X| 0    | 1   | 2   | 3   | 4   | 
+|--|------|-----|-----|-----|-----|
+| 0|  1250|   82|   74|   22|  947|
+| 1|    61|  143|   11|    5|  164|    
+| 2|   222|    8|10884|   19|  558|    
+| 3|    67|   26|    0|   62|   54|    
+| 3|   135|   13|  225|    2| 1868|    
 
 
 ## METHODOLOGY
@@ -345,7 +356,7 @@ These are the jupyter notebooks I created while making this project:
 * _CNN_First_Iteration.ipynb_ : First iteration with 8 classes 
 * _CNN_Second_Iteration.ipynb_ : Second iteration with 5 classes and some corrections in the data set 
 * _CNN_Third_Iteration.ipynb_ : Third iteration with more corrections, a more advanced model and a first attempt to use the model to split videos 
-* *CNN_Third_Iteration.ipynb* : Fourth iteration and final results 
+* *CNN_Fourth_Iteration.ipynb* : Fourth iteration and final results 
 
 ### REFINEMENT
 
@@ -369,26 +380,28 @@ I decided pretty early that my main model would be a VGG implementation in Pytor
 
 #### IMAGE CLASSIFICATION
 
-The final model uses 512126 images ( 320 x 180 ) in color, VGG13, with 8 epochs. This is the confusion matrix and metrics on the full dataset.    
+The final model uses 51216 images ( 320 x 180 ) in color, VGG13, with 8 epochs. This is the confusion matrix and metrics on the full dataset.    
 
 Confusion matrix
 
 | X| 0    | 1   | 2   | 3   | 4   | 
 |--|------|-----|-----|-----|-----|
-| 0|  7094|   34|   53|    8|    9|
-| 1|     1| 1151|    6|    5|    0|    
-| 2|   197|   15|35063|    4|  146|    
-| 3|     3|   18|    1|  612|    0|    
-| 4|    22|    7|  182|    5| 6580|    
+| 0|  7126|   13|   49|    3|    7|
+| 1|     0| 1159|    1|    2|    1|    
+| 2|   163|   13|35154|    5|   90|    
+| 3|     5|    6|    0|  623|    0|    
+| 3|      |  181|  181|    2| 6609|    
+
+Classification Report
 
 |class name|class|precision | recall | f1-score |support|
 |----------|-----|----------|--------|----------|-------|
-| Battle   |    0|      0.97|    0.99|      0.98|   7198|
-| Hideout  |    1|      0.94|    0.99|      0.96|   1163|
+| Battle   |    0|      0.98|    0.99|      0.98|   7198|
+| Hideout  |    1|      0.97|    1.00|      0.98|   1163|
 | Other    |    2|      0.99|    0.99|      0.99|  35425|
-| Siege    |    3|      0.91|    0.98|      0.95|    194|
-| Tournam  |    4|      0.98|    0.97|      0.97|   6796|
-| |macro avg     |      0.97|    0.98|      0.97|  51216|
+| Siege    |    3|      0.98|    0.98|      0.98|    194|
+| Tournam  |    4|      0.99|    0.97|      0.98|   6796|
+| |macro avg     |      0.98|    0.99|      0.98|  51216|
 | |weighted avg  |      0.99|    0.99|      0.99|  51216|
 
 When just executed on the test dataset, it returns an accuracy of 98,7% and a cross entropy of 0.0026 and following confusion matrix and classification report
@@ -415,13 +428,33 @@ Confusion Matrix
 | |weighted avg  |      0.99|    0.99|      0.99|   7171|
 
 
-
 ### JUSTIFICATION
 
 <!-- The final results are compared to the benchmark result or threshold with some type of statistical analysis. Justification is made as to whether the final model and solution is significant enough to have adequately solved the problem. -->
 
-In the final model, both F1 and Accuracy are in the 97-99% range for every category, unlike the simple model I used in the benchmark. It is particularly important to be able to tell tournaments from battles, and show good precision / recall on Siege / Hideout, which are actually the information that we need to.
+In the final model, both F1 and Accuracy are in the 97-99% range for every category, unlike the simple model I used in the benchmark. It is particularly important to be able to tell tournaments from battles, and show good precision / recall on Siege / Hideout frames, which are actually the information that we need to.
 
+To see that, we can compare how the VGG13, Random Tree Forest and Stochastic Tree Descent scores compare in regard to classifying each category. We can have a look at the F1 score.
+
+| F1         |VGG13  |RTF   |SGD   | 
+|------------|-------|------|------|
+| Battle     |   0.98|  0.87|  0.61|
+| Hideout    |   0.98|  0.31|  0.44|
+| Other      |   0.99|  0.98|  0.95|
+| Siege      |   0.96|  0.51|  0.39|
+| Tournament |   0.98|  0.86|  0.64|
+
+The difference in Recall is even greater:
+
+| Recall     |VGG13  |RTF   |SGD   | 
+|------------|-------|------|------|
+| Battle     |   0.99|  0.91|  0.53|
+| Hideout    |   1.00|  0.18|  0.37|
+| Other      |   0.99|  0.97|  0.93|
+| Siege      |   0.96|  0.34|  0.30|
+| Tournament |   0.97|  0.92|  0.83|
+
+In future improvements I am  planning to extract more categories, which will also have few samples. This makes the difference in Recall even more critical.
 
 ## RESULTS
 

@@ -57,12 +57,9 @@ def save_model_params(model_dir, class_names, img_width, img_height, epochs, lay
 def save_model_metrics(model_dir, best_acc, best_loss):
     """
     Save the metrics found while training
-    :param model_dir : where to save the model
-    :param num_classes : the amount of categories
-    :param img_width: the width to which resize images
-    :param img_height: the height to which resize images
-    :param: number of epochs in iteration
-    :param layer_cfg: what configuration of layers to use in the VGG model ()
+    :param model_dir: where to save the model
+    :param best_acc: best accuracy to save
+    :param best_loss: best loss to save
     """
     model_metrics_path = os.path.join(model_dir, 'model_metrics.pth')
     with open(model_metrics_path, 'wb') as f:
@@ -146,8 +143,8 @@ def test_model(model,  criterion, test_data_loader, test_count):
     :param model: the model to test
     :param criterion: the criterion to use to optimize
     :param test_data_loader: the data loader for test data
-    :param test_count:
-    :return:
+    :param test_count: the amount of datapoints in the test dataset
+    :return: predictions array, true values so that statistics can be generated
     """
     use_gpu = torch.cuda.is_available()
     since = time.time()

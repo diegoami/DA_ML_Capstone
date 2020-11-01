@@ -9,11 +9,5 @@ pushd letsplay_classifier
 ##PYTHONPATH=$(pwd) python train.py --epochs=8 --img-width=320 --img-height=180 --layer-cfg=B --batch-size=16
 ##PYTHONPATH=$(pwd) python verify_model.py
 ##PYTHONPATH=$(pwd) python pca/pca_vgg.py
-PYTHONPATH=$(pwd) python interval/predict_intervals_walkdir.py --data-dir=/media/diego/QData/youtube_ml/wendy-cnn-5/frames/E69
-PYTHONPATH=$(pwd) python interval/predict_intervals_walkdir.py --data-dir=/media/diego/QData/youtube_ml/wendy-cnn-5/frames/E71
-PYTHONPATH=$(pwd) python interval/predict_intervals_walkdir.py --data-dir=/media/diego/QData/youtube_ml/wendy-cnn-5/frames/E72
-PYTHONPATH=$(pwd) python interval/predict_intervals_walkdir.py --data-dir=/media/diego/QData/youtube_ml/wendy-cnn-5/frames/E73
-PYTHONPATH=$(pwd) python interval/predict_intervals_walkdir.py --data-dir=/media/diego/QData/youtube_ml/wendy-cnn-5/frames/E74
-PYTHONPATH=$(pwd) python interval/predict_intervals_walkdir.py --data-dir=/media/diego/QData/youtube_ml/wendy-cnn-5/frames/E75
-PYTHONPATH=$(pwd) python interval/predict_intervals_walkdir.py --data-dir=/media/diego/QData/youtube_ml/wendy-cnn-5/frames/E76
+##PYTHONPATH=$(pwd) python interval/predict_intervals_walkdir.py --data-dir=/media/diego/QData/youtube_ml/wendy-cnn-5/frames/E76
 popd
