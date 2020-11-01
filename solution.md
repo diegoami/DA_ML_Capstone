@@ -16,59 +16,59 @@ During the last few years it has become more and more common to stream on platfo
 
 The game that I have chosen to analyze is _Mount of Blade: Warband_, of which I made several walkthroughs. This is a game where you spend most of the time on a "strategic map", taking your warband to any of the towns or villages, following or running away from other warbands which can belong to friendly or rival factions, or looking for quest objectives. 
 
-![E_00_41_00_09_28.jpg](docimages/other/E_0041_00_09_28.jpg)
+![E_00_41_00_09_28.jpg](docimages/E_0041_00_09_28.jpg)
  
-![E_0049_00_15_38.jpg](docimages/other/E_0049_00_15_38.jpg)
+![E_0049_00_15_38.jpg](docimages/E_0049_00_15_38.jpg)
 
-![E_0063_00_17_06.jpg](docimages/other/E_0063_00_17_06.jpg)
+![E_0063_00_17_06.jpg](docimages/E_0063_00_17_06.jpg)
 
 Other in-game screenshots can show the character's inventory, warband composition, allow interaction with in-game characters, display status messages...
 
-![E_0056_00_31_30.jpg](docimages/other/E_0056_00_31_30.jpg)
+![E_0056_00_31_30.jpg](docimages/E_0056_00_31_30.jpg)
 
-![E_0056_00_58_08.jpg](docimages/other/E_0056_00_58_08.jpg)
+![E_0056_00_58_08.jpg](docimages/E_0056_00_58_08.jpg)
 
-![E_0059_00_26_26.jpg](docimages/other/E_0059_00_26_26.jpg)
+![E_0059_00_26_26.jpg](docimages/E_0059_00_26_26.jpg)
 
 The hero can also take a walk in town, villages and castles. 
 
-![E_0055_00_33_54.jpg](docimages/other/E_0055_00_33_54.jpg)
+![E_0055_00_33_54.jpg](docimages/E_0055_00_33_54.jpg)
 
 ... have training sessions with soldiers...
 
-![E_0064_00_52_16.jpg](docimages/other/E_0064_00_52_16.jpg)
+![E_0064_00_52_16.jpg](docimages/E_0064_00_52_16.jpg)
  
     
 However, what we are interested in is locating the scenes when the warband engages enemies and the game switches to a tactical view, such as a battle in an open field or in a village...
 
-![E_0060_00_44_20.jpg](docimages/other/E_0060_00_44_20.jpg)
+![E_0060_00_44_20.jpg](docimages/E_0060_00_44_20.jpg)
 
-![E_0066_01_21_18.jpg](docimages/other/E_0066_01_21_18.jpg)
+![E_0066_01_21_18.jpg](docimages/E_0066_01_21_18.jpg)
 
-![E_0065_00_29_08.jpg](docimages/other/E_0065_00_29_08.jpg)
+![E_0065_00_29_08.jpg](docimages/E_0065_00_29_08.jpg)
 
 or a sieges to a town or a castle...
 
-![E_0068_00_20_08.jpg](docimages/other/E_0068_00_20_08.jpg)
+![E_0068_00_20_08.jpg](docimages/E_0068_00_20_08.jpg)
 
-![E_0068_00_48_04.jpg](docimages/other/E_0068_00_48_04.jpg)
+![E_0068_00_48_04.jpg](docimages/E_0068_00_48_04.jpg)
 
 
 or an assault to a bandit hideout, on foot.
 
-![E_0054_00_10_54.jpg](docimages/other/E_0054_00_10_54.jpg)
+![E_0054_00_10_54.jpg](docimages/E_0054_00_10_54.jpg)
 
-![E_0042_00_05_08.jpg](docimages/other/E_0042_00_05_08.jpg)
+![E_0042_00_05_08.jpg](docimages/E_0042_00_05_08.jpg)
 
 The hero often can also take part in tournaments, which are an important part of the game.
 
-![E_0057_00_21_48.jpg](docimages/other/E_0057_00_21_48.jpg)
+![E_0057_00_21_48.jpg](docimages/E_0057_00_21_48.jpg)
 
-![E_0061_00_25_56.jpg](docimages/other/E_0061_00_25_56.jpg)
+![E_0061_00_25_56.jpg](docimages/E_0061_00_25_56.jpg)
 
 The scene that are most challenging to recognize are quests and ambushes, as they are pretty infrequent and the screenshots may look similar to more peaceful situations. For instance, screenshots from a scene when the hero is rescuing a lord from prison are not very different from scenes when he might be just taking a stroll in the town.
 
-![E_0054_00_40_24.jpg](docimages/other/E_0054_00_40_24.jpg)
+![E_0054_00_40_24.jpg](docimages/E_0054_00_40_24.jpg)
 
  ... or scenes when the hero is training his troops or sparring with them in the arena may be confused with Tournament scenes. 
 
@@ -147,18 +147,18 @@ Browsing images I found out that grayscale informati
 <!-- A visualization has been provided that summarizes or extracts a relevant characteristic or feature about the dataset or input data with thorough discussion. Visual cues are clearly defined. -->
 Using PCA on a flattened version of the image matrixes, in format 80x45, black and white, I produced visualizations in 2d of the dataset.
 
-![pca_sklearn_2d.png](visualizations/pca_sklearn_2d.png)
+![pca_sklearn_2d.png](visualizations/pca_sklearn_2d_80_45_L.png)
 
 and here in 3d, using the same color scheme.
-![pca_sklearn_3d.png](visualizations/pca_sklearn_3d.png)
+![pca_sklearn_3d.png](visualizations/pca_sklearn_3d_80_45_L.png)
 
 It can be seen that "Other" scenes are separated in several clusters. "Battle", "Tournament", "Siege" and "Hideout" images do group in certain regions, but there is a lot of overlap beween each other and with some of the "Other" images.
 
 We move on to create a VGG13 model and do a PCA representation of the features of the images dataset recovered from the last layer .
 
-![pca_v4_2d.jpg](visualizations/pca_v4_2d.png)
+![pca_v4_2d.jpg](visualizations/pca_v5d_2d_f.png)
 
-![pca_v4_3d.jpg](visualizations/pca_v4_3d.png)
+![pca_v4_3d.jpg](visualizations/pca_v5n_3d_f4.png)
 
 Here there are is much less overlap between regions where the different classes are located. That shows how the new created features are important for the categorization task.
 
@@ -199,7 +199,7 @@ I ended up using the VGG13 Model, which gives satisfying results while also not 
 
 As 67.4 % of the images belong to the category "Other", a model should have an accuracy of at least 68% for being considered better than a model that always pick the Category "Other".
 
-Other than that, I create a very simple model that would use flattened matrixes of images, possibly in black and white, using standard scikit-learn transformers and PCA.
+Other than that, I create a very simple model that would use flattened matrixes of images, possibly in greyscale, using standard scikit-learn transformers and PCA.
 
 Using greyscale images in 80x45 format, I got the following results using a RandomTreeForest an SGD on 50 PCA-produced features, on the validation set (which had not been used for training).
 
@@ -208,11 +208,10 @@ It is not surprising that these results do not look that bad at all, and are act
 #### RandomForestClassifier
 
 ```
-=====================================
-RandomForestClassifier()
-Accuracy: 0.897881907466572
-F1 Score: 0.8847078087889461
-              precision    recall  f1-score   support
+Accuracy (validation) : 0.898
+F1 Score (validation) : 0.885
+              
+                precision    recall  f1-score   support
 
            0       0.76      0.84      0.80      2375
            1       0.83      0.01      0.03       384
@@ -224,13 +223,8 @@ F1 Score: 0.8847078087889461
    macro avg       0.86      0.53      0.52     16902
 weighted avg       0.90      0.90      0.88     16902
 
-[[ 2005     1   109     0   260]
- [  181     5    34     0   164]
- [  211     0 11322     0   158]
- [   65     0    22     2   120]
- [  192     0   209     0  1842]]
 =====================================
-=====================================
+#### RandomForestClassifier 
 SGDClassifier()
 /home/diego/anaconda3/envs/cnn-wendy/lib/python3.8/site-packages/sklearn/linear_model/_stochastic_gradient.py:570: ConvergenceWarning: Maximum number of iteration reached before convergence. Consider increasing max_iter to improve the fit.
   warnings.warn("Maximum number of iteration reached before "
@@ -361,6 +355,31 @@ I decided pretty early that my main model would be a VGG implementation in Pytor
 
 <!-- The final model’s qualities—such as parameters—are evaluated in detail. Some type of analysis is used to validate the robustness of the model’s solution. -->
 
+#### IMAGE CLASSIFICATION
+
+The final model uses 512126 images ( 320 x 180 ) in color    
+
+
+| X| 0    | 1   | 2   | 3   | 4   | 
+|--|------|-----|-----|-----|-----|
+| 0|  7094|   34|   53|    8|    9|
+| 1|     1| 1151|    6|    5|    0|    
+| 2|   197|   15|35063|    4|  146|    
+| 3|     3|   18|    1|  612|    0|    
+| 4|    22|    7|  182|    5| 6580|    
+
+|class name|class|precision | recall | f1-score |support|
+|----------|-----|----------|--------|----------|-------|
+| Battle   |    0|      0.97|    0.99|      0.98|   7198|
+| Hideout  |    1|      0.94|    0.99|      0.96|   1163|
+| Other    |    2|      0.99|    0.99|      0.99|  35425|
+| Siege    |    3|      0.91|    0.98|      0.95|    194|
+| Tournam  |    4|      0.98|    0.97|      0.97|   6796|
+| |macro avg     |      0.97|    0.98|      0.97|  51216|
+| |weighted avg  |      0.99|    0.99|      0.99|  51216|
+
+When just executed on the test dataset, it returns an accuracy of 98,7% and a cross entropy of 0.0026 and following confusion matrix and classification report
+
 
 ```
 
@@ -370,6 +389,7 @@ Confusion Matrix
  [  197    15 35063     4   146]
  [    3    18     1   612     0]
  [   22     7   182     5  6580]]
+
               precision    recall  f1-score   support
 
            0       0.97      0.99      0.98      7198
@@ -388,7 +408,7 @@ weighted avg       0.99      0.99      0.99     51216
 
 <!-- The final results are compared to the benchmark result or threshold with some type of statistical analysis. Justification is made as to whether the final model and solution is significant enough to have adequately solved the problem. -->
 
-In the final model, both F1 and Accuracy are in the 97-99% range for every category. It is particolarly important that these models are able to tell tournament from battles, and have good precision / recall on Siege / Hideout, which are actually the information that we need to.
+In the final model, both F1 and Accuracy are in the 97-99% range for every category, unlike the simple model I used in the benchmark. It is particularly important to be  abl to tell tournaments from battles, and show good precision / recall on Siege / Hideout, which are actually the information that we need to.
 
 ## RESULTS
 
