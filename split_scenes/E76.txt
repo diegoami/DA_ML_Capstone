@@ -463,3 +463,14 @@
 50:04-58:00 | Other : 7% , Tournament : 92%
 58:08-58:08 | ?????
 59:00-59:00 | ?????
+
+
+CORRECT METADATA
+===============================
+
+03:02-04:10 Battle with Emir Ralcha
+11:38 Somehow at war with Sarrranids again
+42:46-43:00 Arena Sparring
+43:04-43:18 Arena Sparring
+44:40-49:50 Tournament in Tulga
+50:04-58:00 Tournament in Tulga

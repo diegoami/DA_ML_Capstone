@@ -2,9 +2,9 @@
 
 CAPSTONE Project - Machine Learning Engineer Nanodegree - October 2020
 
+Project location : https://github.com/diegoami/DA_ML_Capstone
+
 ## DEFINITION
-
-
 
 ### PROJECT OVERVIEW
 
@@ -37,6 +37,8 @@ The hero can also take a walk in town, villages and castles.
 ... have training sessions with soldiers...
 
 ![E_0064_00_52_16.jpg](docimages/E_0064_00_52_16.jpg)
+
+or spar in arena with them as well.
  
     
 However, what we are interested in is locating the scenes when the warband engages enemies and the game switches to a tactical view, such as a battle in an open field or in a village...
@@ -71,6 +73,8 @@ The scene that are most challenging to recognize are quests and ambushes, as the
 ![E_0054_00_40_24.jpg](docimages/E_0054_00_40_24.jpg)
 
  ... or scenes when the hero is training his troops or sparring with them in the arena may be confused with Tournament scenes. 
+ 
+![E_0076_00_42_48.jpg](docimages/E_0076_00_42_48.jpg)
 
 ### PROBLEM STATEMENT
 
@@ -88,7 +92,7 @@ A necessary requirement for this project is to gather a dataset of screenshots t
 
 I will measure the performance of the image classifier using accuracy and cross-entropy loss on the training, validation and test (holdout) dataset. 
 
-I will also measure precision, recall, accuracy and F1 for each category,  as well as a total weighted and mean accuracy. I will also provide a confusion matrix.
+I will also measure precision, recall, accuracy and F1 for each category,  as well as a total weighted and mean accuracy. I will also provide a confusion matrix for each class. 
 
 ## ANALYSIS
 
@@ -98,10 +102,11 @@ I will also measure precision, recall, accuracy and F1 for each category,  as we
 
 #### CREATING A DATASET
 
-To create a dataset I took some videos from a game walkthrough of mine, the adventures of Wendy. I used the episodes from 41 to 69 from following public playlists on youtube: 
+To create a dataset I took some videos from a game walkthrough of mine, the adventures of Wendy. I used the episodes from 41 to 68 from following  playlists on youtube: 
 
 * CNN-Wendy-I: _https://www.youtube.com/playlist?list=PLNP_nRm4k4jfVfQobYTRQAXV_uOzt8Bov_
 * CNN-Wendy-II: _https://www.youtube.com/playlist?list=PLNP_nRm4k4jdEQ-OM31xNqeE64svvx-aT_ 
+* CNN-Wendy-III: _https://www.youtube.com/playlist?list=PLNP_nRm4k4jdEQ-OM31xNqeE64svvx-aTPLNP_nRm4k4jeoJ8H7mtTUbbOJ6_Rx_god_
 
 I found scenes in these episodes and added scene descriptions, that can be found in the video descriptions on youtube. 
 
@@ -125,6 +130,9 @@ This project:
 * extracts at every two seconds a frame and save it an jpeg file, using the *opencv* python library, resizing to the practical format 320x180
 * downloads the text from the youtube description and save it along the video ( _metadata_ )
 * Copy files to directories named by the image categories.
+
+The result of this process has been uploaded to Amazon S3. Files can be browsed here: https://da-youtube-ml.s3.eu-central-1.amazonaws.com/ 
+
 
 #### DATASET CHARACTERISTICS
 
@@ -156,9 +164,9 @@ It can be seen that "Other" scenes are separated in several clusters. "Battle", 
 
 We move on to create a VGG13 model and do a PCA representation of the features of the images dataset recovered from the last layer .
 
-![pca_v4_2d.jpg](visualizations/pca_v5d_2d_f.png)
+![pca_v5d_2d_f.png](visualizations/pca_v5d_2d_f.png)
 
-![pca_v4_3d.jpg](visualizations/pca_v5n_3d_f4.png)
+![pca_v5n_3d_f4.png](visualizations/pca_v5n_3d_f4.png)
 
 Here there are is much less overlap between regions where the different classes are located. That shows how the new created features are important for the categorization task.
 
@@ -222,33 +230,37 @@ F1 Score (validation) : 0.885
     accuracy                           0.90     16902
    macro avg       0.86      0.53      0.52     16902
 weighted avg       0.90      0.90      0.88     16902
+```
+Confusion Matrix
+[[ 2150     0    84     0   141]
+ [   99    73    27     1   184]
+ [  169     0 11400     0   122]
+ [   86     0    11    65    47]
+ [  101     1    82     0  2059]]
 
-=====================================
-#### RandomForestClassifier 
-SGDClassifier()
-/home/diego/anaconda3/envs/cnn-wendy/lib/python3.8/site-packages/sklearn/linear_model/_stochastic_gradient.py:570: ConvergenceWarning: Maximum number of iteration reached before convergence. Consider increasing max_iter to improve the fit.
-  warnings.warn("Maximum number of iteration reached before "
-Accuracy: 0.8211454265767365
-F1 Score: 0.812107606159407
+#### SGDClassifier(alpha=0.001, max_iter=10000) 
+
+```
+Accuracy: 0.848
+F1 Score: 0.848
               precision    recall  f1-score   support
 
-           0       0.60      0.53      0.57      2375
-           1       0.24      0.12      0.16       384
-           2       0.92      0.96      0.94     11691
-           3       0.17      0.10      0.12       209
-           4       0.56      0.58      0.57      2243
+           0       0.56      0.82      0.67      2375
+           1       0.71      0.21      0.32       384
+           2       0.97      0.93      0.95     11691
+           3       0.56      0.20      0.30       209
+           4       0.66      0.60      0.63      2243
 
-    accuracy                           0.82     16902
-   macro avg       0.50      0.46      0.47     16902
-weighted avg       0.81      0.82      0.81     16902
-
-[[ 1270    85   392    51   577]
- [  110    45    77     3   149]
- [  204     6 11249     6   226]
- [   59     2    62    20    66]
- [  461    48   401    38  1295]]
-=====================================
+    accuracy                           0.85     16902
+   macro avg       0.69      0.55      0.57     16902
+weighted avg       0.86      0.85      0.85     16902
 ```
+[[ 1957    14    66     4   334]
+ [  225    79     6     3    71]
+ [  479     2 10905    26   279]
+ [  135     7     3    42    22]
+ [  675     9   211     0  1348]]
+
 
 ## METHODOLOGY
 
@@ -256,7 +268,7 @@ weighted avg       0.81      0.82      0.81     16902
 
 <!-- All preprocessing steps have been clearly documented. Abnormalities or characteristics of the data or input that needed to be addressed have been corrected. If no data preprocessing is necessary, it has been clearly justified. -->
 
-The image dataset has been created extracting frames from video on youtube, and putting them in subdirectories named like the category they belong with. This is the main dataset I have been working with. These images have also been resized are in 320 x 180  RGB format . 
+The image dataset has been created extracting frames from video on youtube, and putting them in subdirectories named like the category they belong with. This is the main dataset I have been working with. These images have also been resized are in 320 x 180  RGB format , and normalized.
 
 While training the benchmark models, images are transformed into grayscale and resized to 80 x 45, but when training the deep learning models we use the original images in color, 320x180.
 
@@ -357,8 +369,9 @@ I decided pretty early that my main model would be a VGG implementation in Pytor
 
 #### IMAGE CLASSIFICATION
 
-The final model uses 512126 images ( 320 x 180 ) in color    
+The final model uses 512126 images ( 320 x 180 ) in color, VGG13, with 8 epochs. This is the confusion matrix and metrics on the full dataset.    
 
+Confusion matrix
 
 | X| 0    | 1   | 2   | 3   | 4   | 
 |--|------|-----|-----|-----|-----|
@@ -381,34 +394,34 @@ The final model uses 512126 images ( 320 x 180 ) in color
 When just executed on the test dataset, it returns an accuracy of 98,7% and a cross entropy of 0.0026 and following confusion matrix and classification report
 
 
-```
-
 Confusion Matrix
-[[ 7094    34    53     8     9]
- [    1  1151     6     5     0]
- [  197    15 35063     4   146]
- [    3    18     1   612     0]
- [   22     7   182     5  6580]]
 
-              precision    recall  f1-score   support
+| X| 0    | 1   | 2   | 3   | 4   | 
+|--|------|-----|-----|-----|-----|
+| 0|  995 |    3|    7|    1|    2|
+| 1|     0|  163|    0|    0|    0|    
+| 2|    26|    3| 4911|    2|   18|    
+| 3|     3|    1|    0|   85|    0|    
+| 4|     0|    0|   24|    0|  927|  
 
-           0       0.97      0.99      0.98      7198
-           1       0.94      0.99      0.96      1163
-           2       0.99      0.99      0.99     35425
-           3       0.97      0.97      0.97       634
-           4       0.98      0.97      0.97      6796
+|class name|class|precision | recall | f1-score |support|
+|----------|-----|----------|--------|----------|-------|
+| Battle   |    0|      0.97|    0.99|      0.98|   1008|
+| Hideout  |    1|      0.96|    1.00|      0.98|    163|
+| Other    |    2|      0.99|    0.99|      0.99|   4960|
+| Siege    |    3|      0.97|    0.96|      0.96|     89|
+| Tournam  |    4|      0.98|    0.97|      0.98|    951|
+| |macro avg     |      0.97|    0.98|      0.98|   7171|
+| |weighted avg  |      0.99|    0.99|      0.99|   7171|
 
-    accuracy                           0.99     51216
-   macro avg       0.97      0.98      0.97     51216
-weighted avg       0.99      0.99      0.99     51216
-```
 
 
 ### JUSTIFICATION
 
 <!-- The final results are compared to the benchmark result or threshold with some type of statistical analysis. Justification is made as to whether the final model and solution is significant enough to have adequately solved the problem. -->
 
-In the final model, both F1 and Accuracy are in the 97-99% range for every category, unlike the simple model I used in the benchmark. It is particularly important to be  abl to tell tournaments from battles, and show good precision / recall on Siege / Hideout, which are actually the information that we need to.
+In the final model, both F1 and Accuracy are in the 97-99% range for every category, unlike the simple model I used in the benchmark. It is particularly important to be able to tell tournaments from battles, and show good precision / recall on Siege / Hideout, which are actually the information that we need to.
+
 
 ## RESULTS
 
@@ -449,54 +462,68 @@ Confusion Matrix
 
 However, this is not the only result I was striving for. I wanted to create a tool not just to categorize images, but to split videos in scenes. Now, this problem would be worth a project in itself, possibly building a model on top of another model, or maybe considering RNN. At the moment I think this would make the problem too complex, as I expect this tool just to be able to help redact description, and not create them without human supervision. 
 
-To find scenes in videos I created an *intervals predictor* script that I could use locally (_predict_intervals_walkdir_), and one that I could use on Sagemaker: _predict_intervals_endpoint_) .
-I applied to the next episode in the playlist, E67, that isn't still part of the dataset. 
+To convert image classifications to scenes, I use so far an empirical procedure which is very dependent on the model and the dataset. Using probabilities calculated on each frame, I set up a "string visualization" for each frame, such as `HHHSSSSSSBBBBBBBBBB`, which in this case would mean "50% battle, 15% Hideout, 35% Siege ", or "__________________TT" for " 90% Other, 10% Tournament". Scrolling these visualizations it is possible to get an overview of the scenes in the youtube videos.
+
  
-The first generated output is a visualization on how the model classifies each frame. For instance, when a siege scene starts, the following lines are printed out.
+
+The algorithms are in the *interval* package: locally I use (_predict_intervals_walkdir_), on Sagemaker you can use: _predict_intervals_endpoint_). 
+
+I applied this procedure to a few episodes whose images hadn't been used for training, from E69 to E77, skipping E70 which is an outlier (Siege Defence in Slow motion, bugged by the mod I was working on). The results, along with the correct metadata, can be found in the [split_scenes](split_scenes) directory of the main repository.
+
+Pretty much all battles, sieges, hideout and tournaments are recognized correctly, apart form a couple of cases where there was some noise, explained later. 
+For instance
+```
+...
+41:10  __BBBBBBBBBBBBBBB___
+41:12  _BBBBBBBBBBBBBBBBBBB
+41:14  _BBBBBBBBBBBBBBBBBBS
+41:16  __BBBBBBBBBBBBBBBBBB
+41:18  _BBBBBBBBBBBBBBBBBBB
+41:20  __BBBBBBBBBBBBBBBBBB
+41:22  __BBBBBBBBBBBBBBBBHS
+41:24  _BBBBBBBBBBBBBBBBBBB
+41:26  _BBBBBBBBBBBBBBBBBBB
+41:28  __BBBBBBBBBBBBBBBB_T
+41:30  _BBBBBBBBBBBBBBBBB_T
+41:32  __BBBBBBBBBBBBBBB__T
+41:34  ___BBBBBBBBBBBBBBBHH
+41:36  __BBBBBBBBBBBBBBB__T
+41:38  ___BBBBBBBBBBBBBBBBH
+
+01:44-03:06 | Battle : 95%
+19:50-21:54 | Battle : 89% , Other : 7%
+36:50-38:04 | Battle : 94%
+41:10-41:38 | Battle : 85% , Other : 10% 
+```
+
+There are some instance where the output is less than perfect, but very helpful nonetheless. For instance, in E73 the hero talks a walk around her castle between 8:18 and 8:54, with no enenies, which usually would be an "Other" scene, but it is very similar to some outdoor scenes. Ideally there should be a "Walk" category for that. Same issue in E74 and E75.
 
 ```
-22:58 ____________________ ____________________
-23:00 ____________________ ____________________
-23:02 ____________________ ____________________
-23:04 __BBSSSSSSSSSSSSSSSS __BBSSSSSSSSSSSSSSSS
-23:06 _SSSSSSSSSSSSSSSSSSS _SSSSSSSSSSSSSSSSSSS
-23:08 _SSSSSSSSSSSSSSSSSSS _SSSSSSSSSSSSSSSSSSS
-23:10 _SSSSSSSSSSSSSSSSSSS _SSSSSSSSSSSSSSSSSSS
-....
-27:56 _SSSSSSSSSSSSSSSSSSS _SSSSSSSSSSSSSSSSSSS
-27:58 _SSSSSSSSSSSSSSSSSSS _SSSSSSSSSSSSSSSSSSS
-28:00 _SSSSSSSSSSSSSSSSSSS _SSSSSSSSSSSSSSSSSSS
-28:02 _SSSSSSSSSSSSSSSSSSS _SSSSSSSSSSSSSSSSSSS
-28:04 ____________________ ____________________
-28:06 ____________________ ____________________
+08:22  __HHHHHHHHHHHHHHHHHS
+08:24  __HHHHH_____SSSSSTTT
+08:26  __HHHH__SSSSSSSSSSSS
+
+08:30  __HHHH________SSSSSS
+08:32  __HHHHH_SSSSSSSSSSST
+
+08:44  _____________SSSSSSS
+
+08:48  ___________SSSSSSSSS
+08:50  _____SSSSSSSSSSSSSSS
+
+08:22-08:26 | Hideout : 22% , Other : 27% , Siege : 42% , Tournament : 7%
+08:30-08:32 | Hideout : 25% , Other : 15% , Siege : 55%
+08:44-08:44 | ?????
+08:48-08:50 | Other : 25% , Siege : 75%
 ```
- 
- 
-Long sequences of frames that are not classified as "other" (battles, sieges, tournaments, hideouts) are clumped together, as they can sometimes be confused with each other. The sequences of frame visualizations become scenes, that I also print along with their time frame intervals.
- 
-|  INTERVAL         | PREDICTION                                       | REALITY                                |
-|-------------------|--------------------------------------------------|----------------------------------------|
-| 23:04-28:04       | Siege : 87%                                      | Siege of Unuzdaq Castle                |
-| 42:48-42:52       | Tournament : 85%                                 |                                        |
-| 43:44-43:52       | Tournament : 88%                                 |                                        |
-| 46:24-47:44       | Battle : 53% , Tournament : 39%                  | Battle with Desert Bandits             |
-| 52:28-53:02       | Battle : 53% , Hideout : 26% ,  Siege : 31%      | Trap in Dirigh Abana (Battle)          |
-| 54:38-56:00       | Battle : 69% , Tournament : 23%                  | Battle with Boyar Gerluch              |
-| 01:03:52-01:05:42 | Battle : 81%                                     | Battle with Steppe Bandits (knockd out)|
-| 01:14:00-01:16:36 | Battle : 86%                                     | Battle with Emir Atis                  |
-| 01:17:50-01:19:16 | Battle : 90%                                     | Battle with Emir Hamezan               |
-| 01:33:12-01:34:22 | Battle : 94%                                     | Battle with Emir Rafard                |
-| 01:38:16-01:43:50 | Battle : 83%                                     | Battle with Emir Dashwhal (1)          |
-| 01:43:56-01:46:06 | Battle : 84% ,  Tournament : 7%                  | Battle with Emir Dashwhal (2)          |
-| 01:49:00-01:50:38 | Battle : 93%                                     | Battle with Emir Ralcha   (1)          |
-| 01:50:48-01:53:32 | Battle : 94%                                     | Battle with Emir Ralcha   (2)          |
-| 01:55:52-01:57:46 | Battle : 94%                                     | Battle with Emir Azadun                |
+Other interesting problems:
 
-There are some discrepancies, but the result is a great help when describing a video. 
+* in E73, a siege is recognized correctly, but the program is confused when the hero gets knocked out and the troops keep fighting without her, so the correct interval is not recognized.
+* In E72 there are a couple of mountain battles, when the hero can fight dismounted, which are therefore then partly classified as Hideouts 
+* In E72 some noise is generated because of a "Training" session, which I usually put in the "Other" bucket, but are actually fight scenes with some similarity to Tournaments. Training would also deserve its own category, if there were more samples.
+* In E73 the algorith gets confused during a siege when the hero gets knocked out 
+* In E72 and E74 the algorithms gets confused by short scene where the main  
+* The Siege of Halmar in E75 gets about 45% probability Siege, 40% probability Hideout
+* In E76 some sparring in the Arena is confused with a Tournament
 
-## CONCLUSIONS
-
-This project proved to me that it is possible to reliably build a classification model for images extracted from video games playthroughs. I could apply this technique also to other video games.
-
-It also proved that this model can be used to successfully split videos from video games playthrough into scenes, with some postprocessing.
-
+The idea in the long term is to gather more data and see what categories can also be introduced.

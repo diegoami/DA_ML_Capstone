@@ -422,3 +422,16 @@
 14:50-16:00 | Battle : 44% , Hideout : 37% , Other : 14%
 20:32-23:06 | Battle : 94%
 25:28-27:24 | Battle : 91% , Other : 8%
+
+
+CORRECT METADATA
+===============================
+
+
+00:06--00:16 Walk around castle Dramuq
+00:44-03:42 Battle with Boyar Reamald
+10:04-14:46 Battle with Count Haeda (I)
+14:50-16:00 Battle with Count Haeda (II)
+20:32-23:06 Battle with Boyar Hiwan
+25:28-27:24 Battle with Boyar Uqais
+27:49 Reyvadin

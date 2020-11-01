@@ -292,6 +292,8 @@ Confusion Matrix
 
 
 
+
+
 ### INTERVAL IDENTIFICATION
 
 However, this is not the only result I was striving for. I wanted to create a tool not just to categorize images, but to split videos in scenes. Now, this problem would be worth a project in itself, possibly building a model on top of another model, or maybe considering RNN. At the moment I think this would make the problem too complex, as I expect this tool just to be able to help redact description, and not create them without human supervision. 

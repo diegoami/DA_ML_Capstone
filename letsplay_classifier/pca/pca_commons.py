@@ -66,9 +66,9 @@ def plot_3d_pca(df):
 
 def plot_2d_pca(df, labels):
     """
-    plot pca on a 3d
+    plot pca on a 2d
     :param df: dataframe containing principal components
-    :param labels: name of the lables to show
+    :param labels: name of the labels to show
     """
     plt.figure(figsize=(16, 10))
     sns.scatterplot(
@@ -79,4 +79,5 @@ def plot_2d_pca(df, labels):
         legend="full",
         alpha=0.3
     )
+    plt.tight_layout()
     plt.show()

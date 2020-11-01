@@ -139,8 +139,8 @@ if __name__ == '__main__':
     Xp = do_pca(X, args.n_components)
     df = df_from_pca(Xp, y, get_labels(args.data_dir))
 
-    do_estimator_wf(Xp, y, RandomForestClassifier(n_estimators=100))
-    do_estimator_wf(Xp, y, SGDClassifier(max_iter=1000, tol=1e-3))
+    #do_estimator_wf(Xp, y, RandomForestClassifier(n_estimators=100))
+    do_estimator_wf(Xp, y, SGDClassifier(max_iter=10000, alpha=0.01))
 
     class_names = get_labels(args.data_dir)
     plot_2d_pca(df, class_names)

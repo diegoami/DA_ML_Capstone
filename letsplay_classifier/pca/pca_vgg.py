@@ -88,13 +88,11 @@ if __name__ == '__main__':
     print(f'Data Dir: {args.data_dir}')
     print(f'Model Dir: {args.model_dir}')
 
-
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     use_gpu = torch.cuda.is_available()
     model = model_fn(args.model_dir)
     model_info = get_model_info(args.model_dir)
     args = parser.parse_args()
-
 
     # remove last fully-connected layer to get feaut
     new_classifier = nn.Sequential(*list(model.classifier.children())[:-1])

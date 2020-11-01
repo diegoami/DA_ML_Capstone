@@ -482,3 +482,17 @@
 01:14:18-01:15:42 | Battle : 89% , Other : 8%
 01:15:52-01:16:32 | Battle : 93% , Other : 6%
 01:19:16-01:20:44 | Battle : 79% , Other : 15%
+
+CORRECT METADATA
+===============================
+
+16:08-18:36 Battle against Emir Hamezan
+21:04-21:52 Battle against Emir Mundhalir (I)
+21:56-21:56  Battle against Emir Mundhalir (II)
+22:00-23:30 Battle against Emir Mundhalir (III)
+25:22-27:30 Siege of Halmer
+40:30-43:52 Walk around Halmer
+01:04:44-01:06:00 Battle with Khergit deserters
+01:14:18-01:15:42 Battle with Emir Ghanawa (I)
+01:15:52-01:16:32 Battle with Emir Ghanawa (II)
+01:19:16-01:20:44 Battle with Emir Bracha

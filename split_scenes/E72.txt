@@ -470,3 +470,19 @@
 52:38-52:54 | Battle : 46% , Other : 53%
 53:02-54:44 | Battle : 83% , Other : 11%
 01:04:58-01:05:04 | Battle : 15% , Hideout : 36% , Other : 30% , Tournament : 15%
+
+
+CORRECT SCENES
+================================
+
+08:18-08:54 Walk around the castle Unuzdaq
+10:28-11:16 Battle with Sarranid deserters
+17:54-19:28 Battle against Boyar Vlan
+26:38-28:40 Battle with Count Imriza
+30:30-31:38 Battle with Deserters
+35:32-35:36 Battle with Boyar Hiwan (I)
+35:40-37:56 Battle with Boyar Hiwan (II)
+42:52-45:24 Battle in Village with Boyar Ghulassen
+46:08-46:58 Battle with Khergit Deserters
+51:56-54:44 Battle with Deserters
+01:04:38-1:05:05 Training villagers in Amere

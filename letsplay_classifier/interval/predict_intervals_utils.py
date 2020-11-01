@@ -1,4 +1,6 @@
 
+THRESHOLD_BORING = 15
+
 def get_short_classes(class_names):
     """
     Creates an array of short names of categories. "Other" takes "_" by default
@@ -46,7 +48,7 @@ def convert_to_intervals(frame_visualizations, short_classes, class_names, print
     in_scene = False
 
 
-    in_spell = False
+    in_boring_scene = False
 
     # scene start
     start_scene = None
@@ -62,27 +64,27 @@ def convert_to_intervals(frame_visualizations, short_classes, class_names, print
 
         # shows visualization
         if (print_lines):
-            if (visualization.count('_') >= 20):
-                if in_spell:
+            if (visualization.count('_') > THRESHOLD_BORING):
+                if in_boring_scene:
                     pass
                 else:
-                    in_spell = True
+                    in_boring_scene = True
                     print()
             else:
-                in_spell = False
+                in_boring_scene = False
                 print(f'{current_time}  {visualization}')
 
-        second_tot += 2
+
 
         if not in_scene:
             # start of a scene, if a not in one
-            if visualization.count('_') <= 15:
-                start_scene = current_time
+            if visualization.count('_') <= THRESHOLD_BORING:
+                start_scene = second_tot
                 in_scene = True
         else:
             # end of a scene, if in one
-            if visualization.count('_') >= 20:
-                end_scene = current_time
+            if visualization.count('_') > THRESHOLD_BORING:
+                end_scene = second_tot - 2
                 # a new interval description has been  generated
                 scenes_description.append((start_scene, end_scene, scene_description))
                 start_scene, end_scene = None, None
@@ -91,15 +93,17 @@ def convert_to_intervals(frame_visualizations, short_classes, class_names, print
             else:
                 # if in scene, concatenate current frame visualization to current scene description to be able to able to show probability for each scene type
                 scene_description += visualization
+        second_tot += 2
 
     # loops through interval descriptions
     for start_scene, end_scene, scene_description in scenes_description:
+        start_cur_time, end_cur_time = get_hour_format(start_scene), get_hour_format(end_scene),
         if len(scene_description) > 0:
             # build the scene type probability string
             prob_list = [int(scene_description.count(short_classes[x]) / len(scene_description) * 100) for x in range(0, 5)]
             prob_str = ', '.join([f'{class_names[x]} : {prob_list[x]}% ' for x in range(0, 5) if prob_list[x] > 5])
             # prints the interval start, end and the probability breakdown
-            print(f'{start_scene}-{end_scene} | {prob_str}')
+            print(f'{start_cur_time}-{end_cur_time} | {prob_str}')
         else:
-            print(f'{start_scene}-{end_scene} | ????? ')
+            print(f'{start_cur_time}-{end_cur_time} | ????? ')
             
