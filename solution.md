@@ -140,6 +140,7 @@ The dataset contains 51216 images , 320 x 190, in jpeg format, categorized in th
 |    |   TOTAL    |     51216|
 
 You can browse them using the _analysis.ipynb_ notebooks.
+Browsing images I found out that grayscale informati
 
 ### EXPLORATORY VISUALIZATION
 
@@ -186,11 +187,11 @@ For the Image Classifier I choose to start with one of the Convolutional Neural 
 As the images extracted from game walkthroughs are not related to real world images, using a pre-trained net and expanding it with transfer learning did not seem a sensible approach. Instead, I opted for a full train.
 
 
-I decided not to split the dataset into train, validation and test set, and to this split dynamically while training the model. As the dataset is expected to keep growing while I am going to add new videos and new frames, this was done to simplify dataset management.
-
 #### MODELS
 
-I chose to use Pytorch and the models that it includes 
+The approach I considered most simple and promising was to use Convolutional Neural Network included in the torchvision package in Pytorch.
+
+I ended up using the VGG13 Model, which gives satisfying results while also not being overbloated.
 
 ### BENCHMARK
 
@@ -200,56 +201,59 @@ As 67.4 % of the images belong to the category "Other", a model should have an a
 
 Other than that, I create a very simple model that would use flattened matrixes of images, possibly in black and white, using standard scikit-learn transformers and PCA.
 
-Using black/white images in 80x45 format, I got the following results using a RandomTreeForest an SGD on 50 PCA-produced features, on the validation set (which had not been used for training).
+Using greyscale images in 80x45 format, I got the following results using a RandomTreeForest an SGD on 50 PCA-produced features, on the validation set (which had not been used for training).
 
 It is not surprising that these results do not look that bad at all, and are actually good as separating "Other" images from images depicting any kind of engagement / fight (Tournament, Battle, Siege, Hideout). That is expected, as there are some GUI components that appear only in these scenes.
 
 #### RandomForestClassifier
 
 ```
-Accuracy: 0.8816708081883801
-F1 Score: 0.8683343720512487
+=====================================
+RandomForestClassifier()
+Accuracy: 0.897881907466572
+F1 Score: 0.8847078087889461
               precision    recall  f1-score   support
 
-           0       0.73      0.80      0.76      2375
-           1       0.67      0.01      0.01       384
-           2       0.96      0.96      0.96     11691
-           3       1.00      0.00      0.01       209
-           4       0.70      0.79      0.74      2243
+           0       0.76      0.84      0.80      2375
+           1       0.83      0.01      0.03       384
+           2       0.97      0.97      0.97     11691
+           3       1.00      0.01      0.02       209
+           4       0.72      0.82      0.77      2243
 
-    accuracy                           0.88     16902
-   macro avg       0.81      0.51      0.50     16902
-weighted avg       0.88      0.88      0.87     16902
+    accuracy                           0.90     16902
+   macro avg       0.86      0.53      0.52     16902
+weighted avg       0.90      0.90      0.88     16902
 
-[[ 1895     0   195     0   285]
- [  157     2    58     0   167]
- [  265     0 11242     0   184]
- [   57     0    22     1   129]
- [  231     1   249     0  1762]]
-```
-
-#### SGDClassifier
-
-```
-Accuracy: 0.8071234173470595
-F1 Score: 0.7993071530691789
+[[ 2005     1   109     0   260]
+ [  181     5    34     0   164]
+ [  211     0 11322     0   158]
+ [   65     0    22     2   120]
+ [  192     0   209     0  1842]]
+=====================================
+=====================================
+SGDClassifier()
+/home/diego/anaconda3/envs/cnn-wendy/lib/python3.8/site-packages/sklearn/linear_model/_stochastic_gradient.py:570: ConvergenceWarning: Maximum number of iteration reached before convergence. Consider increasing max_iter to improve the fit.
+  warnings.warn("Maximum number of iteration reached before "
+Accuracy: 0.8211454265767365
+F1 Score: 0.812107606159407
               precision    recall  f1-score   support
 
-           0       0.49      0.67      0.57      2375
-           1       0.10      0.02      0.03       384
-           2       0.94      0.94      0.94     11691
-           3       0.15      0.10      0.12       209
-           4       0.59      0.44      0.51      2243
+           0       0.60      0.53      0.57      2375
+           1       0.24      0.12      0.16       384
+           2       0.92      0.96      0.94     11691
+           3       0.17      0.10      0.12       209
+           4       0.56      0.58      0.57      2243
 
-    accuracy                           0.81     16902
-   macro avg       0.45      0.44      0.43     16902
-weighted avg       0.80      0.81      0.80     16902
+    accuracy                           0.82     16902
+   macro avg       0.50      0.46      0.47     16902
+weighted avg       0.81      0.82      0.81     16902
 
-[[ 1595    29   228    60   463]
- [  225     7    56     5    91]
- [  542     9 11025     9   106]
- [  118     1    34    21    35]
- [  758    25   425    41   994]]
+[[ 1270    85   392    51   577]
+ [  110    45    77     3   149]
+ [  204     6 11249     6   226]
+ [   59     2    62    20    66]
+ [  461    48   401    38  1295]]
+=====================================
 ```
 
 ## METHODOLOGY
@@ -258,9 +262,10 @@ weighted avg       0.80      0.81      0.80     16902
 
 <!-- All preprocessing steps have been clearly documented. Abnormalities or characteristics of the data or input that needed to be addressed have been corrected. If no data preprocessing is necessary, it has been clearly justified. -->
 
-The image dataset has been created extracting frames from video on youtube, and putting them in a directory - named like the category they belong with. This is the main dataset I have been working with. These images have also been resized are in 320 x 180 format and RGB. 
+The image dataset has been created extracting frames from video on youtube, and putting them in subdirectories named like the category they belong with. This is the main dataset I have been working with. These images have also been resized are in 320 x 180  RGB format . 
 
-When training and predicting, the only pre-processing step that  is to resize images and change their mode to black and white. We do this when training the benchmark models, but when training the deep learning models we use the original images in color, 320x180.
+While training the benchmark models, images are transformed into grayscale and resized to 80 x 45, but when training the deep learning models we use the original images in color, 320x180.
+
 
  As these images originate from video games,  any kind of data augmentation such as mirrored or cropped images do not make sense. These images would not be produced by the game, as many GUI components are always in the same place.
 
@@ -272,9 +277,11 @@ When training and predicting, the only pre-processing step that  is to resize im
 
 I set up scripts and notebooks so that they would work both locally and on Sagemaker. 
 
-A pytorch/conda environment, as the one in Sagemaker, is assumed - the missing libaries from the default sagemaker conda pytorch environment are in the _/requirements.txt_ file. 
+A pytorch/conda environment, as the one in Sagemaker, is assumed - the missing libaries from the default sagemaker conda pytorch environment are in the _/requirements.txt_ file. The four environment variables require for Sagemaker,  SM_HOSTS, SM_CHANNEL_TRAIN, SM_MODEL_DIR, SM_CURRENT_HOST, must be set.
 
-The code root directory is _letsplay_classifier_ - scripts should be executed from this directory, or the directory should be included in PYTHONPATH.
+The code root directory is _letsplay_classifier_ - scripts should be executed from this directory, and directory should be included in PYTHONPATH.
+
+For more details see the file [README.md](README.md)
 
 #### TRAINING SCRIPT
 
@@ -290,10 +297,11 @@ These are the steps that are executed:
 
 * use an image loader from pytorch to create a generator scanning all files in the data directory. 
 * use a pytorchvision transformer to resize images
-* divide the dataset in train and validation sets, using stratification and shuffling
+* divide the dataset in train, validation and test sets, using stratification and shuffling
 * load a VGG neural network, modified so that the output layers produce a category from our domain (5 categories in the final version)
 * For each epoch, execute a training step and evaluation step, trying to minimize the cross entropy loss in the validation set
 * Save the model so that it can be further used by the following steps
+* Evaluate the produced model on the test dataset, and print classification report and confusion matrix
  
 The cross entropy is the most useful metrics while training a classifier with C classes, therefore it is used here.
 
@@ -303,46 +311,44 @@ The verification script  _verify_model.py_ works only locally, as it assumes the
 
 * Loads the model created in the previous step
 * Walks through all the images in the dataset, one by one, and retrieve the predicted label
-* Print average accuracy, a classification report based on discrepancies, a confusion matrix, and a list of images whose predicted category does not coincide with their labels, so that they can be checked.
+* Print average accuracy, a classification report based on discrepancies, a confusion matrix, and a list of images whose predicted category does not coincide with their labels, so that the dataset can be corrected.
 
 
-#### MISCLASSIFIED IMAGES
-
-
-I found out that there were images in the training / validation set that were misclassified. At first I tried correcting the dataset using a GUI, where I would correct images that were classified wrongly according to _verify_model.py_, and save this information so that images could be moved to the correct place. I dropped this approach aas it turned out require a lot of overhead and was error-prone.
-
-I decided instead to have the suspiciously classified images printed from _verify_model.py_, and correct the data at the source, in the video metadata and description. This way I found out a bug in the way I was generating frames (as I was consistently misclassifying the first and last frame) and improved the training dataset.
 
 
 #### PREDICTOR
 
 The file _predict.py_ contains the methods that are necessary to deploy the model to an endpoint. It works both locally and on a Sagemaker container and requires a previously trained model.
 
-* input_fn: this is be the endpoint entry point, which converts a JSON payload to a Pillow Image
-* model_fn: predicts a category using a previously trained model, from an image in the domain space (a screenshot from *Mount&Blade: Warband* in format 320 x 180)
-* output_fn: returns the model output as a list of log probabilites for each class 
+* input_fn: this is be the endpoint entry point, which converts a Numpy matrix payload to a Pillow Image, applying the same preprocessing steps as during training
+* model_fn: predicts a category using a previously trained model, accepting an image from the domain space (a screenshot from *Mount&Blade: Warband* in format 320 x 180) and transformed in the same way as during training
+* output_fn: returns the model output as a numpy array: a list of log probabilites for each class 
 
 
 #### ENDPOINT 
 
-The file _endpoint.py_ contains a method to call an endpoint on Sagemaker, to collect predictions, to show a classification report and a confusion matrix. It requires locally saved data, but the model is accessed through a published endpoint, unlike the _verify_model.py_ component which requires a saved model locally.
+The file _endpoint.py_ contains a method _evaluate_ allowing to call an endpoint on Sagemaker, so that you can  collect predictions, which can be used to show a classification report and a confusion matrix. It requires locally saved data, but the model is accessed through a published endpoint, unlike the _verify_model.py_ component which requires a saved model locally.
 
-_endpoint.py_ works only in Sagemaker, when called from a Jupyter Notebook. Examples can be seen in the jupyter notebooks, for instance in CNN_Third_iteration.ipynb
+_endpoint.py_ works only in Sagemaker, when called from a Jupyter Notebook. Examples can be seen in the jupyter notebooks, for instance in [CNN_Fourth_iteration.ipynb](CNN_Fourth_iteration.ipynb)
 
 #### JUPYTER NOTEBOOKS
 
 These are the jupyter notebooks I created while making this project:
 
-* _analysis.ipynb_: just to analyse data
+* _analysis.ipynb_: just to browse through images
 * _CNN_First_Iteration.ipynb_ : First iteration with 8 classes 
 * _CNN_Second_Iteration.ipynb_ : Second iteration with 5 classes and some corrections in the data set 
-* _CNN_Third_Iteration.ipynb_ : Third iteration with more correction, a more advanced model and verification how the model splits videos 
+* _CNN_Third_Iteration.ipynb_ : Third iteration with more corrections, a more advanced model and a first attempt to use the model to split videos 
+* *CNN_Third_Iteration.ipynb* : Fourth iteration and final results 
 
 ### REFINEMENT
 
 <!-- The process of improving upon the algorithms and techniques used is clearly documented. Both the initial and final solutions are reported, along with intermediate solutions, if necessary. -->
 
-The most important refinement I had to do after training the first times was to find images in the dataset that had been wrongly labeled. For this, I used the output from one of my scripts, _verify_model.py_, which pointed to images whose prediction mismatched with labels. The only semnsible way to deal with that was to correct metadata at the source and use the companion project  
+At the beginning I was trying recognize 8 types of scenes. Apart from the categories BATTLE, HIDEOUT, OTHER, SIEGE, TOURNAMENT I had also the categories TOWN, TRAP and TRAINING. But as can be seen in  [CNN_First_Iteration.ipynb](CNN_First_Iteration.ipynb), I had too few amples of these and merged TRAINING into OTHER, while TOWN and TRAP became BATTLE.
+
+
+Another important refinement was finding images in the dataset that had been wrongly labeled. For this, I used the output from one of my scripts, _verify_model.py_, which pointed to images whose prediction mismatched with labels. The only semnsible way to deal with that was to correct metadata at the source and use the companion project  
 *DA_split_youtube_frames_S3* to regenerate frames in the correct directory.
 
 I decided pretty early that my main model would be a VGG implementation in Pytorch.   

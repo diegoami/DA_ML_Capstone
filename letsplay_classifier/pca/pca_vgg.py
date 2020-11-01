@@ -28,7 +28,8 @@ def get_data_loaders(img_dir, img_height, img_width, batch_size=8):
     data_transform = torchvision.transforms.Compose(
         [
             transforms.Resize((img_height, img_width)),
-            transforms.ToTensor()
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ]
     )
     

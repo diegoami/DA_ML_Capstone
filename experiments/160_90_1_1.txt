@@ -1,0 +1,47 @@
+Saving to /media/diego/QData/models/cnn-wendy/v5/fullnpy_160_90_1_1.0.npy
+=====================================
+RandomForestClassifier()
+Accuracy: 0.897881907466572
+F1 Score: 0.8847078087889461
+              precision    recall  f1-score   support
+
+           0       0.76      0.84      0.80      2375
+           1       0.83      0.01      0.03       384
+           2       0.97      0.97      0.97     11691
+           3       1.00      0.01      0.02       209
+           4       0.72      0.82      0.77      2243
+
+    accuracy                           0.90     16902
+   macro avg       0.86      0.53      0.52     16902
+weighted avg       0.90      0.90      0.88     16902
+
+[[ 2005     1   109     0   260]
+ [  181     5    34     0   164]
+ [  211     0 11322     0   158]
+ [   65     0    22     2   120]
+ [  192     0   209     0  1842]]
+=====================================
+=====================================
+SGDClassifier()
+/home/diego/anaconda3/envs/cnn-wendy/lib/python3.8/site-packages/sklearn/linear_model/_stochastic_gradient.py:570: ConvergenceWarning: Maximum number of iteration reached before convergence. Consider increasing max_iter to improve the fit.
+  warnings.warn("Maximum number of iteration reached before "
+Accuracy: 0.8211454265767365
+F1 Score: 0.812107606159407
+              precision    recall  f1-score   support
+
+           0       0.60      0.53      0.57      2375
+           1       0.24      0.12      0.16       384
+           2       0.92      0.96      0.94     11691
+           3       0.17      0.10      0.12       209
+           4       0.56      0.58      0.57      2243
+
+    accuracy                           0.82     16902
+   macro avg       0.50      0.46      0.47     16902
+weighted avg       0.81      0.82      0.81     16902
+
+[[ 1270    85   392    51   577]
+ [  110    45    77     3   149]
+ [  204     6 11249     6   226]
+ [   59     2    62    20    66]
+ [  461    48   401    38  1295]]
+=====================================

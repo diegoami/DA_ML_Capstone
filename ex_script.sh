@@ -2,7 +2,7 @@
 export SM_HOSTS=[]
 # replace with your data
  export SM_CHANNEL_TRAIN=/media/diego/QData/youtube_ml/wendy-cnn-5/frames/all
-export SM_MODEL_DIR=/media/diego/QData/models/cnn-wendy/v5
+export SM_MODEL_DIR=/media/diego/QData/models/cnn-wendy/v5n
 export SM_CURRENT_HOST=
 pushd letsplay_classifier
 ##PYTHONPATH=$(pwd) python pca/pca_sklearn.py --img-width=160 --img-height=90 --n-components=100

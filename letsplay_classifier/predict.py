@@ -74,7 +74,9 @@ def input_fn(request_body, content_type='application/x-npy'):
             image = Image.fromarray(image_data)
         image_resized = transforms.Resize((IMG_HEIGHT, IMG_WIDTH))(image)
         image_tensor = transforms.ToTensor()(image_resized)
-        image_unsqueezed = image_tensor.unsqueeze(0)
+        image_normalized = transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))(image_tensor)
+
+        image_unsqueezed = image_normalized.unsqueeze(0)
         return image_unsqueezed
     raise Exception(f'Requested unsupported ContentType in content_type {content_type}')
 

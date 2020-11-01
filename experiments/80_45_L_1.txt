@@ -1,0 +1,51 @@
+51000 processed up to 51000
+Saving to /media/diego/QData/models/cnn-wendy/v5/fullnpy_80_45_L_1.0.npy
+=====================================
+RandomForestClassifier()
+Accuracy: 0.9313690687492604
+F1 Score: 0.9254327234192059
+              precision    recall  f1-score   support
+
+           0       0.83      0.91      0.86      2375
+           1       0.96      0.20      0.33       384
+           2       0.98      0.97      0.98     11691
+           3       1.00      0.33      0.50       209
+           4       0.80      0.91      0.86      2243
+
+    accuracy                           0.93     16902
+   macro avg       0.92      0.67      0.71     16902
+weighted avg       0.94      0.93      0.93     16902
+
+[[ 2156     2    82     0   135]
+ [   94    76    31     0   183]
+ [  167     0 11390     0   134]
+ [   80     0    14    70    45]
+ [  113     1    79     0  2050]]
+=====================================
+=====================================
+SGDClassifier()
+Accuracy: 0.8634481126493906
+F1 Score: 0.864927577622813
+              precision    recall  f1-score   support
+
+           0       0.67      0.73      0.69      2375
+           1       0.28      0.31      0.30       384
+           2       0.97      0.95      0.96     11691
+           3       0.57      0.36      0.44       209
+           4       0.68      0.69      0.69      2243
+
+    accuracy                           0.86     16902
+   macro avg       0.63      0.61      0.62     16902
+weighted avg       0.87      0.86      0.86     16902
+
+[[ 1724   117   114    27   393]
+ [  155   119    13     5    92]
+ [  269    65 11127    22   208]
+ [   69    27     7    76    30]
+ [  371    93   227     4  1548]]
+=====================================
+Traceback (most recent call last):
+  File "pca/pca_sklearn.py", line 147, in <module>
+    plot_3d_pca(df, class_names)
+TypeError: plot_3d_pca() takes 1 positional argument but 2 were given
+(cnn-wendy) ➜  /home/diego/projects/DA_ML_Capstone/letsplay_classifier git
