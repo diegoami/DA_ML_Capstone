@@ -1,10 +1,7 @@
 from __future__ import print_function # future proof
 import argparse
-
 import os
 import json
-
-from constants import IMG_WIDTH, IMG_HEIGHT
 import torch.utils.data
 import torch
 import torch.nn as nn
@@ -15,13 +12,10 @@ from torchvision import transforms
 from predict import model_fn, get_model_info
 
 
-
-
-
 from pca.pca_commons import do_pca, df_from_pca, plot_2d_pca, plot_3d_pca
 
         
-def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_size=8):
+def get_data_loaders(img_dir, img_height, img_width, batch_size=8):
     """
     Builds the data loader objects for retrieving images from a specific directory
     :param img_dir - the directory where images are located
@@ -81,9 +75,9 @@ if __name__ == '__main__':
     parser.add_argument('--model-dir', type=str, default=os.environ['SM_MODEL_DIR'])
     parser.add_argument('--data-dir', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
 
-    parser.add_argument('--img-width', type=int, default=IMG_WIDTH, metavar='N',
+    parser.add_argument('--img-width', type=int, default=320, metavar='N',
                         help='width of image (default: 128)')
-    parser.add_argument('--img-height', type=int, default=IMG_HEIGHT, metavar='N',
+    parser.add_argument('--img-height', type=int, default=180, metavar='N',
                         help='height of image (default: 72)')
     parser.add_argument('--batch-size', type=int, default=8, metavar='N',
                         help='input batch size for training (default: 8)')
@@ -113,9 +107,8 @@ if __name__ == '__main__':
 
     X, y = get_feature_matrix_from_dataset(dataloader)
 
-
     Xp = do_pca(X, 3)
     df = df_from_pca(Xp, y, model_info['class_names'])
 
     plot_2d_pca(df, model_info['class_names'])
-    plot_3d_pca(df, model_info['class_names'])
+    plot_3d_pca(df)

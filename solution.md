@@ -175,18 +175,15 @@ There is not much to do about that as we have too few images that we could categ
 
 The general idea is to create an image classifier to categorize the images extracted from gameplay videos as belonging to a particular type of scenes. Then to use this image classifier on frames extracted from other gameplay vidoes to identify how to split videos into scenese.
 
-Concentrating on the image classifier, at first I would 
-I chose to verify whether a model is viable was to start and set up a Convolutional Neural Network in Pytorch, as I was pretty sure that 
+For the Image Classifier I choose to start with one of the Convolutional Neural Network which are already available in Pytorch, as  
 
-* this was pretty much the most sensible way to approach the problem
-* I could use standard CNN topologies available in Pytorch
+* this is a well-tried way to approach the problem 
+* I could use standard CNN topologies available in Pytorch, such as VGG, which would als not require too much memory
 * analyzing the result of the model would give me more information on what I would have to be looking for
 
-Convolutional Neural Network are, as a matter of fact, a very standard approach for categorizing images. A simple to use and flexible topology I decided to use was VGG, which is included in the Pytorch library. 
+ A simple to use and flexible topology I decided to use was VGG, which is powerful enough and small enough to fit on the GPU I used for training.
 
 As the images extracted from game walkthroughs are not related to real world images, using a pre-trained net and expanding it with transfer learning did not seem a sensible approach. Instead, I opted for a full train.
-
-In the pre-processing phase, I keep images to their original size 320 x 180. Resizing to a smaller size gave worse result. As I already have over 50000 images, I do not need any kind of data augmentation such as  mirrored images, also because the game may not produce mirrored images.
 
 
 I decided not to split the dataset into train, validation and test set, and to this split dynamically while training the model. As the dataset is expected to keep growing while I am going to add new videos and new frames, this was done to simplify dataset management.
@@ -203,7 +200,9 @@ As 67.4 % of the images belong to the category "Other", a model should have an a
 
 Other than that, I create a very simple model that would use flattened matrixes of images, possibly in black and white, using standard scikit-learn transformers and PCA.
 
-Using black/white images in 80x45 format, I got the following results using a RandomTreeForest an SGD on 50 PCA-produced features.
+Using black/white images in 80x45 format, I got the following results using a RandomTreeForest an SGD on 50 PCA-produced features, on the validation set (which had not been used for training).
+
+It is not surprising that these results do not look that bad at all, and are actually good as separating "Other" images from images depicting any kind of engagement / fight (Tournament, Battle, Siege, Hideout). That is expected, as there are some GUI components that appear only in these scenes.
 
 #### RandomForestClassifier
 
@@ -261,7 +260,10 @@ weighted avg       0.80      0.81      0.80     16902
 
 The image dataset has been created extracting frames from video on youtube, and putting them in a directory - named like the category they belong with. This is the main dataset I have been working with. These images have also been resized are in 320 x 180 format and RGB. 
 
-When training and predicting, the only pre-processing step that  is to resize images and change their mode to black and white. We do this when training the benchmark models, but when training the deep learning models we use
+When training and predicting, the only pre-processing step that  is to resize images and change their mode to black and white. We do this when training the benchmark models, but when training the deep learning models we use the original images in color, 320x180.
+
+ As these images originate from video games,  any kind of data augmentation such as mirrored or cropped images do not make sense. These images would not be produced by the game, as many GUI components are always in the same place.
+
 
 ### IMPLEMENTATION
 
@@ -300,7 +302,7 @@ The cross entropy is the most useful metrics while training a classifier with C 
 The verification script  _verify_model.py_ works only locally, as it assumes the model and the dataset is saved locally from the previous step. It requires the same environment variables as the training script.
 
 * Loads the model created in the previous step
-* Walks through all the images in the dataset, one by one, and retrievea the predicted label
+* Walks through all the images in the dataset, one by one, and retrieve the predicted label
 * Print average accuracy, a classification report based on discrepancies, a confusion matrix, and a list of images whose predicted category does not coincide with their labels, so that they can be checked.
 
 
@@ -340,11 +342,19 @@ These are the jupyter notebooks I created while making this project:
 
 <!-- The process of improving upon the algorithms and techniques used is clearly documented. Both the initial and final solutions are reported, along with intermediate solutions, if necessary. -->
 
+The most important refinement I had to do after training the first times was to find images in the dataset that had been wrongly labeled. For this, I used the output from one of my scripts, _verify_model.py_, which pointed to images whose prediction mismatched with labels. The only semnsible way to deal with that was to correct metadata at the source and use the companion project  
+*DA_split_youtube_frames_S3* to regenerate frames in the correct directory.
+
+I decided pretty early that my main model would be a VGG implementation in Pytorch.   
+
+
+
 ## RESULTS
 
 ### MODEL EVALUATION AND VALIDATION
 
 <!-- The final model’s qualities—such as parameters—are evaluated in detail. Some type of analysis is used to validate the robustness of the model’s solution. -->
+
 
 ```
 
@@ -372,6 +382,7 @@ weighted avg       0.99      0.99      0.99     51216
 
 <!-- The final results are compared to the benchmark result or threshold with some type of statistical analysis. Justification is made as to whether the final model and solution is significant enough to have adequately solved the problem. -->
 
+In the final model, both F1 and Accuracy are in the 97-99% range for every category. It is particolarly important that these models are able to tell tournament from battles, and have good precision / recall on Siege / Hideout, which are actually the information that we need to.
 
 ## RESULTS
 

@@ -5,7 +5,6 @@ import copy
 import os
 import json
 import numpy as np
-from constants import IMG_WIDTH, IMG_HEIGHT
 import torch.utils.data
 import torch
 import torch.nn as nn
@@ -74,7 +73,7 @@ def save_model_metrics(model_dir, best_acc, best_loss):
         torch.save(model_metrics, f)
         
         
-def get_data_loaders(img_dir, img_height=IMG_HEIGHT, img_width=IMG_WIDTH, batch_size=8):
+def get_data_loaders(img_dir, img_height, img_width, batch_size=8):
     """
     Builds the data loader objects for retrieving images from a specific directory
     :param img_dir - the directory where images are located
@@ -320,10 +319,10 @@ if __name__ == '__main__':
     parser.add_argument('--model-dir', type=str, default=os.environ['SM_MODEL_DIR'])
     parser.add_argument('--data-dir', type=str, default=os.environ['SM_CHANNEL_TRAIN'])
 
-    parser.add_argument('--img-width', type=int, default=IMG_WIDTH, metavar='N',
-                        help='width of image (default: 128)')
-    parser.add_argument('--img-height', type=int, default=IMG_HEIGHT, metavar='N',
-                        help='height of image (default: 72)')
+    parser.add_argument('--img-width', type=int, default=320, metavar='N',
+                        help='width of image (default: 320)')
+    parser.add_argument('--img-height', type=int, default=180, metavar='N',
+                        help='height of image (default: 180)')
     parser.add_argument('--batch-size', type=int, default=8, metavar='N',
                         help='input batch size for training (default: 8)')
     parser.add_argument('--layer-cfg', type=str, default='D', metavar='N',

@@ -17,13 +17,15 @@ from pca.pca_commons import get_labels, do_pca, df_from_pca, plot_2d_pca, plot_3
 
 
 
-def retrieve_df(data_dir, model_dir, width=80, height=45, mode=1, percentage=1, do_save=False):
+def retrieve_df(data_dir, model_dir, width=80, height=45, mode='L', percentage=1, do_save=False):
     """
     retrieves a dataframe containing all images of the dataset in a 80x45, black and white format, in a numpy array, and their labels
     :param data_dir: images location
     :param model_dir: model directory where to save the dataframe
-
-    :param percentage:
+    :param width: width of image to resize to
+    :param height: height of image to resize to
+    :param mode: image mode to use to
+    :param percentage: the percentage of image to build the dataframe with
     :return:
     """
     file_name_complete = f'fullnpy_{width}_{height}_{mode}_{percentage}.npy'
@@ -62,7 +64,7 @@ def retrieve_df(data_dir, model_dir, width=80, height=45, mode=1, percentage=1, 
                         image = Image.open(f)
                         image = image.resize((width, height))
                         if (mode == 1):
-                            image = image.convert('1')
+                            image = image.convert(mode)
                         data = np.asarray(image).flatten()
 
                         if X is None:
@@ -122,10 +124,11 @@ if __name__ == '__main__':
                         help='image width')
     parser.add_argument('--img-height', type=int, default=45,
                         help='image height')
-    parser.add_argument('--img-mode', type=int, default=1,
+    parser.add_argument('--img-mode', type=str, default='L',
                         help='image mode')
     parser.add_argument('--percentage', type=int, default=100,
                         help='percentage')
+
 
     args = parser.parse_args()
 
@@ -141,4 +144,4 @@ if __name__ == '__main__':
 
     class_names = get_labels(args.data_dir)
     plot_2d_pca(df, class_names)
-    plot_3d_pca(df, class_names)
+    plot_3d_pca(df)
