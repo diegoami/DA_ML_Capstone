@@ -5,7 +5,6 @@ import numpy as np
 
 from .predict_intervals_utils import convert_to_intervals, get_short_classes
 from PIL import Image
-from sagemaker.predictor import RealTimePredictor
 
 def evaluate(predictor, data_dir, class_names, print_lines=False):
     """
@@ -38,6 +37,5 @@ def evaluate(predictor, data_dir, class_names, print_lines=False):
             frame_visualization = ''.join([min(int(out_normalized[x]), 20) * short_classes[x] for x in range(0, 5)]).rjust(20,'_')
             frame_visualizations.append(frame_visualization)
 
-    convert_to_intervals(frame_visualizations, short_classes, class_names)
+    convert_to_intervals(frame_visualizations, short_classes, class_names, print_lines)
     
-#    evaluate('pytorch-inference-2020-10-26-04-51-38-837', '/home/ec2-user/SageMaker/DA_ML_Capstone/wendy_cnn_frames_E67/E67', class_names= ['Battle', 'Hideout', 'Other', 'Siege', 'Tournament'], print_lines=True)
