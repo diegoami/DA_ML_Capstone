@@ -4,10 +4,16 @@
 %
 \documentclass[
 ]{article}
+\usepackage[colorlinks = true,
+linkcolor = blue,
+urlcolor  = blue,
+citecolor = blue,
+anchorcolor = blue]{hyperref}
 \usepackage{lmodern}
 \usepackage{amssymb,amsmath}
 \usepackage{ifxetex,ifluatex}
 \usepackage{subcaption}
+\usepackage{float}
 \captionsetup{compatibility=false}
 \ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
   \usepackage[T1]{fontenc}
@@ -73,22 +79,42 @@
 
 \author{}
 \date{}
-
+\newcommand{\hhref}[3][blue]{\href{#2}{\color{#1}{#3}}}%
 \begin{document}
 
-\hypertarget{machine-learning-capstone-project}{%
-\section{MACHINE LEARNING CAPSTONE
-PROJECT}\label{machine-learning-capstone-project}}
+\begin{titlepage}
+	\begin{center}
+		\vspace*{1cm}
+		
+		\textbf{Automatic splitting into scenes of gameplay videos}
+		
+		\vspace{0.5cm}
+		\hhref{https://github.com/diegoami/DA_ML_Capstone}{https://github.com/diegoami/DA\_ML\_Capstone}
+		
+		\vspace{1.5cm}
+		
+		\textbf{Diego Amicabile}
+		
+		\vfill
+		
+		Final Capstone Project for the Machine Learning Engineering Nanodegree
+		\vspace{0.8cm}
+	
+		\textbf{Udacity}
+		
+		\vspace{0.8cm}
+		
 
-CAPSTONE Project - Machine Learning Engineer Nanodegree - October 2020
-
-Project location : https://github.com/diegoami/DA\_ML\_Capstone
+		2 November 2020
+		
+	\end{center}
+\end{titlepage}
 
 \hypertarget{definition}{%
-\subsection{DEFINITION}\label{definition}}
+\section{DEFINITION}\label{definition}}
 
 \hypertarget{project-overview}{%
-\subsubsection{PROJECT OVERVIEW}\label{project-overview}}
+\subsection{PROJECT OVERVIEW}\label{project-overview}}
 
 During the last few years it has become more and more common to stream
 on platforms such as Youtube and Twitch while playing video games, or to
@@ -103,14 +129,15 @@ Overworld surface, in caves, in the Nether and the End respectively -
 the four main settings of this game.
 
 The game that I have chosen to analyze is \emph{Mount of Blade:
-Warband}, of which I made several walkthroughs. This is a game where you
-spend most of the time on a ``strategic map'', taking your warband to
+Warband}, of which I attempted several walkthroughs. In this game, you command a hero, and later on a warband,  in their quest to power in the fictitious continent of Calradia, divided between six warring factions. On their way there you have to fight battles, sieges, tournaments, clear bandit handouts, fulfill quests in what is usually a very long game, spanning hundreds of hours.
+
+This is a game where you spend most of the time on a ``strategic map'', taking your warband to
 any of the towns or villages, following or running away from other
 warbands which can belong to friendly or rival factions, or looking for
 quest objectives.
 
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.3\textwidth}
 		\includegraphics[width=\linewidth]{docimages/E_0041_00_09_28.jpg}
@@ -132,7 +159,7 @@ composition, allow interaction with non-playing characters (NPCs), display statu
 messages\ldots{}
 
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.3\textwidth}
 		\includegraphics[width=\linewidth]{docimages/E_0056_00_31_30.jpg}
@@ -152,7 +179,7 @@ messages\ldots{}
 The hero can also take a walk in town, villages and castles, have training sessions with soldiers, or spar with them in arena.
 
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.3\textwidth}
 		\includegraphics[width=\linewidth]{docimages/E_0055_00_33_54.jpg}
@@ -172,7 +199,7 @@ However, what we are interested in is locating the scenes when the
 warband engages enemies and the game switches to a tactical view, such
 as a battle in an open field or in a village\ldots{}
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.3\textwidth}
 		\includegraphics[width=\linewidth]{docimages/E_0060_00_44_20.jpg}
@@ -188,9 +215,9 @@ as a battle in an open field or in a village\ldots{}
 	\end{subfigure}
 \end{figure}
 
-or when they sieges a town or a castle...
+or when they siege a town or a castle...
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.3\textwidth}
 		\includegraphics[width=\linewidth]{docimages/E_0068_00_48_04.jpg}
@@ -210,7 +237,7 @@ or when they assault a bandit hideout.
 
 
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.3\textwidth}
 		\includegraphics[width=\linewidth]{docimages/E_0041_00_39_58.jpg}
@@ -227,14 +254,13 @@ or when they assault a bandit hideout.
 \end{figure}
 
 
-\newpage
 
 The hero often takes part in tournaments, which are a very important
-part of the game which we want to locate. Regrettably, they may look similar to situations like training or sparring in the arena, that are not very interesting.
+part of the gam, and which we want to locate in gameplay videos. Regrettably, they may look similar to situations like training or sparring in the arena, that are not very interesting.
 
 
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.3\textwidth}
 		\includegraphics[width=\linewidth]{docimages/E_0057_00_21_48.jpg}
@@ -255,7 +281,7 @@ Quests and ambushes, are pretty infrequent and the screenshots may look
 similar to those of more peaceful situations. For instance when the hero is rescuing a lord from prison, or fighting a bandit in a village, are not very different from scenes when he might be just taking a stroll in a town or village.
 
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.3\textwidth}
 		\includegraphics[width=\linewidth]{docimages/E_0054_00_40_24.jpg}
@@ -276,54 +302,45 @@ similar to those of more peaceful situations. For instance when the hero is resc
 
 
 \hypertarget{problem-statement}{%
-\subsubsection{PROBLEM STATEMENT}\label{problem-statement}}
+\subsection{PROBLEM STATEMENT}\label{problem-statement}}
 
 The goal is to create and deploy a model which is able to classify
 images from the game \emph{Mount\&Blade: Warband} and return a category,
 such as ``Battle'', ``Hideout'', ``Siege'', ``Tournament'' and
-``Other''. It is also desirable to find out an optimal number of
-categories. It would be ideal to have categories for less frequent
-scenes such as ``Prison escape'', ``Ambush'', ``Quest'', but this will
-be out of scope and such scenes will be lumped together with the closes
-``main'' category.
+``Other'' for each frame.
 
-An additional goal is to have a model which identifies contiguous scenes
-in a gameplay video of \emph{Mount\&Blade: Warband}, providing the
-beginning and the end of the scenes, and its category.
+The approach should be robust enough to allow for later expanding of categories, for which there are not enough samples at the moment.
+It would be ideal to have categories for less frequent scenes such as "Prison escape", "Ambush", "Quest", but this will be out of scope and such scenes will be lumped together with the closes "main" category.
 
-A necessary requirement for this project is to gather a dataset of
-screenshots taken from the game, as well as the category to which they
-belong.
+An additional goal is to have a model which identifies contiguous scenes in a gameplay video of \emph{Mount\&Blade: Warband}, providing the beginning and the end of the scenes, and their most likely categories.
+
+A necessary requirement for this project is to gather a dataset of screenshots taken from the game, as well as the category to which they belong. For that, it will be necessary to choose some gameplay videos of the games, from which to extract frames that can be labeled.
 
 \hypertarget{metrics}{%
-\subsubsection{METRICS}\label{metrics}}
+\subsection{METRICS}\label{metrics}}
 
-I will measure the performance of the image classifier using accuracy
-and cross-entropy loss on the training, validation and test (holdout)
-dataset.
+While training, validating and testing the image classifier model, I will evaluate it  by means of accuracy and cross-entropy loss.
+While overall accuracy is not a good metrics in an unbalanced dataset, cross-entropy loss is a good loss function for Classification Problems with several classes, as it minimizes the distance between the predicted and the actual probability.
 
-I will also measure precision, recall, accuracy and F1 for each
-category, as well as a total weighted and mean accuracy. I will also
-provide a confusion matrix for each class.
+I will also use scikit-learn functions to measure precision, recall, accuracy and F1, for each class and average, as well as to calculate a total weighted and mean accuracy. A model will not be considered good enough if it cannot deliver a good precision and, even more importantly, recall on classes that have relatively few samples.
 
 \hypertarget{analysis}{%
-\subsection{ANALYSIS}\label{analysis}}
+\section{ANALYSIS}\label{analysis}}
 
 \hypertarget{data-exploration}{%
-\subsubsection{DATA EXPLORATION}\label{data-exploration}}
+\subsection{DATA EXPLORATION}\label{data-exploration}}
 
 \hypertarget{creating-a-dataset}{%
-\paragraph{CREATING A DATASET}\label{creating-a-dataset}}
+\subsubsection{CREATING A DATASET}\label{creating-a-dataset}}
 
 To create a dataset I took some videos from a game walkthrough of mine,
-the adventures of Wendy. I used the episodes from 41 to 68 from
-following playlists on youtube:
+the adventures of Wendy (\hhref{https://www.youtube.com/playlist?list=PLNP_nRm4k4jfNLo7FkjXewFH9Xe5Uc2Pa}{I}, \hhref{https://www.youtube.com/playlist?list=PLNP_nRm4k4jd-AJ0GwTPS1ld2YP8FdT4h}{II}). 
+I used the episodes from 41 to 68 to build the model, keeping episodes 69 to 77 to test it, and to simplify download I also created following playlists on youtube, containing just the episodes I will be using in this project:
 
 \begin{itemize}
 \tightlist
 \item
-  CNN-Wendy-I:
-  \emph{https://www.youtube.com/playlist?list=PLNP\_nRm4k4jfVfQobYTRQAXV\_uOzt8Bov}
+  \hhref{https://www.youtube.com/playlist?list=PLNP_nRm4k4jfVfQobYTRQAXV\_uOzt8Bov}{CNN-Wendy-I}
 \item
   CNN-Wendy-II:
   \emph{https://www.youtube.com/playlist?list=PLNP\_nRm4k4jdEQ-OM31xNqeE64svvx-aT}
@@ -602,10 +619,10 @@ X & 0 & 1 & 2 & 3 & 4\tabularnewline
 \end{longtable}
 
 \hypertarget{methodology}{%
-\subsection{METHODOLOGY}\label{methodology}}
+\section{METHODOLOGY}\label{methodology}}
 
 \hypertarget{data-processing}{%
-\subsubsection{DATA PROCESSING}\label{data-processing}}
+\subsection{DATA PROCESSING}\label{data-processing}}
 
 The image dataset has been created extracting frames from video on
 youtube, and putting them in subdirectories named like the category they
@@ -623,7 +640,7 @@ images would not be produced by the game, as many GUI components are
 always in the same place.
 
 \hypertarget{implementation}{%
-\subsubsection{IMPLEMENTATION}\label{implementation}}
+\subsection{IMPLEMENTATION}\label{implementation}}
 
 I set up scripts and notebooks so that they would work both locally and
 on Sagemaker.
@@ -769,7 +786,7 @@ These are the jupyter notebooks I created while making this project:
 \end{itemize}
 
 \hypertarget{refinement}{%
-\subsubsection{REFINEMENT}\label{refinement}}
+\subsection{REFINEMENT}\label{refinement}}
 
 At the beginning I was trying recognize 8 types of scenes. Apart from
 the categories BATTLE, HIDEOUT, OTHER, SIEGE, TOURNAMENT I had also the
@@ -790,10 +807,10 @@ I decided pretty early that my main model would be a VGG implementation
 in Pytorch.
 
 \hypertarget{results}{%
-\subsection{RESULTS}\label{results}}
+\section{RESULTS}\label{results}}
 
 \hypertarget{model-evaluation-and-validation}{%
-\subsubsection{MODEL EVALUATION AND
+\subsection{MODEL EVALUATION AND
 VALIDATION}\label{model-evaluation-and-validation}}
 
 \hypertarget{image-classification}{%
@@ -870,106 +887,8 @@ Tournam & 4 & 0.98 & 0.97 & 0.98 & 951\tabularnewline
 \bottomrule
 \end{longtable}
 
-\hypertarget{justification}{%
-\subsubsection{JUSTIFICATION}\label{justification}}
-
-In the final model, both F1 and Accuracy are in the 97-99\% range for
-every category, unlike the simple model I used in the benchmark. It is
-particularly important to be able to tell tournaments from battles, and
-show good precision / recall on Siege / Hideout frames, which are
-actually the information that we need to.
-
-To see that, we can compare how the VGG13, Random Tree Forest and
-Stochastic Tree Descent scores compare in regard to classifying each
-category. We can have a look at the F1 score.
-
-\begin{longtable}[]{@{}llll@{}}
-\toprule
-F1 & VGG13 & RTF & SGD\tabularnewline
-\midrule
-\endhead
-Battle & 0.98 & 0.87 & 0.61\tabularnewline
-Hideout & 0.98 & 0.31 & 0.44\tabularnewline
-Other & 0.99 & 0.98 & 0.95\tabularnewline
-Siege & 0.96 & 0.51 & 0.39\tabularnewline
-Tournament & 0.98 & 0.86 & 0.64\tabularnewline
-\bottomrule
-\end{longtable}
-
-The difference in Recall is even greater:
-
-\begin{longtable}[]{@{}llll@{}}
-\toprule
-Recall & VGG13 & RTF & SGD\tabularnewline
-\midrule
-\endhead
-Battle & 0.99 & 0.91 & 0.53\tabularnewline
-Hideout & 1.00 & 0.18 & 0.37\tabularnewline
-Other & 0.99 & 0.97 & 0.93\tabularnewline
-Siege & 0.96 & 0.34 & 0.30\tabularnewline
-Tournament & 0.97 & 0.92 & 0.83\tabularnewline
-\bottomrule
-\end{longtable}
-
-In future improvements I am planning to extract more categories, which
-will also have few samples. This makes the difference in Recall even
-more critical.
-
-\hypertarget{results-1}{%
-\subsection{RESULTS}\label{results-1}}
-
-In the end, I opted for a VGG13 model (layer configuration ``B'' in
-pytorch) trained on full image size (320 x 180). I used for that a
-corrected version of the dataset
-(\emph{https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy\_cnn\_frames\_data\_2b.zip})
-with fewer misclassified images. The results refer to runs I executed
-locally on my computer. On Sagemaker the results are somewhat different,
-as can be seen in the \emph{CNN\_Third\_iteration.ipynb} notebook, but I
-could not figure out why.
-
-\hypertarget{image-classification-1}{%
-\subsubsection{IMAGE CLASSIFICATION}\label{image-classification-1}}
-
-When training for 5 epochs, this approach gives a 98.5 \% accuracy and a
-cross entropy loss of 0.0035 both on train and validation set. The
-improvements are due both to cleaning the dataset and using a bigger
-format for images.
-
-Classification report on full dataset: Accuracy = 0.99
-
-\begin{longtable}[]{@{}llllll@{}}
-\toprule
-class name & class & precision & recall & f1-score &
-support\tabularnewline
-\midrule
-\endhead
-Battle & 0 & 0.97 & 0.99 & 0.98 & 6125\tabularnewline
-Hideout & 1 & 0.99 & 0.97 & 0.98 & 1162\tabularnewline
-Other & 2 & 0.99 & 0.99 & 0.99 & 31430\tabularnewline
-Siege & 3 & 0.85 & 0.99 & 0.92 & 195\tabularnewline
-Tournam & 4 & 0.99 & 0.97 & 0.98 & 6798\tabularnewline
-& macro avg & 0.96 & 0.98 & 0.97 & 45710\tabularnewline
-& weighted avg & 0.99 & 0.99 & 0.99 & 45710\tabularnewline
-\bottomrule
-\end{longtable}
-
-Confusion Matrix
-
-\begin{longtable}[]{@{}llllll@{}}
-\toprule
-X & 0 & 1 & 2 & 3 & 4\tabularnewline
-\midrule
-\endhead
-0 & 6055 & 0 & 55 & 8 & 7\tabularnewline
-1 & 4 & 1131 & 5 & 22 & 0\tabularnewline
-2 & 153 & 13 & 31212 & 2 & 50\tabularnewline
-3 & 0 & 0 & 1 & 194 & 0\tabularnewline
-4 & 8 & 2 & 197 & 1 & 6590\tabularnewline
-\bottomrule
-\end{longtable}
-
 \hypertarget{interval-identification}{%
-\subsubsection{INTERVAL IDENTIFICATION}\label{interval-identification}}
+	\subsubsection{INTERVAL IDENTIFICATION}\label{interval-identification}}
 
 However, this is not the only result I was striving for. I wanted to
 create a tool not just to categorize images, but to split videos in
@@ -1055,33 +974,133 @@ and E75.
 Other interesting problems:
 
 \begin{itemize}
-\tightlist
-\item
-  in E73, a siege is recognized correctly, but the program is confused
-  when the hero gets knocked out and the troops keep fighting without
-  her, so the correct interval is not recognized.
-\item
-  In E72 there are a couple of mountain battles, when the hero can fight
-  dismounted, which are therefore then partly classified as Hideouts
-\item
-  In E72 some noise is generated because of a ``Training'' session,
-  which I usually put in the ``Other'' bucket, but are actually fight
-  scenes with some similarity to Tournaments. Training would also
-  deserve its own category, if there were more samples.
-\item
-  In E73 the algorith gets confused during a siege when the hero gets
-  knocked out
-\item
-  In E72 and E74 the algorithms gets confused by short scene where the
-  main\\
-\item
-  The Siege of Halmar in E75 gets about 45\% probability Siege, 40\%
-  probability Hideout
-\item
-  In E76 some sparring in the Arena is confused with a Tournament
+	\tightlist
+	\item
+	in E73, a siege is recognized correctly, but the program is confused
+	when the hero gets knocked out and the troops keep fighting without
+	her, so the correct interval is not recognized.
+	\item
+	In E72 there are a couple of mountain battles, when the hero can fight
+	dismounted, which are therefore then partly classified as Hideouts
+	\item
+	In E72 some noise is generated because of a ``Training'' session,
+	which I usually put in the ``Other'' bucket, but are actually fight
+	scenes with some similarity to Tournaments. Training would also
+	deserve its own category, if there were more samples.
+	\item
+	In E73 the algorith gets confused during a siege when the hero gets
+	knocked out
+	\item
+	In E72 and E74 the algorithms gets confused by short scene where the
+	main\\
+	\item
+	The Siege of Halmar in E75 gets about 45\% probability Siege, 40\%
+	probability Hideout
+	\item
+	In E76 some sparring in the Arena is confused with a Tournament
 \end{itemize}
 
 The idea in the long term is to gather more data and see what categories
 can also be introduced.
+
+
+\hypertarget{justification}{%
+\subsection{JUSTIFICATION}\label{justification}}
+
+In the final model, both F1 and Accuracy are in the 97-99\% range for
+every category, unlike the simple model I used in the benchmark. It is
+particularly important to be able to tell tournaments from battles, and
+show good precision / recall on Siege / Hideout frames, which are
+actually the information that we need to.
+
+To see that, we can compare how the VGG13, Random Tree Forest and
+Stochastic Tree Descent scores compare in regard to classifying each
+category. We can have a look at the F1 score.
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+F1 & VGG13 & RTF & SGD\tabularnewline
+\midrule
+\endhead
+Battle & 0.98 & 0.87 & 0.61\tabularnewline
+Hideout & 0.98 & 0.31 & 0.44\tabularnewline
+Other & 0.99 & 0.98 & 0.95\tabularnewline
+Siege & 0.96 & 0.51 & 0.39\tabularnewline
+Tournament & 0.98 & 0.86 & 0.64\tabularnewline
+\bottomrule
+\end{longtable}
+
+The difference in Recall is even greater:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+Recall & VGG13 & RTF & SGD\tabularnewline
+\midrule
+\endhead
+Battle & 0.99 & 0.91 & 0.53\tabularnewline
+Hideout & 1.00 & 0.18 & 0.37\tabularnewline
+Other & 0.99 & 0.97 & 0.93\tabularnewline
+Siege & 0.96 & 0.34 & 0.30\tabularnewline
+Tournament & 0.97 & 0.92 & 0.83\tabularnewline
+\bottomrule
+\end{longtable}
+
+In future improvements I am planning to extract more categories, which
+will also have few samples. This makes the difference in Recall even
+more critical.
+
+\hypertarget{results-1}{%
+\section{RESULTS}\label{results-1}}
+
+In the end, I opted for a VGG13 model (layer configuration ``B'' in
+pytorch) trained on full image size (320 x 180). I used for that a
+corrected version of the dataset
+(\emph{https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy\_cnn\_frames\_data\_2b.zip})
+with fewer misclassified images. The results refer to runs I executed
+locally on my computer. On Sagemaker the results are somewhat different,
+as can be seen in the \emph{CNN\_Third\_iteration.ipynb} notebook, but I
+could not figure out why.
+
+\hypertarget{image-classification-1}{%
+\subsubsection{IMAGE CLASSIFICATION}\label{image-classification-1}}
+
+When training for 5 epochs, this approach gives a 98.5 \% accuracy and a
+cross entropy loss of 0.0035 both on train and validation set. The
+improvements are due both to cleaning the dataset and using a bigger
+format for images.
+
+Classification report on full dataset: Accuracy = 0.99
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule
+class name & class & precision & recall & f1-score &
+support\tabularnewline
+\midrule
+\endhead
+Battle & 0 & 0.97 & 0.99 & 0.98 & 6125\tabularnewline
+Hideout & 1 & 0.99 & 0.97 & 0.98 & 1162\tabularnewline
+Other & 2 & 0.99 & 0.99 & 0.99 & 31430\tabularnewline
+Siege & 3 & 0.85 & 0.99 & 0.92 & 195\tabularnewline
+Tournam & 4 & 0.99 & 0.97 & 0.98 & 6798\tabularnewline
+& macro avg & 0.96 & 0.98 & 0.97 & 45710\tabularnewline
+& weighted avg & 0.99 & 0.99 & 0.99 & 45710\tabularnewline
+\bottomrule
+\end{longtable}
+
+Confusion Matrix
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule
+X & 0 & 1 & 2 & 3 & 4\tabularnewline
+\midrule
+\endhead
+0 & 6055 & 0 & 55 & 8 & 7\tabularnewline
+1 & 4 & 1131 & 5 & 22 & 0\tabularnewline
+2 & 153 & 13 & 31212 & 2 & 50\tabularnewline
+3 & 0 & 0 & 1 & 194 & 0\tabularnewline
+4 & 8 & 2 & 197 & 1 & 6590\tabularnewline
+\bottomrule
+\end{longtable}
+
 
 \end{document}

@@ -88,22 +88,25 @@ similar to those of more peaceful situations. For instance when the hero is resc
 
 <!-- The problem which needs to be solved is clearly defined. A strategy for solving the problem, including discussion of the expected solution, has been made. -->
 
-The goal is to create and deploy a model which is able to classify images from the game _Mount&Blade: Warband_ and return a category, such as "Battle", "Hideout", "Siege", "Tournament" and "Other" for each frame. It is also desirable to find out an optimal number of categories. 
+The goal is to create and deploy a model which is able to classify images from the game _Mount&Blade: Warband_ and return a category, such as "Battle", "Hideout", "Siege", "Tournament" and "Other" for each frame.
 
 The approach should be robust enough to allow for later expanding of categories, for which there are not enough samples at the moment.
 It would be ideal to have categories for less frequent scenes such as "Prison escape", "Ambush", "Quest", but this will be out of scope and such scenes will be lumped together with the closes "main" category.
 
-An additional goal is to have a model which identifies contiguous scenes in a gameplay video of _Mount&Blade: Warband_, providing the beginning and the end of the scenes, and its category.
+An additional goal is to have a model which identifies contiguous scenes in a gameplay video of _Mount&Blade: Warband_, providing the beginning and the end of the scenes, and their most likely categories.
 
-A necessary requirement for this project is to gather a dataset of screenshots taken from the game, as well as the category to which they belong.
+A necessary requirement for this project is to gather a dataset of screenshots taken from the game, as well as the category to which they belong. For that, it will be necessary to choose some gameplay videos of the games, from which to extract frames that can be labeled.
 
 ### METRICS
 
 <!-- Metrics used to measure the performance of a model or result are clearly defined. Metrics are justified based on the characteristics of the problem. -->
 
-I will measure the performance of the image classifier using accuracy and cross-entropy loss on the training, validation and test (holdout) dataset. 
+While training, validating and testing the image classifier model, I will evaluate it  by means of accuracy and cross-entropy loss.
+While overall accuracy is not a good metrics in an unbalanced dataset, cross-entropy loss is a good metrics loss function for Classification Problems with several classes, as it minimizes the distance between the predicted and the actual probability.
 
-I will also measure precision, recall, accuracy and F1 for each category,  as well as a total weighted and mean accuracy. I will also provide a confusion matrix for each class. 
+I will also use scikit-learn functions to measure precision, recall, accuracy and F1, for each class and average, as well as to calculate a total weighted and mean accuracy. A model will not be considered good if it cannot deliver a good precision and, even more importantly, recall on classes that have relatively few samples.
+ 
+ I will also provide a confusion matrix for each class. 
 
 ## ANALYSIS
 
