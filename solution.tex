@@ -100,7 +100,7 @@ anchorcolor = blue]{hyperref}
 		Final Capstone Project for the Machine Learning Engineering Nanodegree
 		\vspace{0.8cm}
 	
-		\textbf{Udacity}
+		\textbf{Udacityb}
 		
 		\vspace{0.8cm}
 		
@@ -327,6 +327,9 @@ I will also use scikit-learn functions to measure precision, recall, accuracy an
 \hypertarget{analysis}{%
 \section{ANALYSIS}\label{analysis}}
 
+Most files referenced in these section are relative to \hhref{https://github.com/diegoami/DA_ML_Capstone/}{this Github repository}..
+
+
 \hypertarget{data-exploration}{%
 \subsection{DATA EXPLORATION}\label{data-exploration}}
 
@@ -342,21 +345,17 @@ I used the episodes from 41 to 68 to build the model, keeping episodes 69 to 77 
 \item
   \hhref{https://www.youtube.com/playlist?list=PLNP_nRm4k4jfVfQobYTRQAXV\_uOzt8Bov}{CNN-Wendy-I}
 \item
-  CNN-Wendy-II:
-  \emph{https://www.youtube.com/playlist?list=PLNP\_nRm4k4jdEQ-OM31xNqeE64svvx-aT}
+  \hhref{https://www.youtube.com/playlist?list=PLNP_nRm4k4jdEQ-OM31xNqeE64svvx-aT}{CNN-Wendy-II}
 \item
-  CNN-Wendy-III:
-  \emph{https://www.youtube.com/playlist?list=PLNP\_nRm4k4jdEQ-OM31xNqeE64svvx-aTPLNP\_nRm4k4jeoJ8H7mtTUbbOJ6\_Rx\_god}
+  \hhref{https://www.youtube.com/playlist?list=PLNP_nRm4k4jeoJ8H7mtTUbbOJ6_Rx_god}{CNN-Wendy-III}
 \end{itemize}
 
-I found scenes in these episodes and added scene descriptions, that can
-be found in the video descriptions on youtube.
+To build a dataset, I identified scenes in these episodes and wrote them all down in the video description on youtube. 
 
-For instance, in episode 54, I have identified following scenes, of the
+For instance, in episode 54, I have wrote down following scenes in the description, of the
 category ``Hideout'', ``Battle'', ``Tournament'', ``Town'' (``Town'' is
-eventually remapped to ``Battle''). All the other parts of the video are
-categorized as ``Other''. These lines can be found in the video
-description.
+eventually remapped to ``Battle'') - first word of the description line. All the other parts of the video are
+categorized as ``Other''.   
 
 \begin{itemize}
 \tightlist
@@ -375,37 +374,36 @@ description.
 \end{itemize}
 
 \hypertarget{companion-projects}{%
-\paragraph{COMPANION PROJECTS}\label{companion-projects}}
+\subsubsection{COMPANION PROJECT}\label{companion-projects}}
 
-To prepare the data set, I had set up a companion project under
-\emph{https://github.com/diegoami/DA\_split\_youtube\_frames\_s3/}.
-
-This project:
+To prepare the data set, I created \hhref{https://github.com/diegoami/DA_split_youtube_frames\_s3/}{a companion project} allowing to:
 
 \begin{itemize}
 \tightlist
 \item
-  downloads the relevant videos from youtube, using the
+  download the relevant videos from youtube, using the
   \emph{youtube-dl} python library, in a 640x360 format
 \item
-  extracts at every two seconds a frame and save it an jpeg file, using
+  extract at every two seconds a frame and save it in \emph{jpeg} file, using
   the \emph{opencv} python library, resizing to the practical format
   320x180
 \item
-  downloads the text from the youtube description and save it along the
-  video ( \emph{metadata} )
+  download the text from the youtube descriptions, which describes the scenes, and save it along the
+  video as \emph{metadata}
 \item
-  Copy files to directories named by the image categories.
+  assign the images created in the second step to labels, according to the metadata produced at step 3
+\item 
+  save images into subdirectories named after the labels they ere assigned   
 \end{itemize}
 
-The result of this process has been uploaded to Amazon S3. Files can be
-browsed here: https://da-youtube-ml.s3.eu-central-1.amazonaws.com/
+
+The result of this process has been uploaded \hhref{https://da-youtube-ml.s3.eu-central-1.amazonaws.com/}{to a public bucket on Amazon S3}, from where you can browse and download all files produced in the above described stages.
 
 \hypertarget{dataset-characteristics}{%
-\paragraph{DATASET CHARACTERISTICS}\label{dataset-characteristics}}
+\subsubsection{DATASET CHARACTERISTICS}\label{dataset-characteristics}}
 
-The dataset contains 51216 images , 320 x 190, in jpeg format,
-categorized in this way
+The dataset contains 51216 images, 320 x 180, in jpeg format,
+distributed over the following classes. It can be downloaded and extracted from \hhref{https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy_cnn_frames_data_5.zip}{this zip file on S3}.
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -423,121 +421,99 @@ categorized in this way
 
 You can browse them using the \emph{analysis.ipynb} notebooks. While
 having a look at images, it seemed to me that a format of 320x180, in
-grayscale, keeps most of the information necessary to categorize it.
+grayscale, keeps most of the information necessary to categorize it. 
 
 \hypertarget{exploratory-visualization}{%
 \subsubsection{EXPLORATORY
 VISUALIZATION}\label{exploratory-visualization}}
 
 Using PCA on a flattened version of the image matrixes, in format 80x45,
-black and white, I produced visualizations in 2d of the dataset.
+black and white, I produced visualizations of the distribution of the 2 main principal components of the full dataset. 
 
-\begin{figure}
+\begin{figure}[H]
 \centering
 \includegraphics{visualizations/pca_sklearn_2d_80_45_L.png}
-\caption{pca\_sklearn\_2d.png}
+\caption{2 Main Principal Components}
 \end{figure}
 
-and here in 3d, using the same color scheme.
-\includegraphics{visualizations/pca_sklearn_3d_80_45_L.png}
+and also of the three main principal components, using the same color scheme.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics{visualizations/pca_sklearn_3d_80_45_L.png}
+	\caption{3 Main Principal Components}
+\end{figure}
+
 
 It can be seen that ``Other'' scenes are separated in several clusters.
 ``Battle'', ``Tournament'', ``Siege'' and ``Hideout'' images do group in
-certain regions, but there is a lot of overlap beween each other and
+certain regions, but there is a lot of overlap between themselves and
 with some of the ``Other'' images.
 
-We move on to create a VGG13 model and do a PCA representation of the
-features of the images dataset recovered from the last layer .
+Later on, after we have create a VGG13 model, we can plot an alternative PCA representation of the
+dataset, using the additional generated features that can be recovered from the last layer of the neural net.
 
-\begin{figure}
+\begin{figure}[H]
 \centering
 \includegraphics{visualizations/pca_v5n_2d_f.png}
-\caption{pca\_v5d\_2d\_f.png}
+\caption{VGG13-2 principal components}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[H]
 \centering
 \includegraphics{visualizations/pca_v5n_3d_f4.png}
-\caption{pca\_v5n\_3d\_f4.png}
+\caption{VGG13-3 principal components}
 \end{figure}
 
 Here there are is much less overlap between regions where the different
-classes are located. That shows how the new created features are
+classes are located. That shows how the features created in a neural network are
 important for the categorization task.
 
-\begin{itemize}
-\tightlist
-\item
-  Other --\textgreater{} Tournament: possibly Arena and Training scenes
-  (categorized as Other, they are similar to Tournaments)
-\item
-  Battle --\textgreater{} Other : possibly Town escapes and Ambushes
-  (categorized as Battle, but look like scenes in which the hero is
-  strolling)
-\end{itemize}
-
-There is not much to do about that as we have too few images that we
-could categorize as Arena, Ambush, Training\ldots{} and we will accept
-that those frames may confuse the model.
+The script used to produce these visualzations are \emph{pca\_vgg.py} and \emph{pca\_sklearn.py}  
 
 \hypertarget{algorithms-and-techniques}{%
-\subsubsection{ALGORITHMS AND
+\subsection{ALGORITHMS AND
 TECHNIQUES}\label{algorithms-and-techniques}}
 
-\hypertarget{general-approach}{%
-\paragraph{GENERAL APPROACH}\label{general-approach}}
+The general idea is to create first an image classifier to categorize the
+images extracted from gameplay video. Then to use the predictions generated by the image classifiert as a base for splitting gameplay videos into scenes.
 
-The general idea is to create an image classifier to categorize the
-images extracted from gameplay videos as belonging to a particular type
-of scenes. Then to use this image classifier on frames extracted from
-other gameplay vidoes to identify how to split videos into scenese.
-
-For the Image Classifier I choose to start with one of the Convolutional
-Neural Network which are already available in Pytorch, as
+The main approach to build an Image Classifier will be  Convolutional
+Neural Network, since
 
 \begin{itemize}
 \tightlist
 \item
   this is a well-tried way to approach the problem
 \item
-  I could use standard CNN topologies available in Pytorch, such as VGG,
-  which would als not require too much memory
+  I can use standard CNN topologies available in Pytorch, such as VGG,
+  picking one with the best tradeoff performance/complexity
 \item
-  analyzing the result of the model would give me more information on
-  what I would have to be looking for
+  at the very least the model would give me more information on
+  what I have to be looking for
 \end{itemize}
 
-A simple to use and flexible topology I decided to use was VGG, which is
-powerful enough and small enough to fit on the GPU I used for training.
+A simple to use and flexible topology I decided to use was VGG13, which is
+powerful enough to give good results and small enough to fit on the GPU I used for training.
 
 As the images extracted from game walkthroughs are not related to real
 world images, using a pre-trained net and expanding it with transfer
 learning did not seem a sensible approach. Instead, I opted for a full
 train.
 
-\hypertarget{models}{%
-\paragraph{MODELS}\label{models}}
-
-The approach I considered most simple and promising was to use
-Convolutional Neural Network included in the torchvision package in
-Pytorch.
-
-I ended up using the VGG13 Model, which gives satisfying results while
-also not being overbloated.
-
 \hypertarget{benchmark}{%
-\subsubsection{BENCHMARK}\label{benchmark}}
+\subsection{BENCHMARK}\label{benchmark}}
 
 As 67.4 \% of the images belong to the category ``Other'', a model
 should have an accuracy of at least 68\% for being considered better
-than a model that always pick the Category ``Other''.
+than a model that always picks the Category ``Other''.
 
-Other than that, I create a very simple model that would use flattened
-matrixes of images, possibly in greyscale, using standard scikit-learn
+On top of that, I created a very simple model that uses flattened
+matrixes of images as an input to standard scikit-learn
 transformers and PCA.
 
 Using greyscale images in 80x45 format, I got the following results
-using a RandomTreeForest an SGD on 50 PCA-produced features, on the
+using a Random Tree Forest an Stochastic Gradient Descent on 100 PCA-produced features, from a
 validation set (which had not been used for training).
 
 It is not surprising that these results do not look that bad at all, and
@@ -624,38 +600,28 @@ X & 0 & 1 & 2 & 3 & 4\tabularnewline
 \hypertarget{data-processing}{%
 \subsection{DATA PROCESSING}\label{data-processing}}
 
-The image dataset has been created extracting frames from video on
+The image dataset has been created extracting frames from videos on
 youtube, and putting them in subdirectories named like the category they
-belong with. This is the main dataset I have been working with. These
-images have also been resized are in 320 x 180 RGB format , and
+belong with. 
+
+These images have also been resized are in 320 x 180, RGB format, and
 normalized.
 
 While training the benchmark models, images are transformed into
 grayscale and resized to 80 x 45, but when training the deep learning
-models we use the original images in color, 320x180.
+models we use the original images without resizing them, 320x180, and in color. 
+This is because this is what the VGG models expect.
 
 As these images originate from video games, any kind of data
-augmentation such as mirrored or cropped images do not make sense. These
-images would not be produced by the game, as many GUI components are
-always in the same place.
+augmentation such as mirrored or cropped images do not make sense. These artificially produced 
+images would not be produced by the videogame, as for instance many GUI components are
+always at the same side of the screen.
 
 \hypertarget{implementation}{%
 \subsection{IMPLEMENTATION}\label{implementation}}
 
-I set up scripts and notebooks so that they would work both locally and
-on Sagemaker.
-
-A pytorch/conda environment, as the one in Sagemaker, is assumed - the
-missing libaries from the default sagemaker conda pytorch environment
-are in the \emph{/requirements.txt} file. The four environment variables
-require for Sagemaker, SM\_HOSTS, SM\_CHANNEL\_TRAIN, SM\_MODEL\_DIR,
-SM\_CURRENT\_HOST, must be set.
-
-The code root directory is \emph{letsplay\_classifier} - scripts should
-be executed from this directory, and directory should be included in
-PYTHONPATH.
-
-For more details see the file \url{README.md}
+I created scripts and notebooks so that they would work both locally and
+on Sagemaker. For more details see the file \url{README.md} in the \hhref{https://github.com/diegoami/DA_ML_Capstone}{Github repository}
 
 \hypertarget{training-script}{%
 \paragraph{TRAINING SCRIPT}\label{training-script}}
@@ -665,31 +631,15 @@ The training script \emph{train.py} accepts following arguments:
 \begin{itemize}
 \tightlist
 \item
-  img-width: width to which resize images
-\item
-  img-height: height to which resize images
-\item
-  epochs: for how many epochs to train
-\item
-  batch-size: size of the batch while training
-\item
-  layer-cfg: what type of VGG net to use (A, B, C or D)
-\end{itemize}
-
-These are the steps that are executed:
-
-\begin{itemize}
-\tightlist
-\item
-  use an image loader from pytorch to create a generator scanning all
+  uses an image loader from pytorch to create a generator scanning all
   files in the data directory.
 \item
-  use a pytorchvision transformer to resize images
+  uses a pytorchvision transformer to resize and normalized images
 \item
-  divide the dataset in train, validation and test sets, using
+  splits the dataset in train, validation and test sets, using
   stratification and shuffling
 \item
-  load a VGG neural network, modified so that the output layers produce
+  loads a VGG13 neural network, modified so that the output layers produce
   a category from our domain (5 categories in the final version)
 \item
   For each epoch, execute a training step and evaluation step, trying to
@@ -701,23 +651,19 @@ These are the steps that are executed:
   classification report and confusion matrix
 \end{itemize}
 
-The cross entropy is the most useful metrics while training a classifier
-with C classes, therefore it is used here.
-
 \hypertarget{verification-script}{%
 \paragraph{VERIFICATION SCRIPT}\label{verification-script}}
 
 The verification script \emph{verify\_model.py} works only locally, as
-it assumes the model and the dataset is saved locally from the previous
-step. It requires the same environment variables as the training script.
+it assumes the model and the dataset has been saved locally from the previous
+step. This script
 
 \begin{itemize}
 \tightlist
 \item
   Loads the model created in the previous step
 \item
-  Walks through all the images in the dataset, one by one, and retrieve
-  the predicted label
+  Walks through all the images in the dataset, one by one, returning a list a predictions (by means of the predictor)  and a list of truth values
 \item
   Print average accuracy, a classification report based on
   discrepancies, a confusion matrix, and a list of images whose
@@ -759,7 +705,7 @@ through a published endpoint, unlike the \emph{verify\_model.py}
 component which requires a saved model locally.
 
 \emph{endpoint.py} works only in Sagemaker, when called from a Jupyter
-Notebook. Examples can be seen in the jupyter notebooks, for instance in
+Notebook. An examples can be found in
 \url{CNN_Fourth_iteration.ipynb}
 
 \hypertarget{jupyter-notebooks}{%
@@ -791,13 +737,13 @@ These are the jupyter notebooks I created while making this project:
 At the beginning I was trying recognize 8 types of scenes. Apart from
 the categories BATTLE, HIDEOUT, OTHER, SIEGE, TOURNAMENT I had also the
 categories TOWN, TRAP and TRAINING. But as can be seen in
-\url{CNN_First_Iteration.ipynb}, I had too few amples of these and
+\url{CNN_First_Iteration.ipynb}, I had too few examples of these and
 merged TRAINING into OTHER, while TOWN and TRAP became BATTLE.
 
 Another important refinement was finding images in the dataset that had
 been wrongly labeled. For this, I used the output from one of my
 scripts, \emph{verify\_model.py}, which pointed to images whose
-prediction mismatched with labels. The only semnsible way to deal with
+prediction didn't match with the true values. The only semnsible way to deal with
 that was to correct metadata at the source and use the companion
 project\\
 \emph{DA\_split\_youtube\_frames\_S3} to regenerate frames in the
@@ -888,28 +834,28 @@ Tournam & 4 & 0.98 & 0.97 & 0.98 & 951\tabularnewline
 \end{longtable}
 
 \hypertarget{interval-identification}{%
-	\subsubsection{INTERVAL IDENTIFICATION}\label{interval-identification}}
+\paragraph{INTERVAL IDENTIFICATION}\label{interval-identification}}
 
 However, this is not the only result I was striving for. I wanted to
 create a tool not just to categorize images, but to split videos in
 scenes. Now, this problem would be worth a project in itself, possibly
 building a model on top of another model, or maybe considering RNN. At
 the moment I think this would make the problem too complex, as I expect
-this tool just to be able to help redact description, and not create
+this tool just to be able to help redact descriptions, and not create
 them without human supervision.
 
 To convert image classifications to scenes, I use so far an empirical
 procedure which is very dependent on the model and the dataset. Using
 probabilities calculated on each frame, I set up a ``string
-visualization'' for each frame, such as \texttt{HHHSSSSSSBBBBBBBBBB},
-which in this case would mean ``50\% battle, 15\% Hideout, 35\% Siege'',
-or ``\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_TT'' for " 90\% Other, 10\%
-Tournament". Scrolling these visualizations it is possible to get an
-overview of the scenes in the youtube videos.
+visualization'' for each frame, containing a set of characters 
+representing the initials of the classes the frame is thought to 
+belong to. From these frame representations, scenes in videos are
+ extracted.
+ 
 
-The algorithms are in the \emph{interval} package: locally I use
-(\emph{predict\_intervals\_walkdir}), on Sagemaker you can use:
-\emph{predict\_intervals\_endpoint}).
+The algorithms are in the interval package.
+Locally I use predict\_intervals\_walkdir,
+On Sagemaker you can use predict\_intervals\_endpoint.
 
 I applied this procedure to a few episodes whose images hadn't been used
 for training, from E69 to E77, skipping E70 which is an outlier (Siege
@@ -946,35 +892,13 @@ explained later. For instance
 \end{verbatim}
 
 There are some instance where the output is less than perfect, but very
-helpful nonetheless. For instance, in E73 the hero talks a walk around
-her castle between 8:18 and 8:54, with no enenies, which usually would
-be an ``Other'' scene, but it is very similar to some outdoor scenes.
-Ideally there should be a ``Walk'' category for that. Same issue in E74
-and E75.
+helpful nonetheless. For instance:
 
-\begin{verbatim}
-08:22  __HHHHHHHHHHHHHHHHHS
-08:24  __HHHHH_____SSSSSTTT
-08:26  __HHHH__SSSSSSSSSSSS
-
-08:30  __HHHH________SSSSSS
-08:32  __HHHHH_SSSSSSSSSSST
-
-08:44  _____________SSSSSSS
-
-08:48  ___________SSSSSSSSS
-08:50  _____SSSSSSSSSSSSSSS
-
-08:22-08:26 | Hideout : 22% , Other : 27% , Siege : 42% , Tournament : 7%
-08:30-08:32 | Hideout : 25% , Other : 15% , Siege : 55%
-08:44-08:44 | ?????
-08:48-08:50 | Other : 25% , Siege : 75%
-\end{verbatim}
-
-Other interesting problems:
 
 \begin{itemize}
 	\tightlist
+	\item 
+	In E72, E73, E74  the hero talks a walk around her possession, but the algorithms is confused and somewhat hints at some kind of battle, as it is an outdoor scene (an additional class would be useful)
 	\item
 	in E73, a siege is recognized correctly, but the program is confused
 	when the hero gets knocked out and the troops keep fighting without
@@ -988,20 +912,13 @@ Other interesting problems:
 	scenes with some similarity to Tournaments. Training would also
 	deserve its own category, if there were more samples.
 	\item
-	In E73 the algorith gets confused during a siege when the hero gets
-	knocked out
-	\item
-	In E72 and E74 the algorithms gets confused by short scene where the
-	main\\
-	\item
 	The Siege of Halmar in E75 gets about 45\% probability Siege, 40\%
 	probability Hideout
 	\item
 	In E76 some sparring in the Arena is confused with a Tournament
 \end{itemize}
 
-The idea in the long term is to gather more data and see what categories
-can also be introduced.
+The idea in the long term is to gather more data and introduce additional categories.
 
 
 \hypertarget{justification}{%
@@ -1014,8 +931,8 @@ show good precision / recall on Siege / Hideout frames, which are
 actually the information that we need to.
 
 To see that, we can compare how the VGG13, Random Tree Forest and
-Stochastic Tree Descent scores compare in regard to classifying each
-category. We can have a look at the F1 score.
+Stochastic Tree Descent scores in regard to classifying each
+category. .
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1048,59 +965,6 @@ Tournament & 0.97 & 0.92 & 0.83\tabularnewline
 In future improvements I am planning to extract more categories, which
 will also have few samples. This makes the difference in Recall even
 more critical.
-
-\hypertarget{results-1}{%
-\section{RESULTS}\label{results-1}}
-
-In the end, I opted for a VGG13 model (layer configuration ``B'' in
-pytorch) trained on full image size (320 x 180). I used for that a
-corrected version of the dataset
-(\emph{https://da-youtube-ml.s3.eu-central-1.amazonaws.com/wendy-cnn/frames/wendy\_cnn\_frames\_data\_2b.zip})
-with fewer misclassified images. The results refer to runs I executed
-locally on my computer. On Sagemaker the results are somewhat different,
-as can be seen in the \emph{CNN\_Third\_iteration.ipynb} notebook, but I
-could not figure out why.
-
-\hypertarget{image-classification-1}{%
-\subsubsection{IMAGE CLASSIFICATION}\label{image-classification-1}}
-
-When training for 5 epochs, this approach gives a 98.5 \% accuracy and a
-cross entropy loss of 0.0035 both on train and validation set. The
-improvements are due both to cleaning the dataset and using a bigger
-format for images.
-
-Classification report on full dataset: Accuracy = 0.99
-
-\begin{longtable}[]{@{}llllll@{}}
-\toprule
-class name & class & precision & recall & f1-score &
-support\tabularnewline
-\midrule
-\endhead
-Battle & 0 & 0.97 & 0.99 & 0.98 & 6125\tabularnewline
-Hideout & 1 & 0.99 & 0.97 & 0.98 & 1162\tabularnewline
-Other & 2 & 0.99 & 0.99 & 0.99 & 31430\tabularnewline
-Siege & 3 & 0.85 & 0.99 & 0.92 & 195\tabularnewline
-Tournam & 4 & 0.99 & 0.97 & 0.98 & 6798\tabularnewline
-& macro avg & 0.96 & 0.98 & 0.97 & 45710\tabularnewline
-& weighted avg & 0.99 & 0.99 & 0.99 & 45710\tabularnewline
-\bottomrule
-\end{longtable}
-
-Confusion Matrix
-
-\begin{longtable}[]{@{}llllll@{}}
-\toprule
-X & 0 & 1 & 2 & 3 & 4\tabularnewline
-\midrule
-\endhead
-0 & 6055 & 0 & 55 & 8 & 7\tabularnewline
-1 & 4 & 1131 & 5 & 22 & 0\tabularnewline
-2 & 153 & 13 & 31212 & 2 & 50\tabularnewline
-3 & 0 & 0 & 1 & 194 & 0\tabularnewline
-4 & 8 & 2 & 197 & 1 & 6590\tabularnewline
-\bottomrule
-\end{longtable}
 
 
 \end{document}
