@@ -87,6 +87,12 @@ def retrieve_df(data_dir, model_dir, width=80, height=45, mode='L', percentage=1
     return X, y
 
 def do_estimator_wf(X, y, clf):
+    """
+    estimator workflow. fits, predicts, shows metrics
+    :param X: features
+    :param y: labels
+    :param clf: classificator
+    """
     print("=====================================")
     print(clf)
 

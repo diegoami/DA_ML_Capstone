@@ -2,7 +2,7 @@
 
 ## BACKGROUND
 
-For more of the background on this project, check these [solutions.md](solutions.md) and [proposal.md](proposal.md).
+For more of the background on this project, check [solution.pdf](solution.pdf) and [proposal.pdf](proposal.pdf).
 
 
 ## REQUIRED FILES

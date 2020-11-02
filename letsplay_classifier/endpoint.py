@@ -5,7 +5,6 @@ import json
 from PIL import Image
 import numpy as np
 import random
-from .util import arg_max_list
 
 def evaluate(predictor, data_dir, percentage=1):
     """
