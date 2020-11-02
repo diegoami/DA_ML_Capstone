@@ -30,16 +30,15 @@ Other in-game screenshots can show the character's inventory, warband compositio
 
 ![E_0059_00_26_26.jpg](docimages/E_0059_00_26_26.jpg)
 
-The hero can also take a walk in town, villages and castles. 
+The hero can also take a walk in town, villages and castles, have training sessions with soldiers, or spar with them in arena.
 
 ![E_0055_00_33_54.jpg](docimages/E_0055_00_33_54.jpg)
 
-... have training sessions with soldiers...
-
 ![E_0064_00_52_16.jpg](docimages/E_0064_00_52_16.jpg)
 
-or spar in arena with them as well.
- 
+![E_0076_00_42_48.jpg](docimages/E_0076_00_42_48.jpg)
+
+
     
 However, what we are interested in is locating the scenes when the warband engages enemies and the game switches to a tactical view, such as a battle in an open field or in a village...
 
@@ -55,32 +54,44 @@ or a sieges to a town or a castle...
 
 ![E_0068_00_48_04.jpg](docimages/E_0068_00_48_04.jpg)
 
+![E_0068_00_48_04.jpg](docimages/E_0075_00_25_50.jpg)
 
 or an assault to a bandit hideout, on foot.
+
+![E_0054_00_10_54.jpg](docimages/E_0041_00_39_58.jpg)
 
 ![E_0054_00_10_54.jpg](docimages/E_0054_00_10_54.jpg)
 
 ![E_0042_00_05_08.jpg](docimages/E_0042_00_05_08.jpg)
 
-The hero often can also take part in tournaments, which are an important part of the game.
+The hero often takes part in tournaments, which are a very important
+part of the game which we want to locate. Regrettably, they may look similar to situations like training or sparring in the arena, that are not very interesting.
 
 ![E_0057_00_21_48.jpg](docimages/E_0057_00_21_48.jpg)
 
 ![E_0061_00_25_56.jpg](docimages/E_0061_00_25_56.jpg)
 
-The scene that are most challenging to recognize are quests and ambushes, as they are pretty infrequent and the screenshots may look similar to more peaceful situations. For instance, screenshots from a scene when the hero is rescuing a lord from prison are not very different from scenes when he might be just taking a stroll in the town.
+![E_0061_00_25_56.jpg](docimages/E_0042_00_12_48.jpg)
+
+Quests and ambushes, are pretty infrequent and the screenshots may look
+similar to those of more peaceful situations. For instance when the hero is rescuing a lord from prison, or fighting a bandit in a village, are not very different from scenes when he might be just taking a stroll in a town or village.
 
 ![E_0054_00_40_24.jpg](docimages/E_0054_00_40_24.jpg)
 
- ... or scenes when the hero is training his troops or sparring with them in the arena may be confused with Tournament scenes. 
+![E_0054_00_40_24.jpg](docimages/E_0063_00_27_08.jpg)
+
+![E_0054_00_40_24.jpg](docimages/E_0067_00_52_32.jpg)
+
  
-![E_0076_00_42_48.jpg](docimages/E_0076_00_42_48.jpg)
 
 ### PROBLEM STATEMENT
 
 <!-- The problem which needs to be solved is clearly defined. A strategy for solving the problem, including discussion of the expected solution, has been made. -->
 
-The goal is to create and deploy a model which is able to classify images from the game _Mount&Blade: Warband_ and return a category, such as "Battle", "Hideout", "Siege", "Tournament" and "Other". It is also desirable to find out an optimal number of categories. It would be ideal to have categories for less frequent scenes such as "Prison escape", "Ambush", "Quest", but this will be out of scope and such scenes will be lumped together with the closes "main" category.
+The goal is to create and deploy a model which is able to classify images from the game _Mount&Blade: Warband_ and return a category, such as "Battle", "Hideout", "Siege", "Tournament" and "Other" for each frame. It is also desirable to find out an optimal number of categories. 
+
+The approach should be robust enough to allow for later expanding of categories, for which there are not enough samples at the moment.
+It would be ideal to have categories for less frequent scenes such as "Prison escape", "Ambush", "Quest", but this will be out of scope and such scenes will be lumped together with the closes "main" category.
 
 An additional goal is to have a model which identifies contiguous scenes in a gameplay video of _Mount&Blade: Warband_, providing the beginning and the end of the scenes, and its category.
 
@@ -164,7 +175,7 @@ It can be seen that "Other" scenes are separated in several clusters. "Battle", 
 
 We move on to create a VGG13 model and do a PCA representation of the features of the images dataset recovered from the last layer .
 
-![pca_v5d_2d_f.png](visualizations/pca_v5d_2d_f.png)
+![pca_v5n_2d_f.png](visualizations/pca_v5n_2d_f.png)
 
 ![pca_v5n_3d_f4.png](visualizations/pca_v5n_3d_f4.png)
 
